@@ -1,0 +1,2 @@
+#!/bin/sh
+./resources/php -c ./resources/php.ini -q yasca.php $@

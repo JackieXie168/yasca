@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos -->
+			<title>Docs For Class Plugin_PMD</title>
+			<link rel="stylesheet" href="../media/stylesheet.css" />
+						<meta http-equiv='Content-Type' content='text/html; charset=iso-8859-1'/>
+		</head>
+		<body>
+			<div class="page-body">			
+<h2 class="class-name">Class Plugin_PMD</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+													<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+						|											<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+						
+					</div>
+	<div class="info-box-body">
+        		<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">The PMD Plugin uses PMD to discover potential vulnerabilities in .java files.</p>
+<p class="description"><p>This class is a Singleton that runs only once, returning all of the results that  first time.  Uses PMD 4.2 (as of 28 March 2008)</p></p>
+	<ul class="tags">
+				<li><span class="field">author:</span> Michael V. Scovetta &lt;<a href="mailto:scovetta@users.sourceforge.net">scovetta@users.sourceforge.net</a>&gt;</li>
+				<li><span class="field">version:</span> 1.0</li>
+				<li><span class="field">extends:</span> Plugin</li>
+			</ul>
+		<p class="notes">
+			Located in <a class="field" href="_plugins---PMD.php.html">/plugins/PMD.php</a> (line <span class="field">10</span>)
+		</p>
+		
+				
+		<pre><a href="../Yasca/Plugin.html">Plugin</a>
+   |
+   --Plugin_PMD</pre>
+	
+			</div>
+</div>
+
+
+
+	<a name="sec-var-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variable Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+						<span class="disabled">Vars</span> (<a href="#sec-vars">details</a>)
+							| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+								</div>
+		<div class="info-box-body">
+			<div class="var-summary">
+																																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$is_multi_target" title="details" class="var-name">$is_multi_target</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$valid_file_types" title="details" class="var-name">$valid_file_types</a>
+				</div>
+											</div>
+		</div>
+	</div>
+
+	<a name="sec-method-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Method Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+																		<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+				 
+				|
+						<span class="disabled">Methods</span> (<a href="#sec-methods">details</a>)
+		</div>
+		<div class="info-box-body">			
+			<div class="method-summary">
+																														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#execute" title="details" class="method-name">execute</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#get_rulesets" title="details" class="method-name">get_rulesets</a>
+										()
+									</div>
+											</div>
+		</div>
+	</div>		
+
+	<a name="sec-vars"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variables</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+										<a href="#sec-var-summary">Vars</a> (<span class="disabled">details</span>)
+						
+			
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			
+<a name="var$is_multi_target" id="$is_multi_target"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$is_multi_target</span>
+			 = <span class="var-default"> true</span>			(line <span class="line-number">16</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">This class is multi-target.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../Yasca/Plugin.html#var$is_multi_target">Plugin::$is_multi_target</a></dt>
+						<dd>True iff this object is to be only invoked once. The object itself should prevent  multiple executions.</dd>
+					</dl>
+		
+		
+
+</div>
+<a name="var$valid_file_types" id="$valid_file_types"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$valid_file_types</span>
+			 = <span class="var-default">array(&quot;java&quot;, &quot;jsp&quot;)</span>			(line <span class="line-number">11</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../Yasca/Plugin.html#var$valid_file_types">Plugin::$valid_file_types</a></dt>
+						<dd>Valid file types that this Plugin can operate on.</dd>
+					</dl>
+		
+		
+
+</div>
+							<h4>Inherited Variables</h4>
+				<A NAME='inherited_vars'><!-- --></A>
+									<p>Inherited from <span class="classname"><a href="../Yasca/Plugin.html">Plugin</a></span></p>
+					<blockquote>
+													<span class="var-title">
+								<span class="var-name"><a href="../Yasca/Plugin.html#var$context_size">Plugin::$context_size</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../Yasca/Plugin.html#var$description">Plugin::$description</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../Yasca/Plugin.html#var$filename">Plugin::$filename</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../Yasca/Plugin.html#var$file_contents">Plugin::$file_contents</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../Yasca/Plugin.html#var$initialized">Plugin::$initialized</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../Yasca/Plugin.html#var$is_valid_filetype">Plugin::$is_valid_filetype</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../Yasca/Plugin.html#var$result_list">Plugin::$result_list</a></span><br>
+							</span>
+											</blockquote> 
+										
+		</div>
+	</div>
+	
+	<a name="sec-methods"></a>
+	<div class="info-box">
+		<div class="info-box-title">Methods</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+															<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+																	<a href="#sec-method-summary">Methods</a> (<span class="disabled">details</span>)
+						
+		</div>
+		<div class="info-box-body">
+			<A NAME='method_detail'></A>
+<a name="methodexecute" id="execute"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">execute</span> (line <span class="line-number">41</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Executes the PMD function. This calls out to pmd.bat which then calls Java, but  process output comes back here.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			execute
+		</span>
+				()
+			</div>
+	
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../Yasca/Plugin.html#methodexecute">Plugin::execute()</a></dt>
+						<dd>This function should not be called, since this class is abstract. The execute() function  should be overridden by child classes.</dd>
+					</dl>
+			
+	</div>
+<a name="methodget_rulesets" id="get_rulesets"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">get_rulesets</span> (line <span class="line-number">22</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Gets the specific rulesets to be included. The rule is that any plugin that has  an .xml extension is fair game, except for those starting with an underscore (_).</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			get_rulesets
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+							<h4>Inherited Methods</h4>
+				<a name='inherited_methods'><!-- --></a>	
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../Yasca/Plugin.html">Plugin</a></span></p>
+					<blockquote>
+													<span class="method-name"><a href="../Yasca/Plugin.html#methodPlugin">Plugin::Plugin()</a></span><br>
+													<span class="method-name"><a href="../Yasca/Plugin.html#methodcheck_for_java">Plugin::check_for_java()</a></span><br>
+													<span class="method-name"><a href="../Yasca/Plugin.html#methoddestructor">Plugin::destructor()</a></span><br>
+													<span class="method-name"><a href="../Yasca/Plugin.html#methodexecute">Plugin::execute()</a></span><br>
+													<span class="method-name"><a href="../Yasca/Plugin.html#methodrun">Plugin::run()</a></span><br>
+											</blockquote>
+										
+		</div>
+	</div>
+
+
+	<p class="notes" id="credit">
+		Documentation generated on Mon, 28 Apr 2008 12:52:02 -0400 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.0a2</a>
+	</p>
+	</div></body>
+</html>

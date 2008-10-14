@@ -1,0 +1,25 @@
+name = Custom Cookies  
+file_type = java,jsp
+grep = /(addCookie\()|(setCookie\()/
+category = Custom Cookie Usage
+severity = 3
+description =
+<p>
+	Hardcoded passwords of the form <i>something</i>2<i>something</i> are considered
+	weak and easy to guess. Examples of this include:
+	<ul>
+		<li>myapp2myapp</li>
+		<li>db2db</li>
+		<li>AppId2AppId</li>
+	</ul>
+	These passwords should be changed to something stronger.
+</p>
+<p>
+	<h4>References</h4>
+	<ul>
+		<li>A. Klein. <a href="http://www.packetstormsecurity.org/papers/general/whitepaper_httpresponse.pdf">Divide and Conquer: HTTP Response Splitting, Web Cache Poisoning Attacks, and Related Topics</a>.</li>
+		<li>D. Crab. <a href="http://www.infosecwriters.com/text_resources/pdf/HTTP_Response.pdf">HTTP Response Splitting</a>.</li>
+		<li>(<ahref="http://www.owasp.org">OWASP</a>) <a href="http://www.owasp.org/index.php/HTTP_Response_Splitting">HTTP Response Splitting</a></li>		
+	</ul>
+</p>
+END;

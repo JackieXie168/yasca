@@ -1,0 +1,7 @@
+name = SQL Injection
+file_type = java,jsp
+grep = /\"select .*from .*\+/i
+category = SQL Injection
+severity = 1
+category_link = http://www.fortifysoftware.com/vulncat/java/java_input_sql_injection.html
+; TODO: Improve this - doesn't work in cases like "select * from " + "x where foo=foo"

@@ -1,0 +1,1242 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos -->
+			<title>Docs For Class Yasca</title>
+			<link rel="stylesheet" href="../media/stylesheet.css" />
+						<meta http-equiv='Content-Type' content='text/html; charset=iso-8859-1'/>
+		</head>
+		<body>
+			<div class="page-body">			
+<h2 class="class-name">Class Yasca</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+													<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+						|											<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+						
+					</div>
+	<div class="info-box-body">
+        		<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">This class implements a generic code scanner.</p>
+		<p class="notes">
+			Located in <a class="field" href="_lib---Yasca.php.html">/lib/Yasca.php</a> (line <span class="field">22</span>)
+		</p>
+		
+				
+		<pre></pre>
+	
+			</div>
+</div>
+
+
+
+	<a name="sec-var-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variable Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+						<span class="disabled">Vars</span> (<a href="#sec-vars">details</a>)
+							| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+								</div>
+		<div class="info-box-body">
+			<div class="var-summary">
+																																																				<div class="var-title">
+					static <span class="var-type">mixed</span>
+					<a href="#$instance" title="details" class="var-name">$instance</a>
+				</div>
+																																																																				<div class="var-title">
+					<span class="var-type">array;</span>
+					<a href="#$adjustment_list" title="details" class="var-name">$adjustment_list</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$attachment_list" title="details" class="var-name">$attachment_list</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$cache" title="details" class="var-name">$cache</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$event_callback_list" title="details" class="var-name">$event_callback_list</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$general_cache" title="details" class="var-name">$general_cache</a>
+				</div>
+																								<div class="var-title">
+					<span class="var-type">array</span>
+					<a href="#$options" title="details" class="var-name">$options</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$plugin_file_list" title="details" class="var-name">$plugin_file_list</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">array</span>
+					<a href="#$plugin_list" title="details" class="var-name">$plugin_list</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$progress_callback" title="details" class="var-name">$progress_callback</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">array</span>
+					<a href="#$results" title="details" class="var-name">$results</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">array</span>
+					<a href="#$target_list" title="details" class="var-name">$target_list</a>
+				</div>
+											</div>
+		</div>
+	</div>
+
+	<a name="sec-method-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Method Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+																		<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+				 
+				|
+						<span class="disabled">Methods</span> (<a href="#sec-methods">details</a>)
+		</div>
+		<div class="info-box-body">			
+			<div class="method-summary">
+																																																										
+				<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#getInstance" title="details" class="method-name">&amp;getInstance</a>
+											([<span class="var-type"></span>&nbsp;<span class="var-name">$options</span> = <span class="var-default">array()</span>])
+									</div>
+																																																																																						
+				<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#log_message" title="details" class="method-name">log_message</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$message</span>, [<span class="var-type">integer</span>&nbsp;<span class="var-name">$severity</span> = <span class="var-default">E_USER_NOTICE</span>], [<span class="var-type">boolean</span>&nbsp;<span class="var-name">$include_timestamp</span> = <span class="var-default">false</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$just_print</span> = <span class="var-default">false</span>])
+									</div>
+																														
+				<div class="method-definition">
+					static 						<span class="method-result">0,</span>
+										<a href="#result_list_comparator" title="details" class="method-name">result_list_comparator</a>
+											(<span class="var-type"><a href="../Yasca/Result.html">Result</a></span>&nbsp;<span class="var-name">$a</span>, <span class="var-type"><a href="../Yasca/Result.html">Result</a></span>&nbsp;<span class="var-name">$b</span>)
+									</div>
+																																										
+				<div class="method-definition">
+											<span class="method-result">Yasca</span>
+										<a href="#Yasca" title="details" class="method-name">Yasca</a>
+											([<span class="var-type">array</span>&nbsp;<span class="var-name">$options</span> = <span class="var-default">array()</span>])
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#add_attachment" title="details" class="method-name">add_attachment</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$cache_id</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">hash</span>
+										<a href="#calculate_signature" title="details" class="method-name">calculate_signature</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$data</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$password</span> = <span class="var-default">&quot;3A4B3f39jf203jfALSFJAEFJ30fn2q3lf32cQF3FG&quot;</span>])
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">array</span>
+										<a href="#dir_recursive" title="details" class="method-name">dir_recursive</a>
+											([<span class="var-type">string</span>&nbsp;<span class="var-name">$start_dir</span> = <span class="var-default">'.'</span>])
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#execute_callback" title="details" class="method-name">execute_callback</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$event</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">target</span>
+										<a href="#find_target_by_relative_name" title="details" class="method-name">find_target_by_relative_name</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$rel_filename</span>)
+									</div>
+																						
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#get_adjusted_alternate_name" title="details" class="method-name">get_adjusted_alternate_name</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$plugin_name</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$finding_name</span> = <span class="var-default">&quot;&quot;</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$default_text</span> = <span class="var-default">&quot;&quot;</span>])
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#get_adjusted_description" title="details" class="method-name">get_adjusted_description</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$plugin_name</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$finding_name</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$description</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#get_adjusted_severity" title="details" class="method-name">get_adjusted_severity</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$plugin_name</span>, [<span class="var-type"></span>&nbsp;<span class="var-name">$finding_name</span> = <span class="var-default">&quot;&quot;</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$severity</span> = <span class="var-default">5</span>])
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#get_adjustment" title="details" class="method-name">get_adjustment</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$key</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$default_value</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">extension</span>
+										<a href="#get_report_extension" title="details" class="method-name">get_report_extension</a>
+											([<span class="var-type">array</span>&nbsp;<span class="var-name">$options</span> = <span class="var-default">null</span>])
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">text</span>
+										<a href="#help" title="details" class="method-name">help</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">array</span>
+										<a href="#include_plugins" title="details" class="method-name">include_plugins</a>
+											([<span class="var-type"></span>&nbsp;<span class="var-name">$plugin_dir</span> = <span class="var-default">&quot;plugins&quot;</span>], <span class="var-type">string</span>&nbsp;<span class="var-name">$plugin_directory</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#instantiate_report" title="details" class="method-name">instantiate_report</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">&$results</span>, [<span class="var-type">array</span>&nbsp;<span class="var-name">$options</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$default_report</span> = <span class="var-default">'HTMLGroupReport'</span>], <span class="var-type">array</span>&nbsp;<span class="var-name">$results</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#load_adjustments" title="details" class="method-name">load_adjustments</a>
+										()
+									</div>
+																						
+				<div class="method-definition">
+											<span class="method-result">array</span>
+										<a href="#parse_command_line_arguments" title="details" class="method-name">parse_command_line_arguments</a>
+											([<span class="var-type">boolean</span>&nbsp;<span class="var-name">$parse_arguments</span> = <span class="var-default">true</span>])
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#register_callback" title="details" class="method-name">register_callback</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$event</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$func</span>)
+									</div>
+																						
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#scan" title="details" class="method-name">scan</a>
+										()
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">true</span>
+										<a href="#validate_report" title="details" class="method-name">validate_report</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$data</span>)
+									</div>
+														
+				<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#validate_signature" title="details" class="method-name">validate_signature</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$data</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$signature</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$password</span> = <span class="var-default">&quot;3A4B3f39jf203jfALSFJAEFJ30fn2q3lf32cQF3FG&quot;</span>])
+									</div>
+											</div>
+		</div>
+	</div>		
+
+	<a name="sec-vars"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variables</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+										<a href="#sec-var-summary">Vars</a> (<span class="disabled">details</span>)
+						
+			
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<a name="var$instance" id="$instance"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			static <span class="var-type">mixed</span>
+			<span class="var-name">$instance</span>
+			 = <span class="var-default"> null</span>			(line <span class="line-number">73</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> private</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+
+<a name="var$adjustment_list" id="$adjustment_list"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">array;</span>
+			<span class="var-name">$adjustment_list</span>
+						(line <span class="line-number">66</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Adjusted information for various plugins. Used so we don't have to modify  the original plugins.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> private</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$attachment_list" id="$attachment_list"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$attachment_list</span>
+			 = <span class="var-default">array()</span>			(line <span class="line-number">55</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">This list contains all attachment references to the general cache</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$cache" id="$cache"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$cache</span>
+						(line <span class="line-number">75</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$event_callback_list" id="$event_callback_list"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$event_callback_list</span>
+			 = <span class="var-default">array()</span>			(line <span class="line-number">80</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Holds the event array for callbacks</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$general_cache" id="$general_cache"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$general_cache</span>
+			 = <span class="var-default">array()</span>			(line <span class="line-number">71</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">The general_cache array contains arrays of data to be cached. Read-Write by anyone.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$options" id="$options"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">array</span>
+			<span class="var-name">$options</span>
+						(line <span class="line-number">29</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Options parsed from the command line.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$plugin_file_list" id="$plugin_file_list"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$plugin_file_list</span>
+			 = <span class="var-default">array()</span>			(line <span class="line-number">57</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$plugin_list" id="$plugin_list"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">array</span>
+			<span class="var-name">$plugin_list</span>
+			 = <span class="var-default">array()</span>			(line <span class="line-number">50</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">The list of available plugin functions.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$progress_callback" id="$progress_callback"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$progress_callback</span>
+			 = <span class="var-default"> null</span>			(line <span class="line-number">59</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$results" id="$results"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">array</span>
+			<span class="var-name">$results</span>
+			 = <span class="var-default">array()</span>			(line <span class="line-number">36</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">The results of the scan.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$target_list" id="$target_list"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">array</span>
+			<span class="var-name">$target_list</span>
+			 = <span class="var-default">array()</span>			(line <span class="line-number">43</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">The target list of files to scan.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+						
+		</div>
+	</div>
+	
+	<a name="sec-methods"></a>
+	<div class="info-box">
+		<div class="info-box-title">Methods</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+															<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+																	<a href="#sec-method-summary">Methods</a> (<span class="disabled">details</span>)
+						
+		</div>
+		<div class="info-box-body">
+			<A NAME='method_detail'></A>
+<a name="methodgetInstance" id="getInstance"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">static getInstance</span> (line <span class="line-number">118</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Gets the singleton instance of the Yasca object</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result">void</span>
+		<span class="method-name">
+			&amp;getInstance
+		</span>
+					([<span class="var-type"></span>&nbsp;<span class="var-name">$options</span> = <span class="var-default">array()</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$options</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodlog_message" id="log_message"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">static log_message</span> (line <span class="line-number">340</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">This is the main error log and event log for the application. Depending on</p>
+<p class="description"><p>whether the application is running in GUI or console mode, the output is  directed appropriately. The severity value is one of the following: E_USER_ERROR,  E_USER_WARNING, and E_USER_NOTICE. The function works as following: If --verbose  is set, then everything is shown. Otherwise only E_USER_ERROR and E_USER_WARNING.  If the silent flag is set, then nothing is shown at all.  If the Yasca object is not defined, then this will do a simple print().</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result">void</span>
+		<span class="method-name">
+			log_message
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$message</span>, [<span class="var-type">integer</span>&nbsp;<span class="var-name">$severity</span> = <span class="var-default">E_USER_NOTICE</span>], [<span class="var-type">boolean</span>&nbsp;<span class="var-name">$include_timestamp</span> = <span class="var-default">false</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$just_print</span> = <span class="var-default">false</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">integer</span>
+				<span class="var-name">$severity</span><span class="var-description">: severity associated with the message.</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$message</span><span class="var-description">: message to write</span>			</li>
+					<li>
+				<span class="var-type">boolean</span>
+				<span class="var-name">$include_timestamp</span><span class="var-description">: if true, then include a timestamp in the message.</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$just_print</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodresult_list_comparator" id="result_list_comparator"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">static result_list_comparator</span> (line <span class="line-number">542</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Compares results to sort them by severity.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> 1, or -1 as per comparator standard</li>
+				<li><span class="field">access:</span> private</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result">0,</span>
+		<span class="method-name">
+			result_list_comparator
+		</span>
+					(<span class="var-type"><a href="../Yasca/Result.html">Result</a></span>&nbsp;<span class="var-name">$a</span>, <span class="var-type"><a href="../Yasca/Result.html">Result</a></span>&nbsp;<span class="var-name">$b</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"><a href="../Yasca/Result.html">Result</a></span>
+				<span class="var-name">$a</span><span class="var-description">: Result object to compare</span>			</li>
+					<li>
+				<span class="var-type"><a href="../Yasca/Result.html">Result</a></span>
+				<span class="var-name">$b</span><span class="var-description">: Result object to compare</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodYasca" id="Yasca"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">Constructor Yasca</span> (line <span class="line-number">86</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Creates a new Yasca scanner object using the options passed in.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">Yasca</span>
+		<span class="method-name">
+			Yasca
+		</span>
+					([<span class="var-type">array</span>&nbsp;<span class="var-name">$options</span> = <span class="var-default">array()</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$options</span><span class="var-description">: command line options (parsed)</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodadd_attachment" id="add_attachment"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">add_attachment</span> (line <span class="line-number">739</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Adds an attachment to the attachment list. Only allows attachment that are represented in  the general cache.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			add_attachment
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$cache_id</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$cache_id</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodcalculate_signature" id="calculate_signature"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">calculate_signature</span> (line <span class="line-number">296</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Signs a piece of data using a hash. Uses SHA-1 to hash the data.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> of the data.</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">hash</span>
+		<span class="method-name">
+			calculate_signature
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$data</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$password</span> = <span class="var-default">&quot;3A4B3f39jf203jfALSFJAEFJ30fn2q3lf32cQF3FG&quot;</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$data</span><span class="var-description">: string to hash.</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$password</span><span class="var-description">: salt used in the calculation.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methoddir_recursive" id="dir_recursive"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">dir_recursive</span> (line <span class="line-number">270</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Recursive directory listing. Returns all files starting  at $start_dir.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> of filenames</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">array</span>
+		<span class="method-name">
+			dir_recursive
+		</span>
+					([<span class="var-type">string</span>&nbsp;<span class="var-name">$start_dir</span> = <span class="var-default">'.'</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$start_dir</span><span class="var-description">: starting directory (default=.)</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodexecute_callback" id="execute_callback"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">execute_callback</span> (line <span class="line-number">775</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Executes callbacks for a particular event.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			execute_callback
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$event</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$event</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodfind_target_by_relative_name" id="find_target_by_relative_name"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">find_target_by_relative_name</span> (line <span class="line-number">604</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Attempts to find a target that matches the relative name supplied.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> found, or false if none match.</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">target</span>
+		<span class="method-name">
+			find_target_by_relative_name
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$rel_filename</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$rel_filename</span><span class="var-description">: filename to search for</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodget_adjusted_alternate_name" id="get_adjusted_alternate_name"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">get_adjusted_alternate_name</span> (line <span class="line-number">725</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Gets the adjusted alternate name for a specific plugin.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			get_adjusted_alternate_name
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$plugin_name</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$finding_name</span> = <span class="var-default">&quot;&quot;</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$default_text</span> = <span class="var-default">&quot;&quot;</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$plugin_name</span><span class="var-description">: plugin name referenced in adjustments.xml</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$finding_name</span><span class="var-description">: the &quot;message&quot; that is used in that line</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$default_text</span><span class="var-description">: the default text to show, if nothing was defined in $adjustments.xml (optional)</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodget_adjusted_description" id="get_adjusted_description"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">get_adjusted_description</span> (line <span class="line-number">680</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Gets the adjusted description of the finding.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			get_adjusted_description
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$plugin_name</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$finding_name</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$description</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$plugin_name</span><span class="var-description">: plugin name used</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$finding_name</span><span class="var-description">: finding name</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$description</span><span class="var-description">: current description of the finding</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodget_adjusted_severity" id="get_adjusted_severity"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">get_adjusted_severity</span> (line <span class="line-number">699</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Gets the adjusted severity for a specific plugin.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			get_adjusted_severity
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$plugin_name</span>, [<span class="var-type"></span>&nbsp;<span class="var-name">$finding_name</span> = <span class="var-default">&quot;&quot;</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$severity</span> = <span class="var-default">5</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$plugin_name</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$finding_name</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$severity</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodget_adjustment" id="get_adjustment"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">get_adjustment</span> (line <span class="line-number">665</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieves a specific adjustment.</p>
+	<ul class="tags">
+				<li><span class="field">see:</span> $this-&gt;adjustment_list</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			get_adjustment
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$key</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$default_value</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$key</span><span class="var-description">: key use look up</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$default_value</span><span class="var-description">: default value, if $key does not exist.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodget_report_extension" id="get_report_extension"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">get_report_extension</span> (line <span class="line-number">559</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Finds the actual extension to be used for the report chosen. Includes the period (.).</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> (.html, .xml, .csv, etc.)</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">extension</span>
+		<span class="method-name">
+			get_report_extension
+		</span>
+					([<span class="var-type">array</span>&nbsp;<span class="var-name">$options</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$options</span><span class="var-description">: program options.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodhelp" id="help"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">help</span> (line <span class="line-number">506</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the help message (used in console mode.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> content of the help message (aka usage)</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">text</span>
+		<span class="method-name">
+			help
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodinclude_plugins" id="include_plugins"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">include_plugins</span> (line <span class="line-number">216</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Finds and includes all plugins.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> of functions now available.</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">array</span>
+		<span class="method-name">
+			include_plugins
+		</span>
+					([<span class="var-type"></span>&nbsp;<span class="var-name">$plugin_dir</span> = <span class="var-default">&quot;plugins&quot;</span>], <span class="var-type">string</span>&nbsp;<span class="var-name">$plugin_directory</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$plugin_directory</span><span class="var-description">: directory to look for plugins in (recursively).</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$plugin_dir</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodinstantiate_report" id="instantiate_report"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">instantiate_report</span> (line <span class="line-number">572</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Instantiates a new Report object based on the data passed in.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			instantiate_report
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">&$results</span>, [<span class="var-type">array</span>&nbsp;<span class="var-name">$options</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$default_report</span> = <span class="var-default">'HTMLGroupReport'</span>], <span class="var-type">array</span>&nbsp;<span class="var-name">$results</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$options</span><span class="var-description">: configuration options (especially 'report')</span>			</li>
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$results</span><span class="var-description">: place where report results are placed</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">&$results</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$default_report</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodload_adjustments" id="load_adjustments"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">load_adjustments</span> (line <span class="line-number">617</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Loads all of the adjustments from resources/adjustments.xml.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			load_adjustments
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodparse_command_line_arguments" id="parse_command_line_arguments"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">parse_command_line_arguments</span> (line <span class="line-number">398</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Parses the command line arguments (argc, argv).</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> of options.</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">array</span>
+		<span class="method-name">
+			parse_command_line_arguments
+		</span>
+					([<span class="var-type">boolean</span>&nbsp;<span class="var-name">$parse_arguments</span> = <span class="var-default">true</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">boolean</span>
+				<span class="var-name">$parse_arguments</span><span class="var-description">: actually parse arguments or use the default?</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodregister_callback" id="register_callback"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">register_callback</span> (line <span class="line-number">756</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Registers a callback function to be executed at some time. Valid events are:</p>
+<p class="description"><p>pre-scan    - executes before the scan takes place  post-scan   - executes after scan() completes  pre-report  - executes before the reporting occurs  post-report - executes after the reporting occurs</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			register_callback
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$event</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$func</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$event</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$func</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodscan" id="scan"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">scan</span> (line <span class="line-number">132</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">This function initiaates the scan. After checking various things, it passes  execution along to each of the plugins available, on each of the target files  available.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			scan
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodvalidate_report" id="validate_report"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">validate_report</span> (line <span class="line-number">318</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Validates whether a report content has a valid hash.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> iff the signature matches the expected.</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">true</span>
+		<span class="method-name">
+			validate_report
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$data</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$data</span><span class="var-description">: data to check (the report content)</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodvalidate_signature" id="validate_signature"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">validate_signature</span> (line <span class="line-number">309</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Validates if a signature has been tampered with. Uses calculate_signature() to  re-calculate the signature.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			validate_signature
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$data</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$signature</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$password</span> = <span class="var-default">&quot;3A4B3f39jf203jfALSFJAEFJ30fn2q3lf32cQF3FG&quot;</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$data</span><span class="var-description">: string to hash</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$signature</span><span class="var-description">: purported signature</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$password</span><span class="var-description">: salt used in the calculation.  returns true iff the signature matches the expected.</span>			</li>
+				</ul>
+		
+			
+	</div>
+						
+		</div>
+	</div>
+
+
+	<p class="notes" id="credit">
+		Documentation generated on Mon, 28 Apr 2008 12:52:08 -0400 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.0a2</a>
+	</p>
+	</div></body>
+</html>
