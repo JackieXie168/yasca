@@ -1,6 +1,6 @@
 @echo off
 set TOPDIR=resources\utility\pmd
-set VERSION=4.2
+set VERSION=4.2.4
 set PMDJAR=%TOPDIR%/PMD-Yasca.jar;%TOPDIR%/pmd14-%VERSION%.jar
 set JARPATH=%TOPDIR%/asm-3.1.jar;%TOPDIR%/jaxen-1.1.1.jar;%TOPDIR%/YascaPMD.jar
 set RWPATH=%TOPDIR%/retroweaver-rt-2.0.5.jar;%TOPDIR%/backport-util-concurrent.jar

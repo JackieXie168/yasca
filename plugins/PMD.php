@@ -10,6 +10,8 @@
 class Plugin_PMD extends Plugin {
 	public $valid_file_types = array("java", "jsp");
 
+	private $executable = array('Windows' => "resources\\utility\\pmd\\pmd.bat",
+								'Linux'   => "./resources/utility/pmd/pmd");
 	/**
 	 * This class is multi-target.
 	 */
@@ -55,7 +57,7 @@ class Plugin_PMD extends Plugin {
 			$pmd_results = array();
 			
 			$yasca->log_message("Forking external process (PMD) for $ruleset...", E_USER_WARNING);
-			exec( './resources/utility/pmd/pmd ' . escapeshellarg($dir) . " " . escapeshellarg($ruleset), $pmd_results);
+			exec( $this->executable[getSystemOS()] . " " . escapeshellarg($dir) . " " . escapeshellarg($ruleset), $pmd_results);
 			$yasca->log_message("External process completed...", E_USER_WARNING);
 			
 			if ($yasca->options['debug']) 

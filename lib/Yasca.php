@@ -6,14 +6,14 @@
  * files and plugins, and executing those plugins. The output of this all is a list of 
  * Result objects that can be passed to a renderer.
  * @author Michael V. Scovetta <scovetta@users.sourceforge.net>
- * @version 1.0
+ * @version 1.1
  * @package Yasca
  */
 include_once("lib/Plugin.php");
 include_once("lib/common.php");
 include_once("lib/cache.php");
 
-define("VERSION", "1.0");
+define("VERSION", "1.1");
 
 /**
  * This class implements a generic code scanner.

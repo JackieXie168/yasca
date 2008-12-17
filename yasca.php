@@ -5,7 +5,7 @@
  * This pacakge implements a simple engine for static analysis
  * of source code files. 
  * @author Michael V. Scovetta <scovetta@sourceforge.net>
- * @version 1.0
+ * @version 1.1
  * @package Yasca
  */
 
