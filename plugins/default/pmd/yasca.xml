@@ -11,6 +11,7 @@ This ruleset contains links to all of the rulesets that are included for use in 
 this file for permanent changes, or just rename any of the other rules to eliminate the underscore-prefix.
   </description>
 
+  <rule ref="./plugins/default/pmd/_basic-jsp.xml"/>
   <rule ref="./plugins/default/pmd/_basic.xml">
   	<exclude name="CollapsibleIfStatements"/>
   	<exclude name="BooleanInstantiation"/>
