@@ -26,7 +26,7 @@ done
 # of the directory containing the script (which should
 # normally be "$findbugs_home/bin").
 dir=`dirname "$program"`
-findbugs_home="$dir/.."
+findbugs_home="$dir"
 
 # Handle FHS-compliant installations (e.g., Fink)
 if [ -d "$findbugs_home/share/findbugs" ]; then
@@ -68,13 +68,13 @@ fi
 
 maxheap=768
 
-fb_appjar="$findbugs_home/lib/findbugs.jar"
+fb_appjar="$findbugs_home/findbugs.jar"
 
 ShowHelpAndExit() {
 	fb_mainclass="edu.umd.cs.findbugs.ShowHelp"
 	fb_javacmd=${fb_javacmd:-"java"}
 fb_maxheap=${fb_maxheap:-"-Xmx584m"}
-fb_appjar=${fb_appjar:-"$findbugs_home/lib/findbugs.jar"}
+fb_appjar=${fb_appjar:-"$findbugs_home/findbugs.jar"}
 set -f
 #echo command: \
 exec "$fb_javacmd" \
@@ -152,7 +152,7 @@ while [ $# -gt 0 ]; do
 		done
 		fb_javacmd=${fb_javacmd:-"java"}
 fb_maxheap=${fb_maxheap:-"-Xmx584m"}
-fb_appjar=${fb_appjar:-"$findbugs_home/lib/findbugs.jar"}
+fb_appjar=${fb_appjar:-"$findbugs_home/findbugs.jar"}
 set -f
 #echo command: \
 exec "$fb_javacmd" \
@@ -182,13 +182,13 @@ fb_maxheap="-Xmx${maxheap}m"
 # Extra JVM args for MacOSX.
 if [ $fb_osname = "Darwin" ]; then
 	fb_jvmargs="$fb_jvmargs \
-		-Xdock:name=FindBugs -Xdock:icon=${findbugs_home}/lib/buggy.icns \
+		-Xdock:name=FindBugs -Xdock:icon=${findbugs_home}/buggy.icns \
 		-Dapple.laf.useScreenMenuBar=true"
 fi
 
 fb_javacmd=${fb_javacmd:-"java"}
 fb_maxheap=${fb_maxheap:-"-Xmx584m"}
-fb_appjar=${fb_appjar:-"$findbugs_home/lib/findbugs.jar"}
+fb_appjar=${fb_appjar:-"$findbugs_home/findbugs.jar"}
 set -f
 #echo command: \
 exec "$fb_javacmd" \
