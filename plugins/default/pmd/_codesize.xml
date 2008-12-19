@@ -11,6 +11,7 @@ The Code Size Ruleset contains a collection of rules that find code size related
   </description>
 
 <rule name="NPathComplexity"
+      since="3.9"
       message="The method {0}() has an NPath complexity of {1}"
       class="net.sourceforge.pmd.rules.design.NpathComplexity"
       externalInfoUrl="http://pmd.sourceforge.net/rules/codesize.html#NPathComplexity">
@@ -34,6 +35,7 @@ The Code Size Ruleset contains a collection of rules that find code size related
 </rule>
 
  <rule name="ExcessiveMethodLength"
+ 		 since="0.6"
        message="Avoid really long methods."
        class="net.sourceforge.pmd.rules.design.LongMethodRule"
        externalInfoUrl="http://pmd.sourceforge.net/rules/codesize.html#ExcessiveMethodLength">
@@ -61,6 +63,7 @@ public class Foo {
 
 
  <rule name="ExcessiveParameterList"
+ 		 since="0.9"
        message="Avoid really long parameter lists."
        class="net.sourceforge.pmd.rules.design.LongParameterListRule"
           externalInfoUrl="http://pmd.sourceforge.net/rules/codesize.html#ExcessiveParameterList">
@@ -88,6 +91,7 @@ public class Foo {
 
 
  <rule name="ExcessiveClassLength"
+ 		 since="0.6"
        message="Avoid really long classes."
        class="net.sourceforge.pmd.rules.design.LongClassRule"
           externalInfoUrl="http://pmd.sourceforge.net/rules/codesize.html#ExcessiveClassLength">
@@ -112,19 +116,29 @@ public class Foo {
  </rule>
 
 
-    <rule name="CyclomaticComplexity"
-      message = "The {0} ''{1}'' has a Cyclomatic Complexity of {2}."
-      class="net.sourceforge.pmd.rules.CyclomaticComplexity"
-          externalInfoUrl="http://pmd.sourceforge.net/rules/codesize.html#CyclomaticComplexity">
+    <rule 	name="CyclomaticComplexity"
+    			since="1.03"
+      		message = "The {0} ''{1}'' has a Cyclomatic Complexity of {2}."
+	      	class="net.sourceforge.pmd.rules.CyclomaticComplexity"
+	      	externalInfoUrl="http://pmd.sourceforge.net/rules/codesize.html#CyclomaticComplexity">
    <description>
+   		<![CDATA[
 Complexity is determined by the number of decision points in a method plus one for the
 method entry.  The decision points are 'if', 'while', 'for', and 'case labels'.  Generally,
 1-4 is low complexity, 5-7 indicates moderate complexity, 8-10 is high complexity,
  and 11+ is very high complexity.
+		]]>
    </description>
    <priority>3</priority>
    <properties>
       <property name="reportLevel" description="The Cyclomatic Complexity reporting threshold"  value="10"/>
+      <property name="showClassesComplexity"
+      			description="Indicate if class average violation should be added to the report"
+      			value="true"/>
+      <property name="showMethodsComplexity"
+      			description="Indicate if class average violation should be added to the report"
+      			value="true"/>
+
    </properties>
    <example>
 <![CDATA[
@@ -170,6 +184,7 @@ public class Foo {
 </rule>
 
     <rule name="ExcessivePublicCount"
+    since="1.04"
     message="This class has a bunch of public methods and attributes"
     class="net.sourceforge.pmd.rules.ExcessivePublicCount"
           externalInfoUrl="http://pmd.sourceforge.net/rules/codesize.html#ExcessivePublicCount">
@@ -198,6 +213,7 @@ public class Foo {
     </rule>
 
     <rule name="TooManyFields"
+    		 since="3.0"
           message="Too many fields"
           class="net.sourceforge.pmd.rules.design.TooManyFields"
           externalInfoUrl="http://pmd.sourceforge.net/rules/codesize.html#TooManyFields">
@@ -223,27 +239,28 @@ public class Person {
     </rule>
 
 <rule name="NcssMethodCount" message="The method {0}() has an NCSS line count of {1}"
+   since="3.9"
    class="net.sourceforge.pmd.rules.codesize.NcssMethodCount"
    externalInfoUrl="http://pmd.sourceforge.net/rules/codesize.html#NcssMethodCount">
     <description>
 This rule uses the NCSS (Non Commenting Source Statements) algorithm to determine the number of lines
-of code for a given method. NCSS ignores comments, and counts actual statements. Using this algorithm, 
+of code for a given method. NCSS ignores comments, and counts actual statements. Using this algorithm,
 lines of code that are split are counted as one.
     </description>
     <priority>3</priority>
     <properties>
-    	<property name="minimum" description="The method NCSS count reporting threshold" value="100"/>
+        <property name="minimum" description="The method NCSS count reporting threshold" value="100"/>
     </properties>
    <example>
 <![CDATA[
 public class Foo extends Bar {
  public int methd() {
      super.methd();
- 
- 
- 
- 
- 
+
+
+
+
+
  //this method only has 1 NCSS lines
       return 1;
  }
@@ -253,11 +270,12 @@ public class Foo extends Bar {
    </rule>
 
 <rule name="NcssTypeCount" message="The type has an NCSS line count of {0}"
-   class="net.sourceforge.pmd.rules.codesize.NcssTypeCount" 
+   since="3.9"
+   class="net.sourceforge.pmd.rules.codesize.NcssTypeCount"
    externalInfoUrl="http://pmd.sourceforge.net/rules/codesize.html#NcssTypeCount">
     <description>
 This rule uses the NCSS (Non Commenting Source Statements) algorithm to determine the number of lines
-of code for a given type. NCSS ignores comments, and counts actual statements. Using this algorithm, 
+of code for a given type. NCSS ignores comments, and counts actual statements. Using this algorithm,
 lines of code that are split are counted as one.
     </description>
     <priority>3</priority>
@@ -270,11 +288,11 @@ public class Foo extends Bar {
  public Foo() {
  //this class only has 6 NCSS lines
      super();
- 
- 
- 
- 
- 
+
+
+
+
+
       super.foo();
  }
 }
@@ -282,11 +300,12 @@ public class Foo extends Bar {
    </example></rule>
 
 <rule name="NcssConstructorCount" message="The constructor with {0} parameters has an NCSS line count of {1}"
-   class="net.sourceforge.pmd.rules.codesize.NcssConstructorCount" 
+   since="3.9"
+   class="net.sourceforge.pmd.rules.codesize.NcssConstructorCount"
    externalInfoUrl="http://pmd.sourceforge.net/rules/codesize.html#NcssConstructorCount">
     <description>
 This rule uses the NCSS (Non Commenting Source Statements) algorithm to determine the number of lines
-of code for a given constructor. NCSS ignores comments, and counts actual statements. Using this algorithm, 
+of code for a given constructor. NCSS ignores comments, and counts actual statements. Using this algorithm,
 lines of code that are split are counted as one.
     </description>
     <priority>3</priority>
@@ -298,11 +317,11 @@ lines of code that are split are counted as one.
 public class Foo extends Bar {
  public Foo() {
      super();
- 
- 
- 
- 
- 
+
+
+
+
+
  //this constructor only has 1 NCSS lines
       super.foo();
  }
@@ -310,6 +329,57 @@ public class Foo extends Bar {
 ]]>
    </example>
 </rule>
+
+    <rule
+        name="TooManyMethods"
+        since="4.2"
+        class="net.sourceforge.pmd.rules.XPathRule"
+        message="This class has too many methods, consider refactoring it."
+        externalInfoUrl="http://pmd.sourceforge.net/rules/codesize.html#TooManyMethods">
+        <description>
+            <![CDATA[
+A class with too many methods is probably a good suspect for refactoring, in order to reduce its complexity and find a way to
+have more fine grained objects.
+            ]]>
+        </description>
+        <priority>3</priority>
+        <properties>
+                <property name="maxmethods"  description="The method count reporting threshold " value="10"/>
+                <property name="xpath">
+                <value>
+                    <!--  FIXME: Refine XPath to discard 'get' and 'set' methods with Block no more than 3 lines,
+                                something like this:
+                                    not (
+                                    (
+                                    starts-with(@Image,'get')
+                                        or
+                                    starts-with(@Image,'set')
+                                    )
+                                    and ( (
+                                        (../Block/attribute::endLine)
+                                         -
+                                        (../Block/attribute::beginLine) ) <= 3 )
+                                    )
+                                This will avoid discarding 'real' method...
+                     -->
+                    <![CDATA[
+                     //ClassOrInterfaceDeclaration/ClassOrInterfaceBody
+                    [
+                        count(descendant::MethodDeclarator[
+                            not
+                            (
+                            starts-with(@Image,'get')
+                                or
+                            starts-with(@Image,'set')
+                            )
+                        ]) > $maxmethods
+                    ]
+                    ]]>
+                </value>
+            </property>
+        </properties>
+    </rule>
+
 
 </ruleset>
 

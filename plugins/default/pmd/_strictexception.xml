@@ -10,6 +10,7 @@ These rules provide some strict guidelines about throwing and catching exception
   </description>
 
    <rule name="AvoidCatchingThrowable"
+   		since="1.2"
          message="A catch statement should never catch throwable since it includes errors."
           class="net.sourceforge.pmd.rules.strictexception.AvoidCatchingThrowable"
           externalInfoUrl="http://pmd.sourceforge.net/rules/strictexception.html#AvoidCatchingThrowable">
@@ -33,6 +34,7 @@ public class Foo {
     </rule>
 
    <rule name="SignatureDeclareThrowsException"
+   		since="1.2"
          message="A method/constructor shouldn't explicitly throw java.lang.Exception"
           class="net.sourceforge.pmd.rules.strictexception.ExceptionSignatureDeclaration"
           externalInfoUrl="http://pmd.sourceforge.net/rules/strictexception.html#SignatureDeclareThrowsException">
@@ -51,6 +53,7 @@ public void methodThrowingException() throws Exception {
     </rule>
 
     <rule name="ExceptionAsFlowControl"
+    		 since="1.8"
           message="Avoid using exceptions as flow control."
           class="net.sourceforge.pmd.rules.design.ExceptionAsFlowControl"
           externalInfoUrl="http://pmd.sourceforge.net/rules/strictexception.html#ExceptionAsFlowControl">
@@ -78,6 +81,7 @@ public class Foo {
     </rule>
 
 <rule name="AvoidCatchingNPE"
+	 since="1.8"
     message="Avoid catching NullPointerException; consider removing the cause of the NPE."
     class="net.sourceforge.pmd.rules.XPathRule"
           externalInfoUrl="http://pmd.sourceforge.net/rules/strictexception.html#AvoidCatchingNPE">
@@ -109,6 +113,7 @@ public class Foo {
   </rule>
 
   <rule name="AvoidThrowingRawExceptionTypes"
+      since="1.8"
       message="Avoid throwing raw exception types."
       class="net.sourceforge.pmd.rules.XPathRule"
           externalInfoUrl="http://pmd.sourceforge.net/rules/strictexception.html#AvoidThrowingRawExceptionTypes">
@@ -147,6 +152,7 @@ public void bar() throws Exception {
   </rule>
 
     <rule name="AvoidThrowingNullPointerException"
+    	  since="1.8"
         message="Avoid throwing null pointer exceptions."
         class="net.sourceforge.pmd.rules.XPathRule"
           externalInfoUrl="http://pmd.sourceforge.net/rules/strictexception.html#AvoidThrowingNullPointerException">
@@ -177,6 +183,7 @@ public class Foo {
     </rule>
 
   <rule name="AvoidRethrowingException"
+    since="3.8"
     message="A catch statement that catches an exception only to rethrow it should be avoided."
     class="net.sourceforge.pmd.rules.XPathRule"
     externalInfoUrl="http://pmd.sourceforge.net/rules/strictexception.html#AvoidRethrowingException">
@@ -212,11 +219,12 @@ public class Foo {
 
   <rule
     name="DoNotExtendJavaLangError"
+    since="4.0"
     message="Exceptions should not extend java.lang.Error"
     class="net.sourceforge.pmd.rules.XPathRule"
     externalInfoUrl="http://pmd.sourceforge.net/rules/strictexception.html#DoNotExtendJavaLangError">
     <description>
-      <![CDATA[[
+      <![CDATA[
         Errors are system exceptions. Do not extend them.
       ]]>
     </description>
@@ -235,5 +243,51 @@ public class Foo {
         public class Foo extends Error { }
     ]]></example>
   </rule>
+
+	<rule	name="DoNotThrowExceptionInFinally"
+	       since="4.2"
+		    message="A throw statement in a finally block makes the control flow hard to understand."
+		    class="net.sourceforge.pmd.rules.XPathRule"
+		    externalInfoUrl="http://pmd.sourceforge.net/rules/strictexception.html#DoNotThrowExceptionInFinally">
+    	<description>
+			<![CDATA[
+			      Throwing exception in a finally block is confusing. It may mask exception or a defect of the code,
+			      it also render code cleanup uninstable.
+			Note: This is a PMD implementation of the Lint4j rule "A throw in a finally block"
+			]]>
+		</description>
+    	<priority>4</priority>
+    	<properties>
+			<property name="xpath">
+			  <value>
+			    <![CDATA[
+//FinallyStatement[descendant::ThrowStatement]
+			          ]]>
+			  </value>
+			</property>
+		</properties>
+    	<example>
+    		<![CDATA[
+				public class Foo 
+				{
+					public void bar()
+					{
+						try {
+							// Here do some stuff
+						}
+						catch( Exception e) {
+							// Handling the issue
+						}
+						finally 
+						{
+							// is this really a good idea ?
+							throw new Exception();
+						}
+					}
+				}
+	    	]]>
+    	</example>
+	</rule>
+
 
 </ruleset>

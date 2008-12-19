@@ -11,6 +11,7 @@ These rules deal with different problems that can occur with manipulation of the
 
 
     <rule name="AvoidDuplicateLiterals"
+    	  since="1.0"
         message="The String literal {0} appears {1} times in this file; the first occurrence is on line {2}"
         class="net.sourceforge.pmd.rules.strings.AvoidDuplicateLiteralsRule"
         externalInfoUrl="http://pmd.sourceforge.net/rules/strings.html#AvoidDuplicateLiterals">
@@ -20,6 +21,10 @@ Code containing duplicate String literals can usually be improved by declaring t
         <priority>3</priority>
    <properties>
     <property name="threshold" description="The number of duplicate literals reporting threshold" value="4"/>
+    <property name="skipAnnotations" description="Skip literals within Annotations" value="false"/>
+    <property name="exceptionlist" description="Strings in that list are skipped"/>
+    <property name="separator" description="Separator used in the exceptionlist" value=","/>
+    <property name="exceptionfile" description="File containing strings to skip (one string per line), only used if exceptionlist is not set"/>
    </properties>
     <example>
 <![CDATA[
@@ -37,6 +42,7 @@ public class Foo {
   </rule>
 
     <rule name="StringInstantiation"
+    	  since="1.0"
         message="Avoid instantiating String objects; this is usually unnecessary."
         class="net.sourceforge.pmd.rules.strings.StringInstantiation"
         externalInfoUrl="http://pmd.sourceforge.net/rules/strings.html#StringInstantiation">
@@ -54,6 +60,7 @@ public class Foo {
     </rule>
 
    <rule name="StringToString"
+   	  since="1.0"
         message="Avoid calling toString() on String objects; this is unnecessary."
         class="net.sourceforge.pmd.rules.strings.StringToStringRule"
         externalInfoUrl="http://pmd.sourceforge.net/rules/strings.html#StringToString">
@@ -74,6 +81,7 @@ public class Foo {
     </rule>
 
     <rule name="InefficientStringBuffering"
+   	  since="3.4"
         message="Avoid concatenating nonliterals in a StringBuffer constructor or append()."
         class="net.sourceforge.pmd.rules.strings.InefficientStringBuffering"
         externalInfoUrl="http://pmd.sourceforge.net/rules/strings.html#InefficientStringBuffering">
@@ -97,6 +105,7 @@ public class Foo {
     </rule>
 
     <rule name="UnnecessaryCaseChange"
+          since="3.3"
           message="Using equalsIgnoreCase() is cleaner than using toUpperCase/toLowerCase().equals()."
            class="net.sourceforge.pmd.rules.strings.UnnecessaryCaseChange"
           externalInfoUrl="http://pmd.sourceforge.net/rules/strings.html#UnnecessaryCaseChange">
@@ -119,6 +128,7 @@ Using equalsIgnoreCase() is faster than using toUpperCase/toLowerCase().equals()
      </rule>
 
     <rule name="UseStringBufferLength"
+          since="3.4"
           message="This is an inefficient use of StringBuffer.toString; call StringBuffer.length instead."
           class="net.sourceforge.pmd.rules.strings.UseStringBufferLength"
           externalInfoUrl="http://pmd.sourceforge.net/rules/strings.html#UseStringBufferLength">
@@ -145,6 +155,7 @@ public class Foo {
 
 
     <rule name="AppendCharacterWithChar"
+        since="3.5"
         message="Avoid appending characters as strings in StringBuffer.append."
         class="net.sourceforge.pmd.rules.strings.AppendCharacterWithChar"
         externalInfoUrl="http://pmd.sourceforge.net/rules/strings.html#AppendCharacterWithChar">
@@ -170,6 +181,7 @@ public class Foo {
     </rule>
 
         <rule name="ConsecutiveLiteralAppends"
+        since="3.5"
         message="StringBuffer.append is called {0} consecutive times with literal Strings. Use a single append with a single String."
         class="net.sourceforge.pmd.rules.strings.ConsecutiveLiteralAppends"
         externalInfoUrl="http://pmd.sourceforge.net/rules/strings.html#ConsecutiveLiteralAppends">
@@ -195,6 +207,7 @@ public class Foo {
 
 
     <rule name="UseIndexOfChar"
+        since="3.5"
         message="String.indexOf(char) is faster than String.indexOf(String)."
         class="net.sourceforge.pmd.rules.strings.UseIndexOfChar"
         externalInfoUrl="http://pmd.sourceforge.net/rules/strings.html#UseIndexOfChar">
@@ -218,11 +231,12 @@ public class Foo {
     </rule>
 
     <rule name="InefficientEmptyStringCheck"
+        since="3.6"
         message="String.trim().length()==0 is an inefficient way to validate an empty String."
         class="net.sourceforge.pmd.rules.strings.InefficientEmptyStringCheck"
         externalInfoUrl="http://pmd.sourceforge.net/rules/strings.html#InefficientEmptyStringCheck">
     <description>
-String.trim().length() is an inefficient way to check if a String is really empty, as it 
+String.trim().length() is an inefficient way to check if a String is really empty, as it
 creates a new String object just to check its size. Consider creating a static function that
 loops through a string, checking Character.isWhitespace() on each character and returning
 false if a non-whitespace character is found.
@@ -232,9 +246,9 @@ false if a non-whitespace character is found.
 <![CDATA[
 public class Foo {
     void bar(String string) {
-        if (string != null && string.trim().size() > 0) { 
+        if (string != null && string.trim().size() > 0) {
 		    doSomething();
-        } 
+        }
     }
 }
 ]]>
@@ -242,14 +256,15 @@ public class Foo {
     </rule>
 
     <rule name="InsufficientStringBufferDeclaration"
+        since="3.6"
         message="StringBuffer constructor is initialized with size {0}, but has at least {1} characters appended."
         class="net.sourceforge.pmd.rules.strings.InsufficientStringBufferDeclaration"
         externalInfoUrl="http://pmd.sourceforge.net/rules/strings.html#InsufficientStringBufferDeclaration">
     <description>
-Failing to pre-size a StringBuffer properly could cause it to re-size many times 
+Failing to pre-size a StringBuffer properly could cause it to re-size many times
 during runtime. This rule checks the characters that are actually passed into
-StringBuffer.append(), but represents a best guess "worst case" scenario. An 
-empty StringBuffer constructor initializes the object to 16 characters. This default 
+StringBuffer.append(), but represents a best guess "worst case" scenario. An
+empty StringBuffer constructor initializes the object to 16 characters. This default
 is assumed if the length of the constructor can not be determined.
     </description>
        <priority>3</priority>
@@ -258,7 +273,7 @@ is assumed if the length of the constructor can not be determined.
 public class Foo {
     void bar() {
         StringBuffer bad = new StringBuffer();
-        bad.append("This is a long string, will exceed the default 16 characters");//bad 
+        bad.append("This is a long string, will exceed the default 16 characters");//bad
         StringBuffer good = new StringBuffer(41);
         good.append("This is a long string, which is pre-sized");//good
     }
@@ -268,6 +283,7 @@ public class Foo {
     </rule>
 
     <rule name="UselessStringValueOf"
+          since="3.8"
           message="No need to call String.valueOf to append to a string."
           class="net.sourceforge.pmd.rules.strings.UselessStringValueOf"
           externalInfoUrl="http://pmd.sourceforge.net/rules/strings.html#UselessStringValueOf">
@@ -289,6 +305,7 @@ public String convert(int i) {
 
 
 <rule   name="StringBufferInstantiationWithChar"
+        since="3.9"
         message="Do not instantiate a StringBuffer with a char"
         class="net.sourceforge.pmd.rules.XPathRule"
         externalInfoUrl="http://pmd.sourceforge.net/rules/strings.html#StringBufferInstantiationWithChar">
@@ -324,6 +341,7 @@ class Foo {
     </rule>
 
 <rule   name="UseEqualsToCompareStrings"
+        since="4.1"
         message="Use equals() to compare strings instead of ''=='' or ''!=''"
         class="net.sourceforge.pmd.rules.XPathRule"
         externalInfoUrl="http://pmd.sourceforge.net/rules/strings.html#UseEqualsToCompareStrings">
@@ -335,9 +353,11 @@ Using '==' or '!=' to compare strings only works if intern version is used on bo
         <property name="xpath">
             <value>
 <![CDATA[
-//EqualityExpression/PrimaryExpression/PrimaryPrefix/Literal
+//EqualityExpression/PrimaryExpression
+[(PrimaryPrefix/Literal
    [starts-with(@Image, '"')]
    [ends-with(@Image, '"')]
+and count(PrimarySuffix) = 0)]
 ]]>
             </value>
         </property>
@@ -354,6 +374,37 @@ class Foo {
 ]]>
     </example>
     </rule>
+
+	<rule   name="AvoidStringBufferField"
+	      since="4.2"
+        	message="StringBuffers can grow quite a lot, and so may become a source of memory leak (if the owning class has a long life time)."
+        	class="net.sourceforge.pmd.rules.XPathRule"
+        	externalInfoUrl="http://pmd.sourceforge.net/rules/strings.html#AvoidStringBufferField">
+    <description>
+		<![CDATA[
+			StringBuffers can grow quite a lot, and so may become a source of memory leak (if the owning class has a long life time).
+		]]>
+    </description>
+    <priority>3</priority>
+    <properties>
+        <property name="xpath">
+            <value>
+<![CDATA[
+//FieldDeclaration/Type/ReferenceType/ClassOrInterfaceType[@Image = 'StringBuffer']
+]]>
+			</value>
+		</property>
+		</properties>
+    	<example>
+<![CDATA[
+class Foo {
+	private StringBuffer memoryLeak;
+}
+]]>
+		</example>
+	</rule>
+
+
 
 </ruleset>
 
