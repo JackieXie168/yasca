@@ -7,7 +7,7 @@ include_once("lib/Report.php");
  *
  * This class renders scan results as rich HTML.
  * @author Michael V. Scovetta <scovetta@users.sourceforge.net>
- * @version 1.0
+ * @version 1.2
  * @package Yasca
  */
 class HTMLGroupReport extends Report {
@@ -52,7 +52,7 @@ class HTMLGroupReport extends Report {
 			if (is_array($result->source_context)) {
 				foreach ($result->source_context as $context) {
 					$context = preg_replace('/[\r\n]/', "", $context);
-					$context = substr(trim($context), 0, 76);
+					//$context = substr(trim($context), 0, 76);
 					$source_context .= htmlentities($context) . "~~~";
 				}
 			}
@@ -83,15 +83,15 @@ class HTMLGroupReport extends Report {
 			} 
 			
 			fwrite($handle,
-					"<tr>" .
-					" <td title=\"[Severity: $severity_description]\n[Plugin: $plugin_name]\" class=\"severity_$severity_description\">$row_id</td>\n");
+					"<tr id=\"row_$row_id\">" .
+					" <td title=\"[Severity: $severity_description]\n [Plug-in: $plugin_name]\" class=\"severity_$severity_description\">$row_id</td>\n");
 			
 			fwrite($handle, "<td>"); 
 
 			if ($result->is_source_code || ($line_number != 0 && strlen(trim($source_context)) > 0)) {
 				fwrite($handle, 
-					"<div class=\"snippet_anchor\" title=\"View Source Code\" onclick=\"show_code_snippet(event, '$row_id', $line_number, 'file://$filename');\">&#x25A0;</div>" .  
-					"<div id=\"c_$row_id\" style=\"display:none;\" onclick=\"cancel_event(event);\">$source_context</div>");
+					"<div class=\"snippet_anchor\" title=\"View Source Code\" onclick=\"show_code_snippet(event, '$row_id', $line_number, 'file://$filename');\">&#x25A0;</div>" .
+					"<div id=\"c_$row_id\" class=\"nowrap\" style=\"display:none;\" onclick=\"cancel_event(event);\">$source_context</div>");
 			}
 			fwrite($handle, "\n<!-- $plugin_id \t $description -->\n");
 			if ($description != "") {
@@ -103,8 +103,10 @@ class HTMLGroupReport extends Report {
 			}
 			
 			if ($proposed_fix != "") {
-				fwrite($handle, "<div class=\"proposed_fix_anchor\" title=\"" . htmlentities(trim($proposed_fix)) . "\">&#x25A0;</div>");
+				fwrite($handle, "<div class=\"proposed_fix_anchor\" title=\"View Proposed Fix\" onclick=\"show_fixed_snippet(event, '$row_id', $line_number, 'file://$filename', '". htmlentities(htmlentities(trim($proposed_fix))) ."');\">&#x25A0;</div>");
 			}
+			
+			fwrite($handle, "<div class=\"ignore_finding_anchor\" title=\"Ignore Finding\" onclick=\"ignore('$row_id', '$filename', '$line_number', '$category');\">&#x25A0;</div>");
 
 			
 			fwrite($handle,	    
@@ -154,6 +156,9 @@ class HTMLGroupReport extends Report {
 					$stylesheet_content
 				</style>
 				<script language="javascript">
+					var open_description = null;
+					var CRLF = String.fromCharCode(13) + String.fromCharCode(10);					
+					
 					function on_body_load() {
 						fix_empty_cells();
 					}
@@ -197,12 +202,59 @@ class HTMLGroupReport extends Report {
 						}
 						s.style.top = mouseY(evt);
 						s.style.display = 'block';
+						s.style.height = getCSSValue('code_snippet', 'height');
+						s.style.width = getCSSValue('code_snippet', 'width');
 						evt.cancelBubble = true;
 						evt.returnValue = false;						
 					}
 
-					var open_description = null;
+					function toggle_snippet() {
+					    var s = document.getElementById('code_snippet');
+					    if (!s) return;
+					    if (s.style.left == '15%') {
+						hide_popups();
+						return;
+					    }
+					    s.style.left = '15%';
+					    s.style.width = '70%';
+					    s.style.top = '10%';
+					    s.style.height = '50%';
+					}
 
+					function show_fixed_snippet(evt, snippet_id, line_number, filename, fixed_line) {
+						hide_popups();
+						evt = (window.event) ? window.event : evt;
+						var s = document.getElementById('code_snippet');
+						if (!s) return;
+						var snippet = document.getElementById('c_' + snippet_id).innerHTML;
+						var e = snippet.split("~~~");
+						var t = '';
+    						t += '<div class="toggle_snippet_size" title="Toggle Snippet Size" onclick="toggle_snippet();">&#x25A0;</div>';
+						for (var i=0; i<e.length-1; i++) {
+							t += "<span class=\"line_number\">" + (line_number-3+i) + "</span>";
+							if (i+1 == (Math.floor((1+e.length)/2))) {
+								t += "<span class=\"highlight nowrap\">" + fixed_line + "</span><br/>";
+							} else {
+								t += e[i] + "<br/>";
+							}
+						}					
+						// Code Snippet
+						s.innerHTML = t;
+						var ps = getPageSize();
+						s.style.left = mouseX(evt);
+						if (parseInt(s.style.left) + 575 > ps[2]) {
+							s.style.left = (parseInt(ps[2]) - 595) + "px";
+						}
+						s.style.top = mouseY(evt);
+						s.style.height = getCSSValue('code_snippet', 'height');
+						s.style.width = getCSSValue('code_snippet', 'width');
+						s.style.display = 'block';
+						evt.cancelBubble = true;
+						evt.returnValue = false;						
+					}
+
+
+					
 					function show_description(evt, plugin_id) {
 						hide_popups();
 						evt = (window.event) ? window.event : evt;
@@ -226,10 +278,14 @@ class HTMLGroupReport extends Report {
 					function hide_popups() {
 						document.getElementById('code_snippet').style.display = 'none';
 						document.getElementById('file_base').style.display = 'none';
-						try {
+						document.getElementById('ignore_list').style.display = 'none';
+						document.getElementById('ignore_save_as').style.display = 'none';
+						if (document.getElementById('d_' + open_description)) {
+						    try {
 							document.getElementById('d_' + open_description).style.display = 'none';
-						} catch(e) {
+						    } catch(e) {
 							// ignore
+						    }
 						}
 					}
 
@@ -503,7 +559,6 @@ class HTMLGroupReport extends Report {
 						}
 					}
 					
-					
 					function getInnerText(el) {
 						if (ie5) return el.innerText;	//Not needed but it is faster
 						
@@ -525,10 +580,7 @@ class HTMLGroupReport extends Report {
 									str += cs[i].nodeValue;
 									break;
 							}
-							
-						}
-						
-						
+						}	
 						return str;
 					}
 					
@@ -547,6 +599,22 @@ class HTMLGroupReport extends Report {
 					    } else {
 					        elt.style.display = 'none';
 					    }
+					}
+
+					function getCSSValue(selector, property) {
+					    var i, r, s = document.styleSheets && document.styleSheets[0];
+					    if(s) {
+						r = s.rules ? s.rules : s.cssRules; 
+				    	        if(r) {
+						    i = r.length; 
+						    while (i--) {
+							if(r[i] && r[i].selectorText && r[i].selectorText.toLowerCase() === selector.toLowerCase()) {
+				    			    return ( r[i].style[property] );
+							}
+						    }
+						}
+					    }
+					    return null;
 					}
 					
 					function change_filename_base() {
@@ -599,10 +667,67 @@ class HTMLGroupReport extends Report {
 								return;
 						}
 					}
+
+					function ignore(row_id, filename, line_number, category) {
+					    var row = document.getElementById('row_' + row_id);
+					    var row_value = "        <ignore filename=\"" + filename + "\" line_number=\"" + line_number + "\" category=\"" + category + "\"/>" + CRLF;
+					    var row_header = document.getElementById('row_' + row_id).cells.item(0);
+
+					    if (row.getAttribute("ignore") == "true") {
+						row.setAttribute("ignore", "false");
+						row.setAttribute("ignore_text", "");
+						row_header.style.textDecoration = '';
+					    } else {
+						row.setAttribute("ignore", "true");
+						row.setAttribute("ignore_text", row_value);
+						row_header.style.textDecoration = 'line-through';
+					    }
+					}
+
+					function save_ignore_list(evt) {
+					    evt = (window.event) ? window.event : evt;
+					    var elts = document.getElementsByTagName("tr");
+					    var result = '<?xml version="1.0" encoding="UTF-8" />' + CRLF + CRLF + '<!-- Save this file and include it in the Yasca command line -->' + CRLF + CRLF + "<yasca>" + CRLF + "    <ignore_list>" + CRLF;
+
+					    for (var i=0; i<elts.length; i++) {
+						if (elts[i].getAttribute("ignore") == "true") {
+						    result += elts[i].getAttribute("ignore_text");
+						}
+					    }
+					    result += "    </ignore_list>" + CRLF + "</yasca>" + CRLF;
+
+					    var ignore_list = document.getElementById('ignore_list');
+					    ignore_list.value = result;
+					    ignore_list.style.display = 'block';
+					    if (document.all) {
+					        document.getElementById('ignore_save_as').style.display = 'block';
+					    }
+					    evt.cancelBubble = true;
+					    evt.returnValue = false;						
+
+					}
+					function save_as(evt) {
+					    evt = (window.event) ? window.event : evt;
+					    if (document.all) {
+						try {
+						    fso = new ActiveXObject("Scripting.FileSystemObject");
+						    fso.CreateTextFile("./yasca-ignore", true);
+						    a = fso.GetFile("./yasca-ignore");
+						    b = a.OpenAsTextStream(2, 0);
+						    b.Write(document.getElementById('ignore_list').value);
+						    b.Close();
+						} catch(e) {
+						    alert("An error occurred saving ./yasca-ignore. Please save the file manually.");
+						}
+					    }
+					    cancel_event(evt);
+					}
 				</script>
 				
 			</head>
-
+	
+			<textarea id="ignore_list" onclick="cancel_event(event);"></textarea>
+			<div id="ignore_save_as" style="display:none; right: 10%;position:absolute;top:10%;padding:8px;font-size:12px;"><a href="javascript:void(0);" onclick="save_as(event);">Save As</a></div>
 			<input type="hidden" name="base_dir" id="base_dir" value="$base_dir"/>
 			<body onload="on_body_load();" onclick="hide_popups();">
 			  <div id="code_snippet" onclick="cancel_event(event);"></div>
@@ -626,7 +751,7 @@ class HTMLGroupReport extends Report {
 					    <tr><td class="header_left" nowrap>Version:</td><td class="header_right">$version [ <a target="_blank" href="http://yasca.sourceforge.net/check_version.php?current_version=$version">check for updates</a> ]</td></tr>
 					    <tr><td class="header_left" nowrap>Report Generated:</td><td class="header_right">$generation_date</td></tr>
 					    <tr><td class="header_left" nowrap>Options:</td><td class="header_right">
-						[ <a href="javascript:void(0);" onclick="show_change_base(event);">change links</a> | <a href="http://yasca.sourceforge.net/userguide.php" target="_blank">user guide</a> | <a href="http://yasca.sourceforge.net/feedback.php">send feedback</a> ]</td></tr>
+						[ <a href="javascript:void(0);" onclick="show_change_base(event);">change links</a> | <a href="javascript:void(0);" onclick="save_ignore_list(event);">save ignore list</a> | <a href="http://yasca.sourceforge.net/userguide.php" target="_blank">user guide</a> | <a href="http://yasca.sourceforge.net/feedback.php">send feedback</a> ]</td></tr>
 					</table>
 				    </td>
 				</tr>
@@ -708,6 +833,6 @@ END;
 		}
 		$html .= '</select>';
 		return $html;
-	}	
+	}
 }
 ?>
