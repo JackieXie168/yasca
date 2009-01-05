@@ -89,6 +89,9 @@ class Yasca {
 		// Parse command line arguments if necessary
 		$this->options = (count($options) == 0 ? $this->parse_command_line_arguments() : $options);
 		
+		$this->ignore_list = isset($this->options['ignore-file']) ? $this->parse_ignore_file($this->options['ignore-file']) : array();
+		$this->register_callback('post-scan', array(get_class($this), 'remove_ignored_findings'));
+		
 		$this->cache = new Cache(33554432);		// 32 meg cache
 		
 		// Scan for target files	
@@ -448,11 +451,15 @@ class Yasca {
 					$opt['log'] = $_SERVER['argv'][++$i];
 					break;
 					
-			case "-i":
-			case "--ignore-ext":
+				case "-i":
+				case "--ignore-ext":
 					$opt['ignore-ext'] = $_SERVER['argv'][++$i];
 					break;
-	
+				
+				case "--ignore-file":
+					$opt['ignore-file'] = $_SERVER['argv'][++$i];
+					break;
+					
 	            case "-o":
 	            case "--output":
 	            	$opt['output'] = $_SERVER['argv'][++$i];
@@ -463,9 +470,9 @@ class Yasca {
 	            	$opt['fixes'] = $_SERVER['argv'][++$i];
 	            	break;
 	            	
-		    case "--source-required":
-			$opt['source_required'] = true;
-			break;
+				case "--source-required":
+					$opt['source_required'] = true;
+					break;
 
 	            case "-p":
 	            case "--plugin":
@@ -499,7 +506,7 @@ class Yasca {
 		
 		$opt['ignore-ext'] = str_replace(" ", "", $opt['ignore-ext']);
 		$opt['ignore-ext'] = $opt['ignore-ext'] == "0" ? array() : explode(",", $opt['ignore-ext']);
-		
+
 		$extension = Yasca::get_report_extension($opt); 
 		$profile_dir = isset($_SERVER['USERPROFILE']) ? $_SERVER['USERPROFILE'] : $_SERVER['HOME'];
 		if ($opt['output'] == false) {
@@ -532,6 +539,7 @@ Perform analysis of program source code.
   -h, --help                show this help
   -i, --ignore-ext EXT,EXT  ignore these file extensions 
                               (default: exe,zip,jpg,gif,png,pdf,class)
+      --ignore-file FILE    ignore findings from the specified xml file
       --source-required     only show findings that have source code available
   -f, --fixes FILE          include fixes, written to FILE (default: not included)
                               (EXPERIMENTAL)
@@ -823,6 +831,40 @@ END;
 		if (!isset($this->general_cache["proposed_fixes"])) 
 			$this->general_cache["proposed_fixes"] = "";
 		$this->general_cache["proposed_fixes"] .= "<fix filename=\"$filename\" line_number=\"$line_number\" original=\"" . htmlentities($original) . "\" proposed=\"" . htmlentities($modified) . "\"/>";
+	}
+	
+	private function parse_ignore_file($filename) {
+		if (!file_exists($filename) || !is_readable($filename)) return array();
+		$dom = new DOMDocument();
+		if (!$dom->load($filename)) return array();
+		$elts = $dom->getElementsByTagName("ignore");
+		$ig_list = array();
+		foreach ($elts as $elt) {
+			$ig = new StdClass;
+			$ig->filename = $elt->getAttribute("filename");
+			$ig->line_number = $elt->getAttribute("line_number");
+			$ig->category = $elt->getAttribute("category");
+			array_push($ig_list, $ig);
+		}
+		return $ig_list;
+	}
+	private function remove_ignored_findings() {
+		$new_result = array();
+		
+		foreach ($this->results as $result) {
+			$b_ignore = false;
+			foreach ($this->ignore_list as $ignore) {
+				if ($ignore->filename == str_replace("\\", "/", $result->filename) &&
+					$ignore->line_number == $result->line_number &&
+					$ignore->category == $result->category) {
+					$b_ignore = true;
+					break;
+				}
+			}
+			if (!$b_ignore) 
+				array_push($new_result, $result);
+		}
+		$this->results = $new_result;
 	}
 }
 ?>

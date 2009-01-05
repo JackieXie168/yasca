@@ -7,3 +7,6 @@ Version 1.1 released on 2008-12-19
     Minor bug fixes in PMD and FindBugs plugin (cross-platform)
     Fixed line endings for Unix and Windows
     Added new plugins
+
+Version 1.2
+    Enhanced Grep plugin - multiple regex modifiers allowed

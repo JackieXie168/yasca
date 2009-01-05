@@ -22,6 +22,8 @@ class Plugin_Grep extends Plugin {
 	public $name;
 	public $file_type;
 	public $grep = array();
+	public $pre_grep;			/* Pre Lookahead Grep - must exist within $lookahead before a $grep */
+	public $lookahead_length = 10;		/* Index of pre_grep to grep must be within $lookahead_length */
 	public $fix;
 	public $category;
 	public $category_link;
@@ -38,6 +40,8 @@ class Plugin_Grep extends Plugin {
 		$this->name = "";
 		$this->valid_file_types = array();
 		$this->grep = array();
+		$this->pre_grep = "";
+		$this->lookahead_length = 10;
 		$this->fix = "";
 		$this->category = "";
 		$this->category_link = "";
@@ -90,7 +94,9 @@ class Plugin_Grep extends Plugin {
 				if (preg_match('/^\s*name\s*=\s*(.*)/i', $grep, $matches)) $this->name = $matches[1];
 				elseif (preg_match('/^\s*file_type\s*=\s*(.*)/i', $grep, $matches)) $this->valid_file_types = explode(",", $matches[1]);
 				elseif (preg_match('/^\s*grep\s*=\s*(.*)/i', $grep, $matches)) array_push($this->grep, $matches[1]);
+				elseif (preg_match('/^\s*pre_grep\s*=\s*(.*)/i', $grep, $matches)) $this->pre_grep = $matches[1];
 				elseif (preg_match('/^\s*category\s*=\s*(.*)/i', $grep, $matches)) $this->category = $matches[1];
+				elseif (preg_match('/^\s*lookahead_length\s*=\s*(.*)/i', $grep, $matches)) $this->lookahead_length = $matches[1];
 				elseif (preg_match('/^\s*fix\s*=\s*(.*)/i', $grep, $matches)) $this->fix = $matches[1];
 				elseif (preg_match('/^\s*category_link\s*=\s*(.*)/i', $grep, $matches)) $this->category_link = $matches[1];
 				elseif (preg_match('/^\s*severity\s*=\s*(.*)/i', $grep, $matches)) $this->severity = $matches[1];
@@ -124,9 +130,18 @@ class Plugin_Grep extends Plugin {
 			if (!isset($this->name) || $this->name == "") 
 				$this->name = basename($grep_plugin, ".grep");
 			
+			if (isset($this->pre_grep) && strlen($this->pre_grep) >= 1 ) {
+				$this->grep = array_reverse($this->grep);
+				array_push($this->grep, "__" . $this->pre_grep);
+				$this->grep = array_reverse($this->grep);
+			}
+
+			$pre_matches = array();			// holds line numbers of pre_grep matches
+
 			foreach ($this->grep as $grep) {
+			    $orig_grep = $grep;
 			    // Massage the grep to work below
-			    preg_match("/\/(.*)\/([imsxUX])?/", $grep, $matches);
+			    preg_match("/\/(.*)\/([imsxUX]*)?/", $grep, $matches);
 			    $modifier = isset($matches[2]) ? $matches[2] : "";
 			    $grep = isset($matches[1]) ? $matches[1] : $grep;
 
@@ -134,15 +149,25 @@ class Plugin_Grep extends Plugin {
 			    $matches = array();
 
 			    $orig_error_level = error_reporting(0);
+
 			    $matches = preg_grep('/' . $grep . '/' . $modifier, $this->file_contents);
+
+			    if (preg_match("/^__(.*)/", $orig_grep)) {			// for pre_grep
+				    $pre_matches = array_keys($matches);
+				    continue;
+			    }
+
 			    error_reporting($orig_error_level);
 
 			    if (!is_array($matches)) {
 				$yasca->log_message("Invalid grep expression [/$grep/$modifier]. Ignoring.", E_USER_WARNING);
 				continue;
 			    }
-
 			    foreach ($matches as $line_number => $match) {
+				if ( $orig_grep == "__" . $this->pre_grep ||
+				     (isset($this->pre_grep) && $this->pre_grep != "" && count($pre_matches) == 0) ||
+				     (count($pre_matches) > 0 && !any_within($pre_matches, $line_number+1, $this->lookahead_length)) ) continue;
+
 				$result = new Result();
 				$result->line_number = $line_number + 1;
 				$result->filename = $this->filename;
@@ -152,17 +177,8 @@ class Plugin_Grep extends Plugin {
 				$result->description = $this->description; //$yasca->get_adjusted_description("Grep", $this->name, $this->description);
 				$result->source = $match;
 				$result->plugin_name = $yasca->get_adjusted_alternate_name("Grep", $this->name, "Grep: " . $this->name);
-				if ($this->fix !== "") {
+				if ($this->fix !== "")
 					$yasca->add_fix($result, $this->filename, $result->line_number, $match, eval($this->fix));
-				}
-/*				
-				if ($this->fix !== "") {
-					$modified = eval($this->fix);
-					$result->proposed_fix = "Proposal: " . $modified;
-					if (!isset($yasca->general_cache["proposed_fixes"])) $yasca->general_cache["proposed_fixes"] = "";
-					$yasca->general_cache["proposed_fixes"] .= "<fix filename=\"$this->filename\" line_number=\"$result->line_number\" original=\"" . htmlentities($match) . "\" proposed=\"" . htmlentities($modified) . "\"/>";
-				}
-*/
 				array_push($this->result_list, $result);
 			    }
 			}

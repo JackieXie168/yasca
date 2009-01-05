@@ -412,4 +412,17 @@ function is_valid_regex($regex) {
 function highlight($string, $color="%W") {
 	return Console_Color::convert("%$color$string%n");
 }
+
+function any_within($haystack, $needle, $max_distance = 10) {
+    if (!is_numeric($needle)) return false;
+
+    foreach ($haystack as $hay) {
+        if (!is_numeric($hay)) continue;
+        if ($hay < $needle &&
+            $needle - $hay <= $max_distance) {
+            return true;
+	}
+    }
+    return false;
+}
 ?>

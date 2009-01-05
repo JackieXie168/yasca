@@ -1,0 +1,1 @@
+yasca -px FindBugs,Antic,JLint,PMD resources\test

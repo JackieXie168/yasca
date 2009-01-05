@@ -279,7 +279,7 @@ class HTMLGroupReport extends Report {
 						document.getElementById('code_snippet').style.display = 'none';
 						document.getElementById('file_base').style.display = 'none';
 						document.getElementById('ignore_list').style.display = 'none';
-						document.getElementById('ignore_save_as').style.display = 'none';
+						// document.getElementById('ignore_save_as').style.display = 'none';
 						if (document.getElementById('d_' + open_description)) {
 						    try {
 							document.getElementById('d_' + open_description).style.display = 'none';
@@ -687,7 +687,7 @@ class HTMLGroupReport extends Report {
 					function save_ignore_list(evt) {
 					    evt = (window.event) ? window.event : evt;
 					    var elts = document.getElementsByTagName("tr");
-					    var result = '<?xml version="1.0" encoding="UTF-8" />' + CRLF + CRLF + '<!-- Save this file and include it in the Yasca command line -->' + CRLF + CRLF + "<yasca>" + CRLF + "    <ignore_list>" + CRLF;
+					    var result = '<?xml version="1.0" encoding="UTF-8" ?>' + CRLF + CRLF + '<!-- Save this file and include it in the Yasca command line -->' + CRLF + CRLF + "<yasca>" + CRLF + "    <ignore_list>" + CRLF;
 
 					    for (var i=0; i<elts.length; i++) {
 						if (elts[i].getAttribute("ignore") == "true") {
@@ -700,7 +700,7 @@ class HTMLGroupReport extends Report {
 					    ignore_list.value = result;
 					    ignore_list.style.display = 'block';
 					    if (document.all) {
-					        document.getElementById('ignore_save_as').style.display = 'block';
+					        //document.getElementById('ignore_save_as').style.display = 'block';
 					    }
 					    evt.cancelBubble = true;
 					    evt.returnValue = false;						
@@ -727,7 +727,9 @@ class HTMLGroupReport extends Report {
 			</head>
 	
 			<textarea id="ignore_list" onclick="cancel_event(event);"></textarea>
-			<div id="ignore_save_as" style="display:none; right: 10%;position:absolute;top:10%;padding:8px;font-size:12px;"><a href="javascript:void(0);" onclick="save_as(event);">Save As</a></div>
+<!--
+			<div id="ignore_save_as" style="display:none; right: 10%;position:absolute;top:10%;padding:8px;padding-right:20px;font-size:12px;"><a href="javascript:void(0);" onclick="save_as(event);">Save As</a></div>
+-->
 			<input type="hidden" name="base_dir" id="base_dir" value="$base_dir"/>
 			<body onload="on_body_load();" onclick="hide_popups();">
 			  <div id="code_snippet" onclick="cancel_event(event);"></div>
