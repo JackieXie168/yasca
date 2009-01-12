@@ -443,22 +443,22 @@ class Yasca {
 	            	exit(1);
 	            	break;
 	            
-				case "--debug":
-					$opt['debug'] = true;
-					break;
+		    case "--debug":
+			$opt['debug'] = true;
+			break;
 		
-				case "--log":
-					$opt['log'] = $_SERVER['argv'][++$i];
-					break;
+		    case "--log":
+			$opt['log'] = $_SERVER['argv'][++$i];
+			break;
 					
-				case "-i":
-				case "--ignore-ext":
-					$opt['ignore-ext'] = $_SERVER['argv'][++$i];
-					break;
+		    case "-i":
+		    case "--ignore-ext":
+			$opt['ignore-ext'] = $_SERVER['argv'][++$i];
+			break;
 				
-				case "--ignore-file":
-					$opt['ignore-file'] = $_SERVER['argv'][++$i];
-					break;
+		    case "--ignore-file":
+			$opt['ignore-file'] = $_SERVER['argv'][++$i];
+			break;
 					
 	            case "-o":
 	            case "--output":

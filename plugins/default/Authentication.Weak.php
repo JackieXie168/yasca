@@ -19,7 +19,7 @@ class Plugin_authentication_weak extends Plugin {
 
 	function execute() {
 		// Handle this separately, since it's valid on all files EXCEPT those listed below
-		if (check_in_filetype($this->filename, array("java", "jsp", "class", "jar", "zip", "jpg", "png", "gif", "exe"))) {
+		if (Plugin::check_in_filetype($this->filename, array("java", "jsp", "class", "jar", "zip", "jpg", "png", "gif", "exe"))) {
 		    return;
 		}
 		for ($i=0; $i<count($this->file_contents); $i++) {

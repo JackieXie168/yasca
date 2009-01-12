@@ -79,8 +79,8 @@ class Plugin_Grep extends Plugin {
 		}
 		
 		// check for valid file type usage
-		if (!check_in_filetype($this->filename, Plugin_Grep::$union_valid_file_types)) {
-			return;
+		if (!Plugin::check_in_filetype($this->filename, Plugin_Grep::$union_valid_file_types)) {
+		    return;
 		}
 		
 		foreach ($grep_plugin_list as $grep_plugin) {
@@ -122,7 +122,7 @@ class Plugin_Grep extends Plugin {
 				break;
 
 			// check for valid file type usage
-			if (!check_in_filetype($this->filename, $this->valid_file_types)) {
+			if (!Plugin::check_in_filetype($this->filename, $this->valid_file_types)) {
 			    continue;
 			}
 

@@ -60,14 +60,19 @@ class Plugin {
 	 * Internal variable set to true at the end of the constructor.
 	 */
 	public $initialized = false;
-	
+
+	private static $ext_classes = array( "JAVA" => array("java", "jsp", "jsw"),
+				    	     "C" => 	array("c", "cpp", "h"),
+				    	     "HTML" => array("html", "css", "js", "htm")
+				    );
+
 	/**
 	 * Creates a new generic Plugin.
 	 * @param string $filename that is being examined.
 	 * @param mixed $file_contents array or string of the file contents.
 	 */
 	public function Plugin($filename, &$file_contents) {
-		if (check_in_filetype($filename, $this->valid_file_types)) {
+		if (Plugin::check_in_filetype($filename, $this->valid_file_types)) {
 			$this->filename = $filename;
 			$this->file_contents = $file_contents;
 			if (!is_array($this->file_contents)) 
@@ -145,6 +150,39 @@ class Plugin {
 			return (floatval($version) >= floatval($minimum_version)); 
 		}
 		return false;
+	}
+	
+	/**
+	 * Checks to see if the given filename has a passed extension. $filename does not have
+	 * to be an actual existing file.
+	 * @param string $filename filename to check
+	 * @param mixed $ext string extension or array of extensions to check. Should not include a period.
+	 * @return true iff filename matches one of the extensions, or if $ext was an empty array.
+	 */
+	 public static function check_in_filetype($filename, $ext = array(), $equiv_classes = 0) {
+	    $ext_valid = false;
+	    if ($equiv_classes == 0)
+		$equiv_classes = Plugin::$ext_classes;
+		
+	    if (!is_array($ext))
+	    	$ext = explode(",", $ext);
+
+	    if (is_array($ext)) {
+	    	if (count($ext) == 0) return true; 		// $ext=() means all accepted
+	    	foreach ($ext as $ek => $ev) {
+	    	    if (isset($equiv_classes[$ev])) {
+	    		unset($ext[$ek]);
+	    		foreach ($equiv_classes[$ev] as $eqv) {
+	    		    array_push($ext, $eqv);
+	    		}
+	    	    }
+	    	}
+	    	foreach ($ext as $ek => $ev) {
+		    if (endsWith($filename, "." . $ev))
+			$ext_valid = true;
+		}
+	    }
+	    return $ext_valid;
 	}
 }
 ?>

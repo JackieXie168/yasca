@@ -192,7 +192,7 @@ class HTMLGroupReport extends Report {
 							} else {
 								t += e[i] + "<br/>";
 							}
-						}					
+						}
 						// Code Snippet
 						s.innerHTML = t;
 						var ps = getPageSize();

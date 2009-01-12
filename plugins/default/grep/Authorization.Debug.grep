@@ -8,7 +8,7 @@ description =
 	A <b>debug</b> parameter was found. This can be used within development, but should
 	never be accessible in a production system, unless appropriate access controls limit
 	the actions performed and data accessed to authorized individuals only. Using a hard
-	to guess parameter like <b>debug4ever9123</b> is not sufficient.
+	to guess parameter like <b>debug4ever9123</b> is <b>NOT</b> sufficient.
 	
 	This parameter should be removed.
 </p>

@@ -3,7 +3,7 @@ file_type = java,jsp,php,php5
 
 ;Java Vulnerabilities
 grep = /\"select .*from .*\+/i
-grep = /\".*call .*\"\s*\+\s*(req(uest)?\.getParameter/i
+grep = /\".*call .*\"\s*\+\s*(req(uest)?)\.getParameter/i
 grep = /prepareCall.*\".*call .*"\s*\+\s*[a-zA-Z0-9_]+/i
 
 ;PHP Vulnerabilities
