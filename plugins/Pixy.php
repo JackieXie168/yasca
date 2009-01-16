@@ -25,7 +25,7 @@ class Plugin_Pixy extends Plugin {
 		$yasca =& Yasca::getInstance();
 		
 		if (!$this->check_for_java(1.5)) {
-			$yasca->log_message("The PMD Plugin requires JRE 1.5 or later.", E_USER_WARNING);
+			$yasca->log_message("The Pixy Plugin requires JRE 1.5 or later.", E_USER_WARNING);
 			return;
 		}
 		
@@ -45,9 +45,9 @@ class Plugin_Pixy extends Plugin {
 		    if (preg_match('/^SQL Analysis BEGIN/i', $pixy_results[$i]))  $rule = "SQL Injection";
 		    if (preg_match('/^File Analysis BEGIN/i', $pixy_results[$i])) $rule = "File-Related Vulnerability";
 
-		    if ($rule = "") continue;
+		    if ($rule == "") continue;
 		    
-		    if (preg_match('/^\- (.*):(\d+)$/', $pixy_results[$i], $results)) {
+		    if (preg_match('/^\-\d+(.*):(\d+)$/', $pixy_results[$i], $results)) {
 			    $vFilename = str_replace("\\", "/", trim($results[1]));
 			    if (!file_exists($vFilename)) continue;
 			    
@@ -62,7 +62,7 @@ class Plugin_Pixy extends Plugin {
 			    $result->is_source_code = true;
 			    $result->plugin_name = $yasca->get_adjusted_alternate_name("Pixy", $rule, $rule);
 			    $result->severity = $yasca->get_adjusted_severity("Pixy", $rule, $priority);
-				
+
 			    $result->source = array_slice( file($vFilename), $result->line_number-1, 1 );
 			    $result->source = $result->source[0];
 			    $result->description = $yasca->get_adjusted_description("Pixy", $rule, "<p>description</p><h4>Example:</h4><pre class=\"fixedwidth\">example</pre>");
