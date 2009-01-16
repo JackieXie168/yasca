@@ -47,6 +47,9 @@ class Plugin_Pixy extends Plugin {
 
 		    if (preg_match('/^\- (.*):(\d+)$/', $pixy_results[$i], $results)) {
 			    $vFilename = $results[1];
+			    if (strpos($vFilename, "\\")) {
+				$vFilename = str_replace("\\", "\\\\", $vFilename);
+			    }
 			    $vLine = $results[2];
 			    $priority = 2;
 
