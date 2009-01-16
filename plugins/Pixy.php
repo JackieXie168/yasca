@@ -38,12 +38,20 @@ class Plugin_Pixy extends Plugin {
 			$yasca->log_message("Pixy returned: " . implode("\r\n", $pixy_results), E_ALL);
     
 		$rule = "";
+		$category_link = "#";
 		
 		for ($i=0; $i<count($pixy_results); $i++) {
 		    $line = $pixy_results[$i];
-		    if (preg_match('/^XSS Analysis BEGIN/i', $pixy_results[$i]))  $rule = "Cross-Site Scripting";
-		    if (preg_match('/^SQL Analysis BEGIN/i', $pixy_results[$i]))  $rule = "SQL Injection";
-		    if (preg_match('/^File Analysis BEGIN/i', $pixy_results[$i])) $rule = "File-Related Vulnerability";
+		    if (preg_match('/^XSS Analysis BEGIN/i', $pixy_results[$i])) { 
+			$rule = "Cross-Site Scripting";	
+			$category_link = "http://www.owasp.org/index.php/Cross_Site_Scripting"; 
+		    } elseif (preg_match('/^SQL Analysis BEGIN/i', $pixy_results[$i])) {
+			$rule = "SQL Injection";
+			$category_link = "http://www.owasp.org/index.php/SQL_Injection"; 
+		    } elseif (preg_match('/^File Analysis BEGIN/i', $pixy_results[$i])) {
+			$rule = "File-Related Vulnerability";
+			$category_link = "#";
+		    }
 
 		    if ($rule == "") continue;
 		    
@@ -53,13 +61,13 @@ class Plugin_Pixy extends Plugin {
 			    $vFilename = trim($results[1]);
 
 			    $vLine = $results[2];
-			    $priority = 2;
+			    $priority = 1;
 
 			    $result = new Result();
 			    $result->line_number = $vLine;
 			    $result->filename = $vFilename;
-			    $result->category = "Pixy: $rule";
-			    $result->category_link = "";
+			    $result->category = $rule;
+			    $result->category_link = $category_link;
 			    $result->is_source_code = true;
 			    $result->plugin_name = $yasca->get_adjusted_alternate_name("Pixy", $rule, $rule);
 			    $result->severity = $yasca->get_adjusted_severity("Pixy", $rule, $priority);
