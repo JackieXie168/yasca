@@ -13,7 +13,7 @@ include_once("lib/Plugin.php");
 include_once("lib/common.php");
 include_once("lib/cache.php");
 
-define("VERSION", "1.1");
+define("VERSION", "1.2");
 
 /**
  * This class implements a generic code scanner.
