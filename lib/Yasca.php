@@ -822,7 +822,7 @@ END;
 		}
 		
 		foreach ($event_list as $event) {
-			call_user_func($event);		
+			call_user_func($event);	
 		}
 	}
 	

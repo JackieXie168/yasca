@@ -37,19 +37,20 @@ class Plugin_Pixy extends Plugin {
 		if ($yasca->options['debug']) 
 			$yasca->log_message("Pixy returned: " . implode("\r\n", $pixy_results), E_ALL);
     
-		$rule = "Unknown Vulnerability";
+		$rule = "";
 		
 		for ($i=0; $i<count($pixy_results); $i++) {
 		    $line = $pixy_results[$i];
 		    if (preg_match('/^XSS Analysis BEGIN/i', $pixy_results[$i]))  $rule = "Cross-Site Scripting";
 		    if (preg_match('/^SQL Analysis BEGIN/i', $pixy_results[$i]))  $rule = "SQL Injection";
-		    if (preg_match('/^File Analysis BEGIN/i', $pixy_results[$i])) $rule = "File-Related Vulnerability";		    
+		    if (preg_match('/^File Analysis BEGIN/i', $pixy_results[$i])) $rule = "File-Related Vulnerability";
 
+		    if ($rule = "") continue;
+		    
 		    if (preg_match('/^\- (.*):(\d+)$/', $pixy_results[$i], $results)) {
-			    $vFilename = $results[1];
-			    if (strpos($vFilename, "\\")) {
-				$vFilename = str_replace("\\", "\\\\", $vFilename);
-			    }
+			    $vFilename = str_replace("\\", "/", trim($results[1]));
+			    if (!file_exists($vFilename)) continue;
+			    
 			    $vLine = $results[2];
 			    $priority = 2;
 
