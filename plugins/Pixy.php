@@ -47,10 +47,11 @@ class Plugin_Pixy extends Plugin {
 
 		    if ($rule == "") continue;
 		    
-		    if (preg_match('/^\-\d+(.*):(\d+)$/', $pixy_results[$i], $results)) {
+		    if (preg_match('/^\-\d*(.*?):(\d+)$/', $pixy_results[$i], $results)) {
 			    $vFilename = str_replace("\\", "/", trim($results[1]));
-			    if (!file_exists($vFilename)) continue;
-			    
+			    //if (!file_exists($vFilename)) continue;
+			    $vFilename = trim($results[1]);
+print "vFilename=[$vFilename]\n";
 			    $vLine = $results[2];
 			    $priority = 2;
 
