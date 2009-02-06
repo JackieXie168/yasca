@@ -1,6 +1,7 @@
 name = Both Internal and External JavaScript in Same Tag
 file_type = js,html,jsp,htm,php,xsl 
 grep = /<script[^>]*src[^>]*>[^\s]<\/script>/mi
+grep = /<script[^>]*src[^>]*>/i
 category = Bug: Script Tag in JavaScript file
 severity = 2
 description =
