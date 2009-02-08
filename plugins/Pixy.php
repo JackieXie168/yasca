@@ -16,16 +16,23 @@ class Plugin_Pixy extends Plugin {
 	 * This class is multi-target.
 	 */
 	public $is_multi_target = false;
-
+	
+	/** Shortcuts the Java check because Pixy is not multi-target */
+	private $java_not_found = false;
+	
 	/**
 	 * Executes the Pixy function. This calls out to pixy.bat which then calls Java, but
 	 * process output comes back here.
 	 */
 	function execute() {
+		if ($this->java_not_found)		// added because Pixy is a one-at-a-time plugin
+			return;
+		
 		$yasca =& Yasca::getInstance();
 		
 		if (!$this->check_for_java(1.5)) {
 			$yasca->log_message("The Pixy Plugin requires JRE 1.5 or later.", E_USER_WARNING);
+			$this->java_not_found = true;
 			return;
 		}
 		

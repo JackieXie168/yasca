@@ -1,8 +1,8 @@
 name = Invalid Date/Time Format
 file_type = JAVA
 grep = /SimpleDateFormat\(\"yyyy-mm-dd/
-grep = /SimpleDateFormat\(\"hh:MM:ss
-grep = /SimpleDateFormat\(\"hh:mm:ss\"
+grep = /SimpleDateFormat\(\"hh:MM:ss/
+grep = /SimpleDateFormat\(\"hh:mm:ss\"/
 category = Formatting: Invalid Date/Time Format
 severity = 2
 description =

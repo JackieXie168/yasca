@@ -23,7 +23,13 @@ class Plugin_file_system_temporary_files extends Plugin {
 	                        "_*",
 	                        "vssver.scc",	/* Visual SourceSafe */
 	                        "thumbs.db",	/* Explorer Thumbnails */
-	                        "*.psd"			/* Photoshop */ 
+	                        "*.psd",	/* Photoshop */ 
+				"hco.log",	/* CA Harvest */
+				"harvest.sig",	/* CA Harvest */
+				"*.svn-base",	/* SVN */
+				"all-wcprops",	/* SVN */
+				".project",	/* Eclipse */
+				".classpath"	/* Eclipse */
 	                    	);
 
 	function execute() {		
@@ -32,7 +38,7 @@ class Plugin_file_system_temporary_files extends Plugin {
 			if (fnmatch($pattern, $filename)) {
 				$result = new Result();
 				$result->severity = 3;
-				$result->category = "Sensitive Data Under Web Root";
+				$result->category = "Potentially Sensitive Data Under Web Root";
 				$result->category_link = "http://www.owasp.org/index.php/Sensitive_Data_Under_Web_Root";
 				$result->source = "This type of file is usually not used in production.";
 				$result->is_source_code = false;
