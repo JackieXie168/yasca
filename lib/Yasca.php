@@ -551,14 +551,15 @@ Perform analysis of program source code.
                               desktop in Yasca directory)
       --log FILE            write log entries to FILE
   -r, --report REPORT       use REPORT template (default: HTMLGroupReport). Other options
-                              include HTMLGroupReport, CSVReport, XMLReport, and 
-                              DetailedReport. 
+                              include HTMLGroupReport, CSVReport, XMLReport, SQLLiteReport, 
+                              and DetailedReport. 
   -s, --silent              do not show any output
   -v, --version             show version information
 
 Examples:
   yasca c:\\source_code
   yasca /opt/dev/source_code
+  yasca -px FindBugs,PMD,Antic,JLint /opt/dev/source_code
   yasca -o c:\output.csv --report CSVReport "c:\\foo bar\\quux"
 
 END;
