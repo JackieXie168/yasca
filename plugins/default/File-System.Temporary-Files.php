@@ -9,29 +9,29 @@ class Plugin_file_system_temporary_files extends Plugin {
 	public $valid_file_types = array();	// match everything
 	
 	public $pattern_list = array(
-							"*.tmp",
-	                        "*.temp",
-	                        "*dummy*",
-	                        "*.old",
-	                        "*.bak",
-	                        "*.save",
-	                        "*.backup",
-	                        "*.orig",
-	                        "*.000",
-	                        "*.copy",
-	                        "Copy of*",
-	                        "_*",
-	                        "vssver.scc",	/* Visual SourceSafe */
-	                        "thumbs.db",	/* Explorer Thumbnails */
-	                        "*.psd",		/* Photoshop */ 
-							"hco.log",		/* CA Harvest */
-							"harvest.sig",	/* CA Harvest */
-							"*.svn-base",	/* SVN */
-							"all-wcprops",	/* SVN */
-							".project",		/* Eclipse */
-							".classpath",	/* Eclipse */
-							'.gitignore"	/* Git */
-	                    	);
+                                "*.tmp",
+                                "*.temp",
+                                "*dummy*",
+                                "*.old",
+                                "*.bak",
+                                "*.save",
+                                "*.backup",
+                                "*.orig",
+                                "*.000",
+                                "*.copy",
+                                "Copy of*",
+                                "_*",
+                                "vssver.scc",   /* Visual SourceSafe */
+                                "thumbs.db",    /* Explorer Thumbnails */
+                                "*.psd",        /* Photoshop */ 
+                                "hco.log",      /* CA Harvest */
+                                "harvest.sig",  /* CA Harvest */
+                                "*.svn-base",   /* SVN */
+                                "all-wcprops",  /* SVN */
+                                ".project",     /* Eclipse */
+                                ".classpath",   /* Eclipse */
+                                ".gitignore"    /* Git */
+                                );
 
 	function execute() {		
 		$filename = basename($this->filename);
