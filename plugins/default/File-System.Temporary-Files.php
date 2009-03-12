@@ -23,13 +23,14 @@ class Plugin_file_system_temporary_files extends Plugin {
 	                        "_*",
 	                        "vssver.scc",	/* Visual SourceSafe */
 	                        "thumbs.db",	/* Explorer Thumbnails */
-	                        "*.psd",	/* Photoshop */ 
-				"hco.log",	/* CA Harvest */
-				"harvest.sig",	/* CA Harvest */
-				"*.svn-base",	/* SVN */
-				"all-wcprops",	/* SVN */
-				".project",	/* Eclipse */
-				".classpath"	/* Eclipse */
+	                        "*.psd",		/* Photoshop */ 
+							"hco.log",		/* CA Harvest */
+							"harvest.sig",	/* CA Harvest */
+							"*.svn-base",	/* SVN */
+							"all-wcprops",	/* SVN */
+							".project",		/* Eclipse */
+							".classpath",	/* Eclipse */
+							'.gitignore"	/* Git */
 	                    	);
 
 	function execute() {		
