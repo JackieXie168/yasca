@@ -1,0 +1,9 @@
+Requirements:
+    Yasca
+	* PHP 5 (+ CLI)
+    Pixy
+	* Sun Java 1.6+
+    FindBugs
+	* Sun Java 1.5+
+    PMD
+	* Sun Java 1.4+

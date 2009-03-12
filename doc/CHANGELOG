@@ -7,10 +7,11 @@ Version 1.1 released on 2008-12-19
     Minor bug fixes in PMD and FindBugs plugin (cross-platform)
     Fixed line endings for Unix and Windows
     Added new plugins
-Version 1.2 released on 2009-02-15
+Version 1.2 released on 2009-01-16
     Enhanced Grep plugin - multiple regex modifiers allowed
     Ability to ignore certain findings
     Added external tool Pixy
     Added plugins for PHP
     Added plugins for C++
-    
+Version 1.3 released on 2009-02-15
+    Many bug fixes - thank you to zaph, jack, and jen140
