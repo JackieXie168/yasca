@@ -159,7 +159,6 @@ class Plugin_Grep extends Plugin {
 			    $matches = array();
 
 			    $orig_error_level = error_reporting(0);
-
 			    
 			    $matches = preg_grep('/' . $grep . '/' . $modifier, $file_contents);
 
@@ -187,6 +186,7 @@ class Plugin_Grep extends Plugin {
 				$result->category_link = $this->category_link;
 				$result->description = $this->description; //$yasca->get_adjusted_description("Grep", $this->name, $this->description);
 				$result->source = $match;
+				$result->source_context = array_slice( $file_contents, max( $result->line_number-(($this->context_size+1)/2), 0), $this->context_size );
 				$result->plugin_name = $yasca->get_adjusted_alternate_name("Grep", $this->name, "Grep: " . $this->name);
 				if ($this->fix !== "")
 					$yasca->add_fix($result, $this->filename, $result->line_number, $match, eval($this->fix));

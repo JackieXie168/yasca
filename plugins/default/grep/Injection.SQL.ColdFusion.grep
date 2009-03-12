@@ -2,11 +2,11 @@ name = SQL Injection
 file_type = cfm
 
 preprocess = trim_cfx_ingres_sql
-grep = /cfx_ingres.*\"\s*select .*from .*\'?#form\./i
-grep = /cfx_ingres.*\"\s*delete .*from .*\'?#form\./i
-grep = /cfx_ingres.*\"\s*insert into .*\'?#form\./i
-grep = /cfx_ingres.*\"\s*update .* set .*\'?#form\./i
+grep = /cfx_ingres.*\"\s*select .*from .*\'?#(form|url)\./i
+grep = /cfx_ingres.*\"\s*delete .*from .*\'?#(form|url)\./i
+grep = /cfx_ingres.*\"\s*insert into .*\'?#(form|url)\./i
+grep = /cfx_ingres.*\"\s*update .* set .*\'?#(form|url)\./i
 
-category = SQL Injection
+category = SQL Injection via cfx_ingres tag
 severity = 1
 category_link = http://www.fortifysoftware.com/vulncat/java/java_input_sql_injection.html
