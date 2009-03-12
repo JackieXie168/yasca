@@ -29,6 +29,7 @@ class Plugin_Grep extends Plugin {
 	public $category_link;
 	public $severity = 5;
 	public $description;
+	public $preprocess;
 	public $is_multi_target = true;
 	
 	private static $union_valid_file_types;
@@ -96,6 +97,7 @@ class Plugin_Grep extends Plugin {
 				elseif (preg_match('/^\s*grep\s*=\s*(.*)/i', $grep, $matches)) array_push($this->grep, $matches[1]);
 				elseif (preg_match('/^\s*pre_grep\s*=\s*(.*)/i', $grep, $matches)) $this->pre_grep = $matches[1];
 				elseif (preg_match('/^\s*category\s*=\s*(.*)/i', $grep, $matches)) $this->category = $matches[1];
+				elseif (preg_match('/^\s*preprocess\s*=\s*(.*)/i', $grep, $matches)) $this->preprocess = trim($matches[1]);
 				elseif (preg_match('/^\s*lookahead_length\s*=\s*(.*)/i', $grep, $matches)) $this->lookahead_length = $matches[1];
 				elseif (preg_match('/^\s*fix\s*=\s*(.*)/i', $grep, $matches)) $this->fix = $matches[1];
 				elseif (preg_match('/^\s*category_link\s*=\s*(.*)/i', $grep, $matches)) $this->category_link = $matches[1];
@@ -126,6 +128,12 @@ class Plugin_Grep extends Plugin {
 			    continue;
 			}
 
+			// check for a valid preprocessor
+			if (isset($this->preprocess) && !function_exists($this->preprocess)) {
+			    $yasca->log_message("Unable to find preprocessor function [{$this->preprocess}]. Ignoring.", E_USER_WARNING);
+			    unset($this->preprocess);
+			}
+			    
 			// Set the name if it isn't already specified
 			if (!isset($this->name) || $this->name == "") 
 				$this->name = basename($grep_plugin, ".grep");
@@ -137,6 +145,8 @@ class Plugin_Grep extends Plugin {
 			}
 
 			$pre_matches = array();			// holds line numbers of pre_grep matches
+
+			$file_contents = (isset($this->preprocess) ? call_user_func($this->preprocess, $this->file_contents) : $this->file_contents);
 
 			foreach ($this->grep as $grep) {
 			    $orig_grep = $grep;
@@ -150,7 +160,8 @@ class Plugin_Grep extends Plugin {
 
 			    $orig_error_level = error_reporting(0);
 
-			    $matches = preg_grep('/' . $grep . '/' . $modifier, $this->file_contents);
+			    
+			    $matches = preg_grep('/' . $grep . '/' . $modifier, $file_contents);
 
 			    if (preg_match("/^__(.*)/", $orig_grep)) {			// for pre_grep
 				    $pre_matches = array_keys($matches);

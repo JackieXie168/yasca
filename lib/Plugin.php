@@ -2,6 +2,7 @@
 
 include_once("lib/Result.php");
 include_once("lib/common-analysis.php");
+include_once("lib/PreProcessors.php");
 
 /**
  * Plugin Class
