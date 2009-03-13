@@ -38,7 +38,7 @@ function main() {
 	$yasca->execute_callback("pre-report");
 	Yasca::log_message("Creating report...", E_USER_WARNING);
 	
-	$report = $yasca->instantiate_report($yasca->results);			
+	$report = $yasca->instantiate_report($yasca->results);
 	$report->execute();
 	$yasca->execute_callback("post-report");
 	

@@ -180,8 +180,11 @@ class Plugin {
 	    		}
 	    	    }
 	    	}
+		/* Adding ability to use {foo.txt} instead of txt so that a specific file can be used */
 	    	foreach ($ext as $ek => $ev) {
 		    if (endsWith($filename, "." . $ev))
+			$ext_valid = true;
+		    elseif (fnmatch($ev, $filename))
 			$ext_valid = true;
 		}
 	    }

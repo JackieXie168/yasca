@@ -13,7 +13,7 @@ include_once("lib/Plugin.php");
 include_once("lib/common.php");
 include_once("lib/cache.php");
 
-define("VERSION", "1.2");
+define("VERSION", "1.3");
 
 /**
  * This class implements a generic code scanner.
@@ -551,7 +551,7 @@ Perform analysis of program source code.
                               desktop in Yasca directory)
       --log FILE            write log entries to FILE
   -r, --report REPORT       use REPORT template (default: HTMLGroupReport). Other options
-                              include HTMLGroupReport, CSVReport, XMLReport, SQLLiteReport, 
+                              include HTMLGroupReport, CSVReport, XMLReport, SQLReport, 
                               and DetailedReport. 
   -s, --silent              do not show any output
   -v, --version             show version information
@@ -823,7 +823,7 @@ END;
 		}
 		
 		foreach ($event_list as $event) {
-			call_user_func($event);	
+			@call_user_func($event);	
 		}
 	}
 	

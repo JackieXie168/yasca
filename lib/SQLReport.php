@@ -22,80 +22,114 @@ class SQLReport extends Report {
 	private $dbh;
 
 	function openDatabase() {
-	    $dsn = $yasca->options['dsn'];
-	    $username = $yasca->options['username'];
-	    $password = $yasca->options['password'];
+	    $yasca =& Yasca::getInstance();	    
 	    
 	    try {
-		$this->dbh = new PDO('mysql:dbname=block863_yasca;host=block86.com', 'yasca', 'yasca');
+		$this->dbh = new PDO('sqlite:yasca.db', 'x', 'x');
 	    } catch(PDOException $e) {
-		$yasca->log_message("Error creating database connection: " . $e->getMessage());
+		$yasca->log_message("Error creating database connection: " . $e->getMessage(), E_USER_ERROR);
 		$this->dbh = false;
 		return;
 	    }
 
-	    $rows = $dbh->query("select 1 from scan");
-	    if (!is_array($rows) || count($rows) == 0)
+/*
+	    $rows = $this->dbh->query("select 1 from target");
+	    if (!is_array($rows) || count($rows) == 0) {
 
 		// Create database structure if needed
 		foreach (file("resources/db.sql") as $sql) {
 		    $dbh->exec($sql);
 		}
 	    }
+*/
 	}
-
-	private function setCategory($result) {
-	    if (!$this->db) $this->openDatabase();
-	    $category_id = $this->dbh->query("select category_id from category where name = '{$result->category}' and link = '{$result->category_link}'", true);
-	    print_r($category_id);
-
-	    if (!is_numeric($category_id)) {
-		$this->db->queryExec("insert into category (name, link) values ('{$result->category}', '{$result->category_link}')");
-		$category_id = $this->db->singleQuery("select category_id from category where name = '{$result->category}' and link = '{$result->category_link}'", true);
-	    }
-	    return $category_id;
-	}
-
-	private function setPlugin($result) {
-	    if (!$this->db) $this->openDatabase();
-	    $plugin_id = $this->db->singleQuery("select plugin_id from plugin where name = '{$result->plugin_name}'", true);
-	    if (!is_numeric($plugin_id)) {
-		$this->db->queryExec("insert into plugin (name) values ('{$result->plugin_name}')");
-		$plugin_id = $this->db->singleQuery("select plugin_id from plugin where name = '{$result->plugin_name}'", true);
-	    }
-	    return $plugin_id;
-	}
-
 
 	/**
 	 * Executes a SQLLiteReport, to the output file $options['output'] or ./results.db
 	 */ 
 	function execute() {
 		if (!isset($this->dbh)) $this->openDatabase();
+		if (!$this->dbh) {
+		    $yasca->log_message("Aborting creation of SQLReport.", E_USER_ERROR);
+		    return;
+		}
+		$yasca =& Yasca::getInstance();
+		$sth = false;
 
 		$target_dir = $this->options['dir'];
-		$options = print_r($this->options, true);
+		$username = getenv("USERNAME");
 
-		$this->db->queryExec("insert into scan (target, scan_dt, options) values ('$target_dir', '2009-01-01', '$options')");
-		$scan_id = $this->db->lastInsertRowid();
+		$sth = $this->dbh->prepare("insert into target (location, scan_dt, scan_by) values (?,  date('now'), ?)");
+		$sth->bindParam(1, $target_dir);
+		$sth->bindParam(2, $username);
+		$sth->execute();
 
+		$target_id = $this->dbh->lastInsertId();
+
+		$this->dbh->beginTransaction();
 		foreach ($this->results as $result) {
 			if (!$this->is_severity_sufficient($result->severity))
 			    continue;
-			$category_id = $this->setCategory($result);
-			$plugin_id = $this->setPlugin($result);
-
-
-			$filename = $result->filename;
-			$line_number = $result->line_number;
+			$description_id = $this->get_description_id($result->description);
+			$category_id = $this->get_category_id($result->category, $result->category_link);
 			$is_source_code = $result->is_source_code ? "Y" : "N";
+			$source_context = $result->source_context;
+			$source_context = implode("\n", $source_context);
 
-			$this->db->queryExec("insert into result (scan_id, plugin_id, category_id, filename, line_number, is_source_code) values ($scan_id, $plugin_id, $category_id, '$filename', $line_number, '$is_source_code')");
-			
+			$sth = $this->dbh->prepare("insert into finding (target_id, category_id, severity, filename, line_number, description_id, source_line, source_context, active_fl) values (:target_id, :category_id, :severity, :filename, :line_number, :description_id, :source_line, :source_context, 'Y')");
+
+			$sth->bindParam(":target_id", $target_id, PDO::PARAM_INT);
+			$sth->bindParam(":category_id", $category_id, PDO::PARAM_INT);
+			$sth->bindParam(":severity", $result->severity, PDO::PARAM_INT);
+			$sth->bindParam(":filename", $result->filename);
+			$sth->bindParam(":line_number", $result->line_number, PDO::PARAM_INT);
+			$sth->bindParam(":description_id", $description_id, PDO::PARAM_INT);
+			$sth->bindParam(":source_line", $result->source);
+			$sth->bindParam(":source_context", $source_context);
+
+			$sth->execute();			
 		}
-		
+
+		$this->dbh->commit();
+
+		$this->dbh = null;
 	}
-	
+
+	function get_description_id($description) {
+		$sth = $this->dbh->prepare("select description_id from description where description=?");
+		$sth->bindParam(1, $description);
+		$sth->execute();
+	
+		$rs = $sth->fetch(PDO::FETCH_OBJ);
+		if ($rs == false) {
+		    $sth = $this->dbh->prepare("insert into description (description) values (?)");
+		    $sth->bindParam(1, $description);
+		    $sth->execute();
+		    return $this->dbh->lastInsertId();
+		} else {
+		    return $rs->description_id;
+		}
+	}
+
+	function get_category_id($name, $url) {
+		$sth = $this->dbh->prepare("select category_id from category where name=? and url = ?");
+		$sth->bindParam(1, $name);
+		$sth->bindParam(2, $url);
+		$sth->execute();
+
+		$rs = $sth->fetch(PDO::FETCH_OBJ);
+		if ($rs == false) {
+		    $sth = $this->dbh->prepare("insert into category (name, url) values (?, ?)");
+		    $sth->bindParam(1, $name);
+		    $sth->bindParam(2, $url);
+		    $sth->execute();
+		    return $this->dbh->lastInsertId();
+		} else {
+		    return $rs->category_id;
+		}
+
+	}
+
 	function get_preamble() {
 		return "";
 	}
