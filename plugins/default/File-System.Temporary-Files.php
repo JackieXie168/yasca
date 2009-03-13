@@ -30,7 +30,8 @@ class Plugin_file_system_temporary_files extends Plugin {
 				"*.svn-base",	/* SVN */
 				"all-wcprops",	/* SVN */
 				".project",	/* Eclipse */
-				".classpath"	/* Eclipse */
+				".classpath",	/* Eclipse */
+				".gitignore"    /* Git */
 	                    	);
 
 	function execute() {		
