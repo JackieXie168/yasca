@@ -1,60 +1,12 @@
 <?php
 
-define("PHPLINT_MOD", "/home/jpa/webroots/test/PHPLint/phplint-pure-c-0.8_20090102/modules");
-
-/**
- * The function cmpPHPLintMessages is for sorting of the PHPLint-output using usort.
- * The regular expression for splitting up the message was created with support of
- * => http://www.txt2re.com/
- */
-function cmpPHPLintMessages ($valLeft, $valRight) {
-   $cmpResult = 0;
-   
-   $re1='((?:\\/[\\w\\.\\-]+)+)';	# Filename
-   $re2='.*?';	                    # Non-greedy match on filler
-   $re3='(\\d+)';	               	# Linenumber
-   $re4='.*?';	                    # Non-greedy match on filler
-   $re5='((?:[a-z][a-z]+))';	    # Category
-   $re6='.*?';	                    # Non-greedy match on filler
-   $re7=':\s(.*)';	               	# Errormessage
-
-   if (preg_match_all ("/".$re1.$re2.$re3.$re4.$re5.$re6.$re7."/is", $valLeft, $matches))
-   {
-      $Lfilename = $matches[1][0];
-      $Lline_number = is_numeric($matches[2][0]) ? $matches[2][0] : "0";
-      $Lmessage = $matches[4][0];
-      if (preg_match_all ("/".$re1.$re2.$re3.$re4.$re5.$re6.$re7."/is", $valRight, $matches))
-      {
-         $Rfilename = $matches[1][0];
-         $Rline_number = is_numeric($matches[2][0]) ? $matches[2][0] : "0";
-         $Rmessage = $matches[4][0];
-         
-         $cmpResult = strcmp($Lfilename, $Lfilename);
-         if ($cmpResult == 0)
-         {
-            if ((int)$Lline_number < (int)$Rline_number)
-            {
-               $cmpResult = -1;
-            }
-            elseif ((int)$Lline_number > (int)$Rline_number)
-            {
-               $cmpResult = 1;
-            }
-            else
-            {
-               $cmpResult = strcmp($Lmessage, $Rmessage);
-            }
-         }
-      }
-   }
-
-   return $cmpResult;
-}
-
 /**
  * The PHPLint Plugin uses PHPLint to discover potential vulnerabilities in .php files.
  * This class is a Singleton that runs only once, returning all of the results that
  * first time.
+ *
+ * Special thanks to Jochen Paul for writing this plug-in.
+ *
  * @extends Plugin
  * @package Yasca
  */
@@ -91,9 +43,6 @@ class Plugin_PHPLint extends Plugin {
 		if ($yasca->options['debug'])
 			$yasca->log_message("PHPLint returned: " . implode("\r\n", $result_list), E_ALL);
 			
-         $result_list = array_unique($result_list);		// remove doubles
-         usort ($result_list, "cmpPHPLintMessages");	// sort the list (needed?)
-
          // Now check each message
          foreach($result_list as $result) {
             // http://www.txt2re.com/
