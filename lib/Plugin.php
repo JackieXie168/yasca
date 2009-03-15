@@ -62,11 +62,12 @@ class Plugin {
 	 */
 	public $initialized = false;
 
-	private static $ext_classes = array( "JAVA" => array("java", "jsp", "jsw"),
-				    	     "C" => 	array("c", "cpp", "h"),
-				    	     "HTML" => array("html", "css", "js", "htm"),
+	private static $ext_classes = array( "JAVA"   => array("java", "jsp", "jsw"),
+				    	     "C"      => array("c", "cpp", "h"),
+				    	     "HTML"   => array("html", "css", "js", "htm"),
 					     "BINARY" => array("dll", "zip", "jar", "ear", "war"),
-					     "NET" => array("aspx", "asp", "vb", "frm", "res", "cs")
+					     "PHP"    => array("php", "php5", "php4"),
+					     "NET"    => array("aspx", "asp", "vb", "frm", "res", "cs")
 				    );
 
 	/**

@@ -425,4 +425,14 @@ function any_within($haystack, $needle, $max_distance = 10) {
     }
     return false;
 }
+
+function correct_slashes($path) {
+    if (isWindows()) {
+	$path = str_replace("/", "\\", $path);
+    } else {
+	$path = str_replace("\\", "/", $path);
+    }
+    return $path;
+}
+
 ?>

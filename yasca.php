@@ -42,7 +42,7 @@ function main() {
 	$report->execute();
 	$yasca->execute_callback("post-report");
 	
-	Yasca::log_message("Results have been written to " . $yasca->options["output"], E_USER_WARNING);
+	Yasca::log_message("Results have been written to " . correct_slashes($yasca->options["output"]), E_USER_WARNING);
 	
 	if ($yasca->options['debug']) print_r(profile("get"));
 }

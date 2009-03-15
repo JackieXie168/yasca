@@ -14,7 +14,7 @@ class SQLReport extends Report {
 	/**
 	 * The default extension used for reports of this type.
 	 */
-	public $default_extension = "html";
+	public $default_extension = "db";
 
 	/**
 	 * Holds a reference to the SQL Database
@@ -24,8 +24,22 @@ class SQLReport extends Report {
 	function openDatabase() {
 	    $yasca =& Yasca::getInstance();	    
 	    
+	    $yasca->options["output"] = dirname($yasca->options["output"]) . "/" . basename($yasca->options["output"], ".html") . ".db";
+	    $yasca->options["output"] = correct_slashes($yasca->options["output"]);
+
+	    $output_file = $yasca->options["output"];
+
+	    if (!file_exists(dirname($output_file))) {
+	            @mkdir(dirname($output_file));
+	    }
+
+	    if (!file_exists($output_file)) {
+		    copy("resources/yasca.db", $output_file);
+	    }
+
 	    try {
-		$this->dbh = new PDO('sqlite:yasca.db', 'x', 'x');
+	        $this->dbh = new PDO("sqlite:" . $output_file, '', '');
+		
 	    } catch(PDOException $e) {
 		$yasca->log_message("Error creating database connection: " . $e->getMessage(), E_USER_ERROR);
 		$this->dbh = false;
@@ -59,9 +73,13 @@ class SQLReport extends Report {
 		$target_dir = $this->options['dir'];
 		$username = getenv("USERNAME");
 
-		$sth = $this->dbh->prepare("insert into target (location, scan_dt, scan_by) values (?,  date('now'), ?)");
+		$sth = $this->dbh->prepare("insert into scan (target_dir, options, scan_dt, scan_by) values (?,  ?, date('now'), ?)");
+		$options = print_r($yasca->options, true);
+
 		$sth->bindParam(1, $target_dir);
-		$sth->bindParam(2, $username);
+		$sth->bindParam(2, $options);
+		$sth->bindParam(3, $username);
+
 		$sth->execute();
 
 		$target_id = $this->dbh->lastInsertId();
@@ -74,18 +92,22 @@ class SQLReport extends Report {
 			$category_id = $this->get_category_id($result->category, $result->category_link);
 			$is_source_code = $result->is_source_code ? "Y" : "N";
 			$source_context = $result->source_context;
-			$source_context = implode("\n", $source_context);
+			$source_context = is_array($source_context) ? implode("\n", $source_context) : "";
+			$file_modify_dt = @filemtime($result->filename);
+			if (!isset($file_modify_dt) || $file_modify_dt === false) $file_modify_dt = 0;
+			$file_modify_dt = date('r', $file_modify_dt);
 
-			$sth = $this->dbh->prepare("insert into finding (target_id, category_id, severity, filename, line_number, description_id, source_line, source_context, active_fl) values (:target_id, :category_id, :severity, :filename, :line_number, :description_id, :source_line, :source_context, 'Y')");
+			$sth = $this->dbh->prepare("insert into result (scan_id, category_id, severity, filename, line_number, file_modify_dt, description_id, message, source_context, active_fl) values (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Y')");
 
-			$sth->bindParam(":target_id", $target_id, PDO::PARAM_INT);
-			$sth->bindParam(":category_id", $category_id, PDO::PARAM_INT);
-			$sth->bindParam(":severity", $result->severity, PDO::PARAM_INT);
-			$sth->bindParam(":filename", $result->filename);
-			$sth->bindParam(":line_number", $result->line_number, PDO::PARAM_INT);
-			$sth->bindParam(":description_id", $description_id, PDO::PARAM_INT);
-			$sth->bindParam(":source_line", $result->source);
-			$sth->bindParam(":source_context", $source_context);
+			$sth->bindParam(1, $target_id, PDO::PARAM_INT);
+			$sth->bindParam(2, $category_id, PDO::PARAM_INT);
+			$sth->bindParam(3, $result->severity, PDO::PARAM_INT);
+			$sth->bindParam(4, $result->filename);
+			$sth->bindParam(5, $result->line_number, PDO::PARAM_INT);
+			$sth->bindParam(6, $file_modify_dt);
+			$sth->bindParam(7, $description_id, PDO::PARAM_INT);
+			$sth->bindParam(8, $result->source);
+			$sth->bindParam(9, $source_context);
 
 			$sth->execute();			
 		}

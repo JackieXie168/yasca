@@ -3,7 +3,6 @@
  * The PMD Plugin uses PMD to discover potential vulnerabilities in .java files.
  * This class is a Singleton that runs only once, returning all of the results that
  * first time.
- * Uses PMD 4.2 (as of 28 March 2008)
  * @extends Plugin
  * @package Yasca
  */ 

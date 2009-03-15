@@ -422,6 +422,7 @@ class Yasca {
 		$opt['debug'] = false;
 		$opt['log'] = false;
 		$opt['fixes'] = false;
+		$opt['parameter'] = array();	// will be filled in by -d options
 
 		// go through the command line arguments
 		for ($i = 1; $i < $_SERVER["argc"]; $i++) {
@@ -442,24 +443,28 @@ class Yasca {
 	            	Yasca::help();
 	            	exit(1);
 	            	break;
-	            
-		    case "--debug":
-			$opt['debug'] = true;
-			break;
-		
-		    case "--log":
-			$opt['log'] = $_SERVER['argv'][++$i];
-			break;
-					
-		    case "-i":
-		    case "--ignore-ext":
-			$opt['ignore-ext'] = $_SERVER['argv'][++$i];
-			break;
 				
-		    case "--ignore-file":
-			$opt['ignore-file'] = $_SERVER['argv'][++$i];
-			break;
-					
+				case "-d":		/* Pass this parameter to underlying components */
+					parse_str($_SERVER['argv'][++$i], $opt['parameter']);
+					break;
+		            
+			    case "--debug":
+					$opt['debug'] = true;
+					break;
+			
+			    case "--log":
+					$opt['log'] = $_SERVER['argv'][++$i];
+					break;
+							
+			    case "-i":
+			    case "--ignore-ext":
+					$opt['ignore-ext'] = $_SERVER['argv'][++$i];
+					break;
+						
+			    case "--ignore-file":
+					$opt['ignore-file'] = $_SERVER['argv'][++$i];
+					break;
+						
 	            case "-o":
 	            case "--output":
 	            	$opt['output'] = $_SERVER['argv'][++$i];
@@ -523,6 +528,7 @@ class Yasca {
 			Yasca::help();
 			exit(1);
 		}
+
 		return $opt;
 	}
 	
@@ -537,6 +543,7 @@ Perform analysis of program source code.
 
       --debug               additional debugging
   -h, --help                show this help
+  -d "QUERYSTRING"          pass the expanded query string to Yasca's components
   -i, --ignore-ext EXT,EXT  ignore these file extensions 
                               (default: exe,zip,jpg,gif,png,pdf,class)
       --ignore-file FILE    ignore findings from the specified xml file
@@ -561,6 +568,7 @@ Examples:
   yasca /opt/dev/source_code
   yasca -px FindBugs,PMD,Antic,JLint /opt/dev/source_code
   yasca -o c:\output.csv --report CSVReport "c:\\foo bar\\quux"
+  yasca -d "SQLReport.database=./my.db" -r SQLReport /opt/dev/source_code
 
 END;
 		$this->log_message($help_message, E_USER_WARNING);

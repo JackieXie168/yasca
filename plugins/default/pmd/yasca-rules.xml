@@ -8,22 +8,6 @@
   <description>
 This ruleset contains custom rules written for Yasca.
   </description>
-<!--
-    <rule name="Test Rule"
-          message="Test Rule"
-          class="net.sourceforge.pmd.rules.TestRule"
-          externalInfoUrl="#">
-      <description>
-	Test Rule
-      </description>
-      <priority>3</priority>
-      <example>
-  <![CDATA[
-TEST RULE
- ]]>
-      </example>
-    </rule>
--->
 
     <rule name="Use of non-cryptographic PRNG"
           message="Avoid using Math.random() where true randomness is required."

@@ -15,5 +15,12 @@
 	
 	<adjustment plugin_name="Antic" finding_name="May be wrong assumption about ELSE branch association" severity="5"/>
 	<adjustment plugin_name="Antic" finding_name="May be wrong assumption about IF body" severity="5"/>
+
+	<adjustment plugin_name="PHPLint" finding_name="ERROR" severity="1"/>
+	<adjustment plugin_name="PHPLint" finding_name="Warning" severity="3"/>
+	<adjustment plugin_name="PHPLint" finding_name="notice" severity="5"/>
+
+	<adjustment plugin_name="JavaScriptLint" finding_name="missing semicolon" alternate_name="Statement Missing Semicolon"/>
+	<adjustment plugin_name="JavaScriptLint" finding_name="syntax error" alternate_name="Syntax Error"/>
 		
 </adjustments>
