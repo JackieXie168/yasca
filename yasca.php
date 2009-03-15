@@ -9,7 +9,7 @@
  * @package Yasca
  */
 
-chdir(dirname($_SERVER["argv"][0]));		// get back to the current directory
+chdir(dirname($_SERVER["argv"][0]));        // get back to the current directory
 
 // Use this to show ALL possible errors
 error_reporting(E_ALL | E_PARSE);
@@ -24,27 +24,27 @@ include_once("lib/Report.php");
   * Main entry point for the Yasca engine.
   */
 function main() {
-	Yasca::log_message("Yasca " . constant("VERSION") . " - http://yasca.sourceforge.net - Designed & Developed by Michael V. Scovetta\r\n\r\n", E_USER_NOTICE, false, true);
-	Yasca::log_message("Initializing components...", E_USER_WARNING);
+    Yasca::log_message("Yasca " . constant("VERSION") . " - http://yasca.sourceforge.net - Designed & Developed by Michael V. Scovetta\r\n\r\n", E_USER_NOTICE, false, true);
+    Yasca::log_message("Initializing components...", E_USER_WARNING);
 
-	$yasca =& Yasca::getInstance();	
+    $yasca =& Yasca::getInstance(); 
 
-	if ($yasca->options['debug']) profile("init");
-	$yasca->execute_callback("pre-scan");
-	Yasca::log_message("Starting scan. This may take a few minutes to complete...", E_USER_WARNING);
-	$yasca->scan();
-	$yasca->execute_callback("post-scan");
-	
-	$yasca->execute_callback("pre-report");
-	Yasca::log_message("Creating report...", E_USER_WARNING);
-	
-	$report = $yasca->instantiate_report($yasca->results);
-	$report->execute();
-	$yasca->execute_callback("post-report");
-	
-	Yasca::log_message("Results have been written to " . correct_slashes($yasca->options["output"]), E_USER_WARNING);
-	
-	if ($yasca->options['debug']) print_r(profile("get"));
+    if ($yasca->options['debug']) profile("init");
+    $yasca->execute_callback("pre-scan");
+    Yasca::log_message("Starting scan. This may take a few minutes to complete...", E_USER_WARNING);
+    $yasca->scan();
+    $yasca->execute_callback("post-scan");
+    
+    $yasca->execute_callback("pre-report");
+    Yasca::log_message("Creating report...", E_USER_WARNING);
+    
+    $report = $yasca->instantiate_report($yasca->results);
+    $report->execute();
+    $yasca->execute_callback("post-report");
+    
+    Yasca::log_message("Results have been written to " . correct_slashes($yasca->options["output"]), E_USER_WARNING);
+    
+    if ($yasca->options['debug']) print_r(profile("get"));
 }
 
 
@@ -54,33 +54,33 @@ function main() {
  * @return array of profiling information, if 'get' was passed.
  */
 function profile($cmd = false) {
-	static $log, $last_time, $total;
-	list($usec, $sec) = explode(" ", microtime());
-	$now = (float) $usec + (float) $sec;
-	if($cmd) {
-		if($cmd == 'get') {
-			unregister_tick_function('__profile__');
-			foreach($log as $function => $time) {
-				if($function != '__profile__') {
-				        $by_function[$function] = round($time / $total * 100, 2);
-				}
-			}
-			arsort($by_function);
-			return $by_function;
+    static $log, $last_time, $total;
+    list($usec, $sec) = explode(" ", microtime());
+    $now = (float) $usec + (float) $sec;
+    if($cmd) {
+        if($cmd == 'get') {
+            unregister_tick_function('__profile__');
+            foreach($log as $function => $time) {
+                if($function != '__profile__') {
+                        $by_function[$function] = round($time / $total * 100, 2);
+                }
+            }
+            arsort($by_function);
+            return $by_function;
         }
-		else if($cmd == 'init') {
-			$last_time = $now;
-			register_tick_function('profile');		// Register the tick function
-			declare(ticks=1); 						// Start at # ticks = 1			
-			return;
-		}
-	}
-	$delta = $now - $last_time;
-	$last_time = $now;
-	$trace = debug_backtrace();
-	$caller = $trace[1]['function'];
-	@$log[$caller] += $delta;
-	$total += $delta;
+        else if($cmd == 'init') {
+            $last_time = $now;
+            register_tick_function('profile');      // Register the tick function
+            declare(ticks=1);                       // Start at # ticks = 1         
+            return;
+        }
+    }
+    $delta = $now - $last_time;
+    $last_time = $now;
+    $trace = debug_backtrace();
+    $caller = $trace[1]['function'];
+    @$log[$caller] += $delta;
+    $total += $delta;
 }
 
 function custom_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {

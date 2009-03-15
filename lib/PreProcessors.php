@@ -1,6 +1,10 @@
 <?php
 /* Pre-Processing Functions */
 
+/**
+ * This is a pre-processing function for ColdFusion code that uses the cfx_ingres tag
+ * to remove extra lines from the sql attribute.
+ */
 function trim_cfx_ingres_sql($file_contents) {
     $output = "";
     $line = "";
@@ -20,10 +24,10 @@ function trim_cfx_ingres_sql($file_contents) {
                 $line = str_replace("\t", " ", $line);
                 $line = trim($line);
             }
-	    $output .= $line;
+        $output .= $line;
         } else {
-	    $output .= $line . "\n";
-	}
+        $output .= $line . "\n";
+    }
     }
     return explode("\n", $output);
 }

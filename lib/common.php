@@ -30,15 +30,15 @@ function flatten_array($value, $key, &$array) {
 }
 
 function ellipsize($string, $limit, $repl = "...", $strip_tags = true) {
-	if(strlen($string) > $limit) {
-		if ($strip_tags) {
-			return substr_replace(strip_tags($string),$repl,$limit-strlen($repl));
-		} else {
-			return substr_replace($string, $repl, $limit-strlen($repl));
-		}
-	} else {
-		return $string;
-	}
+    if(strlen($string) > $limit) {
+        if ($strip_tags) {
+            return substr_replace(strip_tags($string),$repl,$limit-strlen($repl));
+        } else {
+            return substr_replace($string, $repl, $limit-strlen($repl));
+        }
+    } else {
+        return $string;
+    }
 }
 
 function unlink_recursive($dir, $del_self = false) {
@@ -110,19 +110,19 @@ if( !function_exists('memory_get_usage') ) {
 }
 
 if ( !function_exists('file_put_contents') ) {
-	define('FILE_APPEND', 1);
-	function file_put_contents($n, $d, $flag = false) {
-	    $mode = ($flag == FILE_APPEND || strtoupper($flag) == 'FILE_APPEND') ? 'a' : 'w';
-	    $f = @fopen($n, $mode);
-	    if ($f === false) {
-	        return 0;
-	    } else {
-	        if (is_array($d)) $d = implode($d);
-	        $bytes_written = fwrite($f, $d);
-	        fclose($f);
-	        return $bytes_written;
-	    }
-	}
+    define('FILE_APPEND', 1);
+    function file_put_contents($n, $d, $flag = false) {
+        $mode = ($flag == FILE_APPEND || strtoupper($flag) == 'FILE_APPEND') ? 'a' : 'w';
+        $f = @fopen($n, $mode);
+        if ($f === false) {
+            return 0;
+        } else {
+            if (is_array($d)) $d = implode($d);
+            $bytes_written = fwrite($f, $d);
+            fclose($f);
+            return $bytes_written;
+        }
+    }
 }
 
 if ( !function_exists('sys_get_temp_dir') )
@@ -157,39 +157,39 @@ if ( !function_exists('sys_get_temp_dir') )
  * Encodes a string in a format similar to base64, but that can be used as a filename.
  */
 function base64_encode_safe($text) {
-	$t = base64_encode( gzcompress($text, 9) );
-	$t = str_replace("+", "_", $t);
-	$t = str_replace("/", "-", $t);
-	return $t;
+    $t = base64_encode( gzcompress($text, 9) );
+    $t = str_replace("+", "_", $t);
+    $t = str_replace("/", "-", $t);
+    return $t;
 }
 
 /**
  * Decodes a string in a format similar to base64.
  */
 function base64_decode_safe($text) {
-	$t = $text;
-	$t = str_replace("-", "/", $t);
-	$t = str_replace("_", "+", $t);
-	$t = base64_decode( gzuncompress($t) );
-	return $t;
+    $t = $text;
+    $t = str_replace("-", "/", $t);
+    $t = str_replace("_", "+", $t);
+    $t = base64_decode( gzuncompress($t) );
+    return $t;
 }
 
-/**	
+/** 
  * Checks to see if $needle is anywhere within any of the components of $haystack.
  * Works recursively.
  */
 function substr_in_array($needle, $haystack) {
-	if (!is_string($needle) ||
-		!is_array($haystack)) {
-		return false;
-	}
+    if (!is_string($needle) ||
+        !is_array($haystack)) {
+        return false;
+    }
   
-	for ($i=0; $i<count($haystack); $i++) {
-		if (is_array($haystack[$i])) {
-			return substr_in_array($needle, $haystack[$i]);
-		} elseif (stripos($haystack[$i], $needle) !== FALSE) {
-			return true;
-      	}
+    for ($i=0; $i<count($haystack); $i++) {
+        if (is_array($haystack[$i])) {
+            return substr_in_array($needle, $haystack[$i]);
+        } elseif (stripos($haystack[$i], $needle) !== FALSE) {
+            return true;
+        }
     }
     return false;
 }
@@ -202,18 +202,18 @@ function substr_in_array($needle, $haystack) {
  * @return true iff filename matches one of the extensions, or if $ext was an empty array.
  */
 function check_in_filetype($filename, $ext = array()) {
-	$ext_valid = false;
-	if (is_array($ext)) {
-		if (count($ext) == 0) return true; 		// $ext=() means all accepted
-		for ($i=0; $i<count($ext); $i++) { 
-			if (endsWith($filename, "." . $ext[$i])) {
-				$ext_valid = true;
-			}
-		}
-	} else {
-		$ext_valid = endsWith($filename, ".$ext");
-	}
-	return $ext_valid;
+    $ext_valid = false;
+    if (is_array($ext)) {
+        if (count($ext) == 0) return true;      // $ext=() means all accepted
+        for ($i=0; $i<count($ext); $i++) { 
+            if (endsWith($filename, "." . $ext[$i])) {
+                $ext_valid = true;
+            }
+        }
+    } else {
+        $ext_valid = endsWith($filename, ".$ext");
+    }
+    return $ext_valid;
 }
 
 /**
@@ -225,25 +225,25 @@ function check_in_filetype($filename, $ext = array()) {
  * have a random (non-conflicting) 4-character string appended to it.
  */
 function collapse_dir($dest_dir, $file_type_list=array(), $start_dir=".", &$translation) {
-	if (!is_dir($dest_dir) || !is_dir($start_dir)) return;
-	$file_list = Yasca::dir_recursive($start_dir);
-	if ($file_list === false) return;
-	$file_id = 0;
-	foreach ($file_list as $filename) {
-		$pinfo = pathinfo($filename);
-		$ext = (isset($pinfo['extension']) ? $pinfo['extension'] : "");
-		
-		$rel_filename = str_replace(array($start_dir), "", $filename);
-		
-		$rel_filename = ++$file_id . ".$ext";
-		$translation[$file_id] = $filename;
-		
-		$dest_dir = str_replace("\\", "/", $dest_dir);
-		
-		if (count($file_type_list) == 0 || in_array(strtolower($ext), $file_type_list)) {
-			copy ($filename, $dest_dir . $rel_filename);
-		}
-	}
+    if (!is_dir($dest_dir) || !is_dir($start_dir)) return;
+    $file_list = Yasca::dir_recursive($start_dir);
+    if ($file_list === false) return;
+    $file_id = 0;
+    foreach ($file_list as $filename) {
+        $pinfo = pathinfo($filename);
+        $ext = (isset($pinfo['extension']) ? $pinfo['extension'] : "");
+        
+        $rel_filename = str_replace(array($start_dir), "", $filename);
+        
+        $rel_filename = ++$file_id . ".$ext";
+        $translation[$file_id] = $filename;
+        
+        $dest_dir = str_replace("\\", "/", $dest_dir);
+        
+        if (count($file_type_list) == 0 || in_array(strtolower($ext), $file_type_list)) {
+            copy ($filename, $dest_dir . $rel_filename);
+        }
+    }
 }
 
 if (!function_exists('fnmatch')) {
@@ -315,7 +315,7 @@ function get_owasp_vulnerability_content($url) {
     $matches = array();
     print "$url\n";
     if (!preg_match('/(https?\:\/\/[^\/]+\/)/i', $url, $matches)) {
-    	return "";
+        return "";
     }
     $baseurl = $matches[1];
 
@@ -329,10 +329,10 @@ function get_owasp_vulnerability_content($url) {
     
     //$html = preg_replace('/href\s*=\s*"\//', 'href="$baseurl/', $html);
     print $html;
-	if (function_exists("tidy_repair_string")) {
-    	return tidy_repair_string($html);
+    if (function_exists("tidy_repair_string")) {
+        return tidy_repair_string($html);
     } else {
-    	return $html;
+        return $html;
     }
 }
 
@@ -349,9 +349,9 @@ function find_similar_text($haystack, $needle, $minimum_similarity = 0) {
     }
     
     if ($closest_sim >= $minimum_similarity)
-    	return $closest_hay;
+        return $closest_hay;
     else
-    	return false;
+        return false;
 }
 
 function find_matching_prefix_length($a, $b) {
@@ -370,13 +370,13 @@ function find_matching_prefix_length($a, $b) {
  * @param string $filename filename to scan 
  */
 function get_class_from_file($filename) {
-	$fc = file_get_contents($filename);
-	if ($fc === false) {
-		return false;
-	}
-	$matches = array();
-	preg_match('/^\s*class\s*([^\s\{]+)/im', $fc, $matches);
-	return $matches[1];
+    $fc = file_get_contents($filename);
+    if ($fc === false) {
+        return false;
+    }
+    $matches = array();
+    preg_match('/^\s*class\s*([^\s\{]+)/im', $fc, $matches);
+    return $matches[1];
 }
 
 function getSystemOS() {
@@ -386,7 +386,7 @@ function getSystemOS() {
     @ob_end_clean();
     
     if (preg_match('/System \=\> ([^\s]+)/mi', $info, $matches)) {
-	return $matches[1];
+    return $matches[1];
     }
     return "Unknown";
 }
@@ -404,13 +404,13 @@ function is_valid_regex($regex) {
     preg_match($regex, "");
     error_reporting($orig_err);
     if (preg_last_error() == PREG_NO_ERROR) {
-	return true;
+    return true;
     } else {
-	return false;
+    return false;
     }
 }
 function highlight($string, $color="%W") {
-	return Console_Color::convert("%$color$string%n");
+    return Console_Color::convert("%$color$string%n");
 }
 
 function any_within($haystack, $needle, $max_distance = 10) {
@@ -421,16 +421,16 @@ function any_within($haystack, $needle, $max_distance = 10) {
         if ($hay < $needle &&
             $needle - $hay <= $max_distance) {
             return true;
-	}
+    }
     }
     return false;
 }
 
 function correct_slashes($path) {
     if (isWindows()) {
-	$path = str_replace("/", "\\", $path);
+    $path = str_replace("/", "\\", $path);
     } else {
-	$path = str_replace("\\", "/", $path);
+    $path = str_replace("\\", "/", $path);
     }
     return $path;
 }
