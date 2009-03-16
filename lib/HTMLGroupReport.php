@@ -14,7 +14,7 @@ class HTMLGroupReport extends Report {
     /**
      * The default extension used for reports of this type.
      */
-    var $default_extension = "html";
+    public $default_extension = "html";
 
     /**
      * Executes an HTMLReport, with output going to $options['output']

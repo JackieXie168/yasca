@@ -14,7 +14,7 @@ class CSVReport extends Report {
     /**
      * The default extension used for reports of this type.
      */
-    var $default_extension = "csv";
+    public $default_extension = "csv";
     
     /**
      * Executes a CSVReport, with output going to $options['output']

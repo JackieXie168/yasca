@@ -21,7 +21,41 @@ class SQLReport extends Report {
      */
     private $dbh;
 
-    function openDatabase() {
+    private $canExecute = true;
+
+    public function SQLReport() {
+        parent::_construct();
+
+        /* Verify that the required libraries are available */
+        if (!extension_loaded("pdo")) {
+            if (getSystemOS() == "Windows") {
+                if (!dl("pdo.dll") && !dl("resources/include/pdo.dll")) {
+                    Yasca::log_message("PDO is required for SQLReport, but cannot be found.", E_USER_ERROR);
+                    $this->canExecute = false;
+                }
+            } elseif (getSystemOS() == "Linux") {
+                if (!dl("pdo.so") && !dl("resources/include/pdo.so")) {
+                    Yasca::log_message("PDO is required for SQLReport, but cannot be found.", E_USER_ERROR);
+                    $this->canExecute = false;
+                }
+            }
+        }
+        if (!extension_loaded("pdo_sqlite")) {
+            if (getSystemOS() == "Windows") {
+                if (!dl("pdo_sqlite.dll") && !dl("resources/include/pdo_sqlite.dll")) {
+                    Yasca::log_message("PDO SQLite is required for SQLReport, but cannot be found.", E_USER_ERROR);
+                    $this->canExecute = false;
+                }
+            } elseif (getSystemOS() == "Linux") {
+                if (!dl("pdo_sqlite.so") && !dl("resources/include/pdo_sqlite.so")) {
+                    Yasca::log_message("PDO SQLite is required for SQLReport, but cannot be found.", E_USER_ERROR);
+                    $this->canExecute = false;
+                }
+            }
+		}
+    }
+
+    private function openDatabase() {
         $yasca =& Yasca::getInstance();     
         
         $yasca->options["output"] = dirname($yasca->options["output"]) . "/" . basename($yasca->options["output"], ".html") . ".db";
@@ -63,7 +97,7 @@ class SQLReport extends Report {
      */ 
     function execute() {
         if (!isset($this->dbh)) $this->openDatabase();
-        if (!$this->dbh) {
+        if (!$this->dbh || !$this->canExecute) {
             $yasca->log_message("Aborting creation of SQLReport.", E_USER_ERROR);
             return;
         }

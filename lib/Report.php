@@ -35,7 +35,7 @@ class Report {
      */
     public $results = array();
     
-    function Report(&$options, &$results) {
+    public function Report(&$options, &$results) {
         $this->options =& $options;
         if (!is_numeric($this->options['level']) ||
             intval($this->options['level']) < 1 ||
@@ -77,6 +77,8 @@ class Report {
         if (!file_exists(dirname($output_file))) {
             @mkdir(dirname($output_file));
         }
+
+	$output_file = dirname($output_file) . "/" . basename($output_file, ".html") . "." . $this->default_extension;
         
         if (!$handle = @fopen($output_file, 'w')) {
             $output_file = rtrim(sys_get_temp_dir(), "\\/") . "/" . basename($output_file);

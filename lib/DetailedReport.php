@@ -14,7 +14,7 @@ class DetailedReport extends Report {
     /**
      * The default extension used for reports of this type.
      */
-    var $default_extension = "html";
+    public $default_extension = "html";
     
     /**
      * Executes a DetailedReport, with output going to $options['output']

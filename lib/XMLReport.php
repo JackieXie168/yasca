@@ -14,7 +14,7 @@ class XMLReport extends Report {
     /**
      * The default extension used for reports of this type.
      */
-    var $default_extension = "xml";
+    public $default_extension = "xml";
     
     /**
      * Executes an XMLReport, with output going to $options['output']
@@ -36,20 +36,20 @@ class XMLReport extends Report {
             $last_slash = strripos($filename, "/");
             $split_filename = substr($filename, $last_slash);
             
-            $result->source_context = implode("\r\n", $result->source_context);
+            $result->source_context = implode("", $result->source_context);
             
             fwrite($handle,
                 "<result>\r\n" .
-                " <plugin_name><![CDATA[" . $result->plugin_name . "]]></plugin_name>\r\n" .
-                " <filename><![CDATA[" . $result->filename . "]]></filename>\r\n" .
-                " <category><![CDATA[" . $result->category . "]]></category>\r\n" .
-                " <category_link><![CDATA[" . $result->category_link . "]]></category_link>\r\n" .
-                " <severity><![CDATA[" . $result->severity . "]]></severity>\r\n" .
-                " <severity_description><![CDATA[" . $this->get_severity_description($result->severity) . "]]></severity_description>\r\n" .
-                " <source><![CDATA[" . $result->source . "]]></source>\r\n" .
-                " <line_number><![CDATA[" . $result->line_number . "]]></line_number>\r\n" .
-                " <source_context><![CDATA[" . $result->source_context . "]]></source_context>\r\n" .
-                " <custom><![CDATA[" . $result->custom . "]]></custom>\r\n" .
+                " <plugin_name><![CDATA[" . trim($result->plugin_name) . "]]></plugin_name>\r\n" .
+                " <filename><![CDATA[" . trim($result->filename) . "]]></filename>\r\n" .
+                " <category><![CDATA[" . trim($result->category) . "]]></category>\r\n" .
+                " <category_link><![CDATA[" . trim($result->category_link) . "]]></category_link>\r\n" .
+                " <severity><![CDATA[" . trim($result->severity) . "]]></severity>\r\n" .
+                " <severity_description><![CDATA[" . trim($this->get_severity_description($result->severity)) . "]]></severity_description>\r\n" .
+                " <source><![CDATA[" . trim($result->source) . "]]></source>\r\n" .
+                " <line_number><![CDATA[" . trim($result->line_number) . "]]></line_number>\r\n" .
+                " <source_context><![CDATA[" . trim($result->source_context) . "]]></source_context>\r\n" .
+                " <custom><![CDATA[" . print_r($result->custom, true) . "]]></custom>\r\n" .
                 "</result>\r\n");
             ++$num_results_written;
         }

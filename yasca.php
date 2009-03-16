@@ -33,8 +33,11 @@ function main() {
     $yasca->execute_callback("pre-scan");
     Yasca::log_message("Starting scan. This may take a few minutes to complete...", E_USER_WARNING);
     $yasca->scan();
-    $yasca->execute_callback("post-scan");
     
+    Yasca::log_message("Executing post-scan callback functions.", E_ALL);
+    $yasca->execute_callback("post-scan");
+
+    Yasca::log_message("Executing pre-report callback functions.", E_ALL);    
     $yasca->execute_callback("pre-report");
     Yasca::log_message("Creating report...", E_USER_WARNING);
     

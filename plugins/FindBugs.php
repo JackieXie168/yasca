@@ -12,7 +12,7 @@ class Plugin_FindBugs extends Plugin {
     public $valid_file_types = array(); // All singletons do not use valid file types
 
     private $executable = array('Windows' => "resources\\utility\\findbugs\\findbugs_start.bat",
-                    'Linux'   => "./resources/utility/findbugs/findbugs_start");
+                                'Linux'   => "./resources/utility/findbugs/findbugs_start");
     
     /**
      * This class is multi-target.

@@ -831,6 +831,7 @@ END;
         }
         
         foreach ($event_list as $event) {
+            $this->log_message("Executing callback [" . implode(", ", $event) . "].", E_ALL);
             @call_user_func($event);    
         }
     }
@@ -857,23 +858,34 @@ END;
         }
         return $ig_list;
     }
-    private function remove_ignored_findings() {
+    
+    private static function remove_ignored_findings() {
+        Yasca::log_message("entering remove_ignored_findings()", E_ALL);
         $new_result = array();
-        
-        foreach ($this->results as $result) {
-            $b_ignore = false;
-            foreach ($this->ignore_list as $ignore) {
-                if ($ignore->filename == str_replace("\\", "/", $result->filename) &&
-                    $ignore->line_number == $result->line_number &&
-                    $ignore->category == $result->category) {
-                    $b_ignore = true;
-                    break;
+
+        $yasca =& Yasca::getInstance();
+        if (!isset($yasca->results) || !is_array($yasca->results)) {
+            Yasca::log_message("No results were found.", E_ALL);
+        } else {
+            foreach ($yasca->results as $result) {
+                $b_ignore = false;
+                $ignore_list = is_array($yasca->ignore_list) ? $yasca->ignore_list : array();
+                
+                foreach ($ignore_list as $ignore) {
+                    if (is_object($ignore) &&
+                        $ignore->filename == str_replace("\\", "/", $result->filename) &&
+                        $ignore->line_number == $result->line_number &&
+                        $ignore->category == $result->category) {
+                        $b_ignore = true;
+                        break;
+                    }
                 }
+                if (!$b_ignore) 
+                    array_push($new_result, $result);
             }
-            if (!$b_ignore) 
-                array_push($new_result, $result);
+            $yasca->results = $new_result;
         }
-        $this->results = $new_result;
+        Yasca::log_message("leaving remove_ignored_findings()", E_ALL);
     }
 }
 ?>
