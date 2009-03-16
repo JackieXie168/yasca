@@ -33,7 +33,7 @@ class Plugin_JavaScriptLint extends Plugin {
                 return;
             } else {
                 $yasca->log_message("Forking external process (JavaScriptLint)...", E_USER_WARNING);
-                exec( "wine resources/utility/javascriptlint/jsl.exe +recurse -process " . escapeshellarg($dir) . "\\* 2>&1", $jslint_results);
+                exec( "wine resources/utility/javascriptlint/jsl.exe +recurse -process " . escapeshellarg($dir) . "/* 2>&1", $jslint_results);
                 $yasca->log_message("External process completed...", E_USER_WARNING);
             }
         }
@@ -46,7 +46,7 @@ class Plugin_JavaScriptLint extends Plugin {
             $matches = array();
             if (preg_match("/^(.*)\((\d+)\): (.*): (.*)/", $jslint_result, $matches)) {
                 $filename = $matches[1];
-                        if (!Plugin::check_in_filetype($filename, $this->valid_file_types)) {
+                if (!Plugin::check_in_filetype($filename, $this->valid_file_types)) {
                     continue;
                 }
 

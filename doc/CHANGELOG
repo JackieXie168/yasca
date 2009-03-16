@@ -26,4 +26,5 @@ Version 1.3 released on 2009-03-15
     Updated FindBugs to version 1.3.7
     Updated FB-Contrib to version 3.8.0
     Added plugins for ColdFusion
-    
+    Added support for JLint and JavaScript Lint under Linux via Wine
+    Removed startup dependencies on extensions - now only loaded if needed    

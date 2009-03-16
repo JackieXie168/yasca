@@ -16,7 +16,7 @@ class Plugin_PHPLint extends Plugin {
     public $is_multi_target = false;
     
     private $executable = array('Windows' => "resources\\utility\\phplint\\phplint.bat",
-                    'Linux'   => "sh ./resources/utility/phplint/phplint.sh");
+                                'Linux'   => "sh ./resources/utility/phplint/phplint.sh");
    
    /**
     * Executes PHPLint on each file.

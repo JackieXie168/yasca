@@ -5,7 +5,7 @@
  * This pacakge implements a simple engine for static analysis
  * of source code files. 
  * @author Michael V. Scovetta <scovetta@sourceforge.net>
- * @version 1.1
+ * @version 1.3
  * @package Yasca
  */
 
@@ -24,7 +24,7 @@ include_once("lib/Report.php");
   * Main entry point for the Yasca engine.
   */
 function main() {
-    Yasca::log_message("Yasca " . constant("VERSION") . " - http://yasca.sourceforge.net - Designed & Developed by Michael V. Scovetta\r\n\r\n", E_USER_NOTICE, false, true);
+    Yasca::log_message("Yasca " . constant("VERSION") . " - http://www.yasca.org/ - Michael V. Scovetta\r\n\r\n", E_USER_NOTICE, false, true);
     Yasca::log_message("Initializing components...", E_USER_WARNING);
 
     $yasca =& Yasca::getInstance(); 
