@@ -19,6 +19,27 @@ class Plugin_FindBugs extends Plugin {
      */
     public $is_multi_target = true;
 
+/*
+    public Plugin_FindBugs($filename, &$file_contents) {
+        parent::Plugin($filename, $file_contents);
+
+        /* Verify that the required libraries are available */
+        if (!extension_loaded("pdo")) {
+            if (getSystemOS() == "Windows") {
+                if (!dl("php_pdo.dll") && !dl("resources/include/php_pdo.dll")) {
+                    Yasca::log_message("PDO is required for SQLReport, but cannot be found.", E_USER_ERROR);
+                    $this->canExecute = false;
+                }
+            } elseif (getSystemOS() == "Linux") {
+                if (!dl("php_pdo.so") && !dl("resources/include/php_pdo.so")) {
+                    Yasca::log_message("PDO is required for SQLReport, but cannot be found.", E_USER_ERROR);
+                    $this->canExecute = false;
+                }
+            }
+        }
+    }
+*/
+
     /**
      * Executes the scanning function. This calls out to findbugs.bat which then calls Java, but
      * process output comes back here.
