@@ -19,7 +19,7 @@ class Plugin_FindBugs extends Plugin {
      */
     public $is_multi_target = true;
 
-    public Plugin_FindBugs($filename, &$file_contents) {
+    public function Plugin_FindBugs($filename, &$file_contents) {
         parent::Plugin($filename, $file_contents);
         if (!class_exists("DOMDocument")) {
             Yasca::log_message("DOMDocument is not available. FindBugs results are not available. Please install php-xml.", E_USER_ERROR);
