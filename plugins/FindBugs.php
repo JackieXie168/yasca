@@ -23,7 +23,7 @@ class Plugin_FindBugs extends Plugin {
     public Plugin_FindBugs($filename, &$file_contents) {
         parent::Plugin($filename, $file_contents);
 
-        /* Verify that the required libraries are available */
+        // Verify that the required libraries are available
         if (!extension_loaded("pdo")) {
             if (getSystemOS() == "Windows") {
                 if (!dl("php_pdo.dll") && !dl("resources/include/php_pdo.dll")) {
