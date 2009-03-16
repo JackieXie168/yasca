@@ -16,7 +16,7 @@ class Plugin_PMD extends Plugin {
      */
     public $is_multi_target = true;
 
-    public function Plugin_FindBugs($filename, &$file_contents) {
+    public function Plugin_PMD($filename, &$file_contents) {
         parent::Plugin($filename, $file_contents);
         if (!class_exists("DOMDocument")) {
             Yasca::log_message("DOMDocument is not available. PMD results are not available. Please install php-xml.", E_USER_WARNING);
