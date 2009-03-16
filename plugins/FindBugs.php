@@ -110,7 +110,7 @@ class Plugin_FindBugs extends Plugin {
         if ($yasca->options['debug']) 
             $yasca->log_message("FindBugs returned: " . $xml, E_ALL);
 
-        $dom = new DOMDocument();
+        $dom = @new DOMDocument();
         if (!$dom->loadXML($xml)) {
             $yasca->log_message("FindBugs did not return valid XML. Unable to parse.", E_USER_WARNING);
             return;

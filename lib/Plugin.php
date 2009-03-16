@@ -119,8 +119,10 @@ class Plugin {
      */
     function run() {
         if (!$this->initialized) return false;
-        if (!$this->is_multi_target && !$this->is_valid_filetype) return false;
+        if ((!$this->is_multi_target && !$this->is_valid_filetype) || !$this->canExecute) return false;
+
         $this->execute();
+
         if (!is_array($this->result_list)) {
             Yasca::log_message("Unable to process results list.", E_USER_ERROR);
             return;
