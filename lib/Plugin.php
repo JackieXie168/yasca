@@ -124,7 +124,7 @@ class Plugin {
         $this->execute();
 
         if (!is_array($this->result_list)) {
-            Yasca::log_message("Unable to process results list.", E_USER_ERROR);
+            Yasca::log_message("Unable to process results list.", E_USER_WARNING);
             return;
         }
         for ($i=0; $i<count($this->result_list); $i++) {

@@ -30,12 +30,12 @@ class SQLReport extends Report {
         if (!extension_loaded("pdo")) {
             if (getSystemOS() == "Windows") {
                 if (!dl("php_pdo.dll") && !dl("resources/include/php_pdo.dll")) {
-                    Yasca::log_message("PDO is required for SQLReport, but cannot be found.", E_USER_ERROR);
+                    Yasca::log_message("PDO is required for SQLReport, but cannot be found.", E_USER_WARNING);
                     $this->canExecute = false;
                 }
             } elseif (getSystemOS() == "Linux") {
                 if (!dl("pdo.so") && !dl("resources/include/pdo.so")) {
-                    Yasca::log_message("PDO is required for SQLReport, but cannot be found.", E_USER_ERROR);
+                    Yasca::log_message("PDO is required for SQLReport, but cannot be found.", E_USER_WARNING);
                     $this->canExecute = false;
                 }
             }
@@ -43,12 +43,12 @@ class SQLReport extends Report {
         if (!extension_loaded("pdo_sqlite")) {
             if (getSystemOS() == "Windows") {
                 if (!dl("php_pdo_sqlite.dll") && !dl("resources/include/php_pdo_sqlite.dll")) {
-                    Yasca::log_message("PDO SQLite is required for SQLReport, but cannot be found.", E_USER_ERROR);
+                    Yasca::log_message("PDO SQLite is required for SQLReport, but cannot be found.", E_USER_WARNING);
                     $this->canExecute = false;
                 }
             } elseif (getSystemOS() == "Linux") {
                 if (!dl("pdo_sqlite.so") && !dl("resources/include/pdo_sqlite.so")) {
-                    Yasca::log_message("PDO SQLite is required for SQLReport, but cannot be found.", E_USER_ERROR);
+                    Yasca::log_message("PDO SQLite is required for SQLReport, but cannot be found.", E_USER_WARNING);
                     $this->canExecute = false;
                 }
             }
@@ -75,7 +75,7 @@ class SQLReport extends Report {
             $this->dbh = new PDO("sqlite:" . $output_file, '', '');
         
         } catch(PDOException $e) {
-        $yasca->log_message("Error creating database connection: " . $e->getMessage(), E_USER_ERROR);
+        $yasca->log_message("Error creating database connection: " . $e->getMessage(), E_USER_WARNING);
         $this->dbh = false;
         return;
         }
@@ -98,7 +98,7 @@ class SQLReport extends Report {
     function execute() {
         if (!isset($this->dbh)) $this->openDatabase();
         if (!$this->dbh || !$this->canExecute) {
-            $yasca->log_message("Aborting creation of SQLReport.", E_USER_ERROR);
+            $yasca->log_message("Aborting creation of SQLReport.", E_USER_WARNING);
             return;
         }
         $yasca =& Yasca::getInstance();

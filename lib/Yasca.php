@@ -780,7 +780,7 @@ END;
      */
     public function add_attachment($cache_id) {
         if (!isset($this->general_cache[$cache_id])) {
-            $this->log_message("Unable to find cache [$cache_id] in the general cache.", E_USER_ERROR);
+            $this->log_message("Unable to find cache [$cache_id] in the general cache.", E_USER_WARNING);
             return;
         }
         if (!in_array($cache_id, $this->attachment_list)) {

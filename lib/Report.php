@@ -83,7 +83,7 @@ class Report {
         if (!$handle = @fopen($output_file, 'w')) {
             $output_file = rtrim(sys_get_temp_dir(), "\\/") . "/" . basename($output_file);
             if (!$handle = @fopen($output_file, 'w')) {
-                Yasca::log_message("Unable to write to the report file [$output_file]. ", E_USER_ERROR);
+                Yasca::log_message("Unable to write to the report file [$output_file]. ", E_USER_WARNING);
                     return false;
             }
         }
