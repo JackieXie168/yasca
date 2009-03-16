@@ -62,13 +62,19 @@ class Plugin {
      */
     public $initialized = false;
 
+
+    /**
+     * Interval marker used to prevent objects from being executed.
+     */
+    public $canExecute = true;
+
     private static $ext_classes = array( "JAVA"   => array("java", "jsp", "jsw"),
-                             "C"      => array("c", "cpp", "h"),
-                             "HTML"   => array("html", "css", "js", "htm"),
-                         "BINARY" => array("dll", "zip", "jar", "ear", "war"),
-                         "PHP"    => array("php", "php5", "php4"),
-                         "NET"    => array("aspx", "asp", "vb", "frm", "res", "cs")
-                    );
+                                         "C"      => array("c", "cpp", "h"),
+                                         "HTML"   => array("html", "css", "js", "htm"),
+                                         "BINARY" => array("dll", "zip", "jar", "ear", "war"),
+                                         "PHP"    => array("php", "php5", "php4"),
+                                         "NET"    => array("aspx", "asp", "vb", "frm", "res", "cs")
+                                  );
 
     /**
      * Creates a new generic Plugin.

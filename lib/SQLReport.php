@@ -34,7 +34,7 @@ class SQLReport extends Report {
                     $this->canExecute = false;
                 }
             } elseif (getSystemOS() == "Linux") {
-                if (!dl("php_pdo.so") && !dl("resources/include/php_pdo.so")) {
+                if (!dl("pdo.so") && !dl("resources/include/pdo.so")) {
                     Yasca::log_message("PDO is required for SQLReport, but cannot be found.", E_USER_ERROR);
                     $this->canExecute = false;
                 }
@@ -47,7 +47,7 @@ class SQLReport extends Report {
                     $this->canExecute = false;
                 }
             } elseif (getSystemOS() == "Linux") {
-                if (!dl("php_pdo_sqlite.so") && !dl("resources/include/php_pdo_sqlite.so")) {
+                if (!dl("pdo_sqlite.so") && !dl("resources/include/pdo_sqlite.so")) {
                     Yasca::log_message("PDO SQLite is required for SQLReport, but cannot be found.", E_USER_ERROR);
                     $this->canExecute = false;
                 }
