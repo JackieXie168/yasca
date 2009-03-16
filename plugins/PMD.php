@@ -16,6 +16,14 @@ class Plugin_PMD extends Plugin {
      */
     public $is_multi_target = true;
 
+    public function Plugin_FindBugs($filename, &$file_contents) {
+        parent::Plugin($filename, $file_contents);
+        if (!class_exists("DOMDocument")) {
+            Yasca::log_message("DOMDocument is not available. PMD results are not available. Please install php-xml.", E_USER_WARNING);
+            $this->canExecute = false;
+        }
+    }
+
     /**
      * Gets the specific rulesets to be included. The rule is that any plugin that has
      * an .xml extension is fair game, except for those starting with an underscore (_).
@@ -40,6 +48,8 @@ class Plugin_PMD extends Plugin {
      * process output comes back here.
      */
     function execute() {
+        if (!$this->canExecute) return;
+
         static $alreadyExecuted;
         if ($alreadyExecuted == 1) return;
         $alreadyExecuted = 1;
