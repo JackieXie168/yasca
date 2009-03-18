@@ -24,16 +24,18 @@ class Plugin_JavaScriptLint extends Plugin {
         
         // Try to execute using native binary of via wine, if possible
         if (getSystemOS() == "Windows") {
+            $star_suffix = is_dir($dir) ? "\\*" : "";
             $yasca->log_message("Forking external process (JavaScriptLint)...", E_USER_WARNING);
-            exec( "resources\\utility\\javascriptlint\\jsl.exe +recurse -process \"" . addslashes($dir) . "\\*\" 2>&1", $jslint_results);
+            exec( "resources\\utility\\javascriptlint\\jsl.exe +recurse -process \"" . addslashes($dir) . $star_suffix . "\" 2>&1", $jslint_results);
             $yasca->log_message("External process completed...", E_USER_WARNING);
         } else if (getSystemOS() == "Linux") {
             if (preg_match("/no wine in/", `which wine`)) {
                 $yasca->log_message("No JavaScript Lint executable and wine not found.", E_ALL);
                 return;
             } else {
+                $star_suffix = is_dir($dir) ? "/*" : "";
                 $yasca->log_message("Forking external process (JavaScriptLint)...", E_USER_WARNING);
-                exec( "wine resources/utility/javascriptlint/jsl.exe +recurse -process \"" . addslashes($dir) . "/*\" 2>&1", $jslint_results);
+                exec( "wine resources/utility/javascriptlint/jsl.exe +recurse -process \"" . addslashes($dir) . $star_suffix . "\" 2>&1", $jslint_results);
                 $yasca->log_message("External process completed...", E_USER_WARNING);
             }
         }
