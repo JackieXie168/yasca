@@ -22,7 +22,7 @@ class Plugin_Grep extends Plugin {
     public $name;
     public $file_type;
     public $grep = array();
-    public $pre_grep;           /* Pre Lookahead Grep - must exist within $lookahead before a $grep */
+    public $pre_grep;                   /* Pre Lookahead Grep - must exist within $lookahead before a $grep */
     public $lookahead_length = 10;      /* Index of pre_grep to grep must be within $lookahead_length */
     public $fix;
     public $category;
@@ -170,13 +170,24 @@ class Plugin_Grep extends Plugin {
                 error_reporting($orig_error_level);
 
                 if (!is_array($matches)) {
-                $yasca->log_message("Invalid grep expression [/$grep/$modifier]. Ignoring.", E_USER_WARNING);
-                continue;
+                    if (!isset($yasca->general_cache["grep.ignored"]))
+                        $yasca->general_cache["grep.ignored"] = array();
+
+                    $c =& $yasca->general_cache["grep.ignored"];
+
+                    if (!isset($c["/$grep/$modifier"])) {
+                        $yasca->log_message("Invalid grep expression [/$grep/$modifier]. Ignoring.", E_USER_WARNING);
+                        $c["/$grep/$modifier"] = 1;
+                    }
+                    continue;
                 }
+
                 foreach ($matches as $line_number => $match) {
                 if ( $orig_grep == "__" . $this->pre_grep ||
                      (isset($this->pre_grep) && $this->pre_grep != "" && count($pre_matches) == 0) ||
-                     (count($pre_matches) > 0 && !any_within($pre_matches, $line_number+1, $this->lookahead_length)) ) continue;
+                     (count($pre_matches) > 0 && !any_within($pre_matches, $line_number+1, $this->lookahead_length)) ) {
+                    continue;
+                }
 
                 $result = new Result();
                 $result->line_number = $line_number + 1;
@@ -188,8 +199,10 @@ class Plugin_Grep extends Plugin {
                 $result->source = $match;
                 $result->source_context = array_slice( $file_contents, max( $result->line_number-(($this->context_size+1)/2), 0), $this->context_size );
                 $result->plugin_name = $yasca->get_adjusted_alternate_name("Grep", $this->name, "Grep: " . $this->name);
+
                 if ($this->fix !== "")
                     $yasca->add_fix($result, $this->filename, $result->line_number, $match, eval($this->fix));
+
                 array_push($this->result_list, $result);
                 }
             }
