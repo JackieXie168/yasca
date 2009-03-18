@@ -3,6 +3,8 @@ file_type = JAVA
 grep = /SimpleDateFormat\(\"yyyy-mm-dd/
 grep = /SimpleDateFormat\(\"hh:MM:ss/
 grep = /SimpleDateFormat\(\"hh:mm:ss\"/
+grep = /SimpleDateFormat\(\"hhmm\"/
+grep = /SimpleDateFormat\(\"hhmmss\"/
 category = Formatting: Invalid Date/Time Format
 severity = 2
 description =
@@ -18,7 +20,7 @@ description =
 <p>
         <h4>References</h4>
         <ul>
-                <li>TODO</li>
+                <li><a href="http://java.sun.com/javase/6/docs/api/java/text/SimpleDateFormat.html">SimpleDateFormat API</a></li>
         </ul>
 </p>
 END;
