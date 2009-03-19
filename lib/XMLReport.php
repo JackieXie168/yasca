@@ -30,7 +30,7 @@ class XMLReport extends Report {
                 continue;
                 
             $filename = $result->filename;
-            $filename = preg_replace("/" . addslashes($this->options['dir']) . "/", "", $filename, 1);
+            $filename = preg_replace("/" . preg_quote($this->options['dir']) . "/", "", $filename, 1);
             $filename = str_replace("\\", "/", $filename);
                         
             $last_slash = strripos($filename, "/");
