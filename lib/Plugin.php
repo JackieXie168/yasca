@@ -73,7 +73,8 @@ class Plugin {
                                          "HTML"   => array("html", "css", "js", "htm"),
                                          "BINARY" => array("dll", "zip", "jar", "ear", "war"),
                                          "PHP"    => array("php", "php5", "php4"),
-                                         "NET"    => array("aspx", "asp", "vb", "frm", "res", "cs")
+                                         "NET"    => array("aspx", "asp", "vb", "frm", "res", "cs"),
+                                         "COBOL"  => array("cobol", "cbl", "cob")
                                   );
 
     /**
