@@ -586,7 +586,7 @@ class HTMLGroupReport extends Report {
                     
                     function getParent(el, pTagName) {
                         if (el == null) return null;
-                        else if (el.nodeType == 1 && el.tagName.toLowerCase() == pTagName.toLowerCase())    // Gecko bug, supposed to be uppercase
+                        else if (el.nodeType == 1 && el.tagName.toLowerCase() == pTagName.toLowerCase())
                             return el;
                         else
                             return getParent(el.parentNode, pTagName);
