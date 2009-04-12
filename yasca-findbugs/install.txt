@@ -1,0 +1,22 @@
+/-----------------------------------------------------------------------/
+    _     _                         
+   ( )   ( )                           --[ www.yasca.org ]--
+   `\`\_/'/'_ _   ___    ___    _ _   
+     `\ /'/'_` )/',__) /'___) /'_` )
+      | |( (_| |\__, \( (___ ( (_| |
+      (_)`\__,_)(____/`\____)`\__,_)
+
+/-----------------------------------------------------------------------/
+
+                       PLUGIN INSTALLATION GUIDE
+
+    To install this plugin, you should unzip it into the main Yasca
+    directory, preserving subdirectories.
+
+    For example, if you installed Yasca in C:\Yasca, you should unzip
+    the plugin into that same directory. Make sure that a new, 0-byte
+    file was created for this plugin in C:\Yasca\resources\installed\.
+
+    This plugin is adopted from a third-party tool, and released under
+    the same license as the third-party tool. All licenses are stored
+    in the ./doc/3rdParty/licenses directory.
