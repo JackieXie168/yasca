@@ -1,0 +1,103 @@
+/-----------------------------------------------------------------------/
+    _     _                         
+   ( )   ( )                           --[ www.yasca.org ]--
+   `\`\_/'/'_ _   ___    ___    _ _   
+     `\ /'/'_` )/',__) /'___) /'_` )
+      | |( (_| |\__, \( (___ ( (_| |
+      (_)`\__,_)(____/`\____)`\__,_)
+
+/-----------------------------------------------------------------------/
+
+                            INSTALLATION GUIDE
+
+    Due to possible licensing conflicts, Yasca is distributed as a
+    core package
+
+
+    Installation Steps (Windows):
+
+        1. Download yasca-core.zip and unzip it into a directory. For
+           example, c:\yasca.
+
+	    2. If you want to install all plugins, run:
+
+             c:\yasca\resources\install-plugins.bat
+
+           Otherwise, you can simply download the specific plugins that
+           you want to install and unzip each of them into the Yasca
+           installation directory.
+
+		3. Install Java 1.5 or later. This is required for a few of the
+           plugins. See doc/REQUIREMENTS for a full list.
+
+
+        4. From the c:\yasca directory, scan resources/test:
+
+             C:\Yasca> yasca resources/test
+
+
+    Installation Steps (Linux):
+
+        1. Download yasca-core.zip and unzip it into a directory. For
+           example, /opt/yasca.
+
+
+	    2. If you want to install all plugins, run:
+
+             /opt/yasca/resources/install-plugins
+
+           You will need unzip and curl installed.
+
+           Otherwise, you can simply download the specific plugins that
+           you want to install and unzip each of them into the Yasca
+           installation directory.
+
+        3. Verify that PHP 5 is installed:
+
+		     # php -v
+
+             PHP 5.2.9-1 (cli) (built: Mar  5 2009 20:02:28)
+             Copyright (c) 1997-2009 The PHP Group
+             Zend Engine v2.2.0, Copyright (c) 1998-2009 Zend Technologies
+
+        4. Verify that php-xml is installed:
+
+             # php -m
+
+             [PHP Modules]
+             ...
+             xml
+             ...
+
+		5. Install Java 1.5 or later. This is required for a few of the
+           plugins. See doc/REQUIREMENTS for a full list.
+
+             # java -version
+
+             java version "1.6.0_06"
+             Java(TM) SE Runtime Environment (build 1.6.0_06-b02)
+             Java HotSpot(TM) 64-Bit Server VM (build 10.0-b22, mixed mode)
+
+
+        6. From the /opt/yasca directory, scan resources/test:
+
+             # yasca resources/test
+
+
+    LICENSES
+    --------
+
+    All license files are stored in the doc/licenses directory.
+
+    The package "yasca-core" is distributed under a BSD-style license.
+    You are free to modify this component and include it in other
+    products, even commercial ones.
+
+    Other packages are distributed under their original license (usually
+    GPL). The only modifications made to the original package is that 
+    the directory structures have been altered so that they can be
+    easily accessed by Yasca. The original binary and source code to
+    each of the packages have been included as well. These packages
+    are distributed under whatever license the underlying product is
+    distributed under.
+
