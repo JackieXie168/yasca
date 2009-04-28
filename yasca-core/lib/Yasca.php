@@ -479,7 +479,7 @@ class Yasca {
 
                 case "-s":
                 case "--sa_home":
-                    $opt['sa_home'] = $SERVER['argv'][++$i];
+                    $opt['sa_home'] = $_SERVER['argv'][++$i];
                     break;
                     
                 case "--source-required":
