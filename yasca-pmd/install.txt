@@ -8,15 +8,22 @@
 
 /-----------------------------------------------------------------------/
 
-                       PLUGIN INSTALLATION GUIDE
+                       PLUG-IN INSTALLATION GUIDE
 
-    To install this plugin, you should unzip it into the main Yasca
-    directory, preserving subdirectories.
+    This plug-in is NOT part of Yasca-Core. It is a separate package
+    that can be utilized by any other program and can be installed
+    into any directory.
 
-    For example, if you installed Yasca in C:\Yasca, you should unzip
-    the plugin into that same directory. Make sure that a new, 0-byte
-    file was created for this plugin in C:\Yasca\resources\installed\.
+    To install this plugin, unzip the distribution file into a
+    directory. For example:
+
+         unzip <distribution.zip> c:\static-analyzers
+
+    Then set the SA_HOME environment variable to that path. 
+    For example:
+
+         SA_HOME=c:\static-analyzers\
 
     This plugin is adopted from a third-party tool, and released under
     the same license as the third-party tool. All licenses are stored
-    in the ./doc/3rdParty/licenses directory.
+    in the doc/3rdParty/licenses directory within this distribution.
