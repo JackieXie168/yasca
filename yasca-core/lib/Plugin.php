@@ -142,7 +142,7 @@ class Plugin {
         }
 
         if ($this->installation_marker !== true) {	// installation_marker == true means, "no plugin installation needed"
-            if (!file_exists("resources/installed/" . $this->installation_marker)) {
+            if (!file_exists(Yasca::$SA_HOME . "resources/installed/" . $this->installation_marker)) {
                 Yasca::log_message("Plugin \"" . $this->installation_marker . "\" not installed. Download the package from www.yasca.org.", E_USER_WARNING);
                 $no_execute[$this->installation_marker] = true;		// add to the cache so this only happens once
                 return false;

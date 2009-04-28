@@ -78,7 +78,9 @@ class Yasca {
      * Holds the event array for callbacks
      */
     public $event_callback_list = array();
-    
+
+    public static $SA_HOME = isset($_ENV["SA_HOME"]) ? $_ENV["SA_HOME"] : ".";
+
     /**
      * Creates a new Yasca scanner object using the options passed in.
      * @param array $options command line options (parsed)
