@@ -13,7 +13,7 @@ class Plugin_JavaScriptLint extends Plugin {
 
     public $is_multi_target = true;
 
-    public $installation_marker = "yasca-javascriptlint";
+    public $installation_marker = "javascriptlint";
     
     function execute() {
         static $alreadyExecuted;
@@ -28,7 +28,7 @@ class Plugin_JavaScriptLint extends Plugin {
         if (getSystemOS() == "Windows") {
             $star_suffix = is_dir($dir) ? "\\*" : "";
             $yasca->log_message("Forking external process (JavaScriptLint)...", E_USER_WARNING);
-            exec( "resources\\utility\\javascriptlint\\jsl.exe +recurse -process \"" . addslashes($dir) . $star_suffix . "\" 2>&1", $jslint_results);
+            exec( "{$this->sa_home}resources\\utility\\javascriptlint\\jsl.exe +recurse -process \"" . addslashes($dir) . $star_suffix . "\" 2>&1", $jslint_results);
             $yasca->log_message("External process completed...", E_USER_WARNING);
         } else if (getSystemOS() == "Linux") {
             if (preg_match("/no wine in/", `which wine`)) {
@@ -37,7 +37,7 @@ class Plugin_JavaScriptLint extends Plugin {
             } else {
                 $star_suffix = is_dir($dir) ? "/*" : "";
                 $yasca->log_message("Forking external process (JavaScriptLint)...", E_USER_WARNING);
-                exec( "wine resources/utility/javascriptlint/jsl.exe +recurse -process \"" . addslashes($dir) . $star_suffix . "\" 2>&1", $jslint_results);
+                exec( "wine {$this->sa_home}resources/utility/javascriptlint/jsl.exe +recurse -process \"" . addslashes($dir) . $star_suffix . "\" 2>&1", $jslint_results);
                 $yasca->log_message("External process completed...", E_USER_WARNING);
             }
         }

@@ -9,9 +9,9 @@
 class Plugin_CppCheck extends Plugin {
     public $valid_file_types = array();
 
-    private $executable = array('Windows' => "resources\\utility\\cppcheck.exe" );
+    public $executable = array('Windows' => "%SA_HOME%resources\\utility\\cppcheck.exe" );
 
-    public $installation_marker = "yasca-cppcheck";
+    public $installation_marker = "cppcheck";
 
     /**
      * This class is multi-target.

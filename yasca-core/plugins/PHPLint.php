@@ -15,10 +15,10 @@ class Plugin_PHPLint extends Plugin {
 
     public $is_multi_target = false;
     
-    private $executable = array('Windows' => "resources\\utility\\phplint\\phplint.bat",
-                                'Linux'   => "sh ./resources/utility/phplint/phplint.sh");
+    public $executable = array('Windows' => "%SA_HOME%resources\\utility\\phplint\\phplint.bat",
+                               'Linux'   => "sh %SA_HOME%resources/utility/phplint/phplint.sh");
 
-    public $installation_marker = "yasca-phplint";
+    public $installation_marker = "phplint";
    
    /**
     * Executes PHPLint on each file.

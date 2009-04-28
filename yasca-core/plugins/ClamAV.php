@@ -15,8 +15,8 @@ class Plugin_ClamAV extends Plugin {
 
     public $installation_marker = true;		// This is ok because this one is multi-target and it will return if Linux and ClamAV not found
 
-	private $executable = array('Windows' => "resources\\utility\\clamav\\clamscan.exe --no-summary -d resources\\utility\\clamav\\ -ri --detect-pua --no-mail --max-recursion=5 --max-dir-recursion=30 ",
-                                'Linux'   => "clamscan --no-summary -ri --detect-pua --no-mail --max-recursion=5 --max-dir-recursion=30 ");
+	public $executable = array('Windows' => "%SA_HOME%resources\\utility\\clamav\\clamscan.exe --no-summary -d %SA_HOME%resources\\utility\\clamav\\ -ri --detect-pua --no-mail --max-recursion=5 --max-dir-recursion=30 ",
+                               'Linux'   => "clamscan --no-summary -ri --detect-pua --no-mail --max-recursion=5 --max-dir-recursion=30 ");
    
    /**
 	* Executes ClamAV on the directory

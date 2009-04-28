@@ -12,7 +12,7 @@ class Plugin_Antic extends Plugin {
 
     public $is_multi_target = true;
 
-    public $installation_marker = "yasca-jlint";
+    public $installation_marker = "jlint";
 
     function execute() {
         static $alreadyExecuted;
@@ -25,7 +25,7 @@ class Plugin_Antic extends Plugin {
 
         if (getSystemOS() == "Windows") {
             $yasca->log_message("Forking external process (antiC)...", E_USER_WARNING);
-            exec( "resources\\utility\\antic.exe  -java " . escapeshellarg($dir), $antic_results);
+            exec( "{$this->sa_home}resources\\utility\\antic.exe  -java " . escapeshellarg($dir), $antic_results);
             $yasca->log_message("External process completed...", E_USER_WARNING);
         } else if (getSystemOS() == "Linux") {
             if (preg_match("/no wine in/", `which wine`)) {
@@ -33,7 +33,7 @@ class Plugin_Antic extends Plugin {
                 return;
             } else {
                 $yasca->log_message("Forking external process (antiC)...", E_USER_WARNING);
-                exec( "wine resources/utility/antic.exe -java " . escapeshellarg($dir), $antic_results);
+                exec( "wine {$this->sa_home}resources/utility/antic.exe -java " . escapeshellarg($dir), $antic_results);
                 $yasca->log_message("External process completed...", E_USER_WARNING);
             }
         }

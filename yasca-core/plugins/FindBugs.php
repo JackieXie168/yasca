@@ -10,10 +10,10 @@
 class Plugin_FindBugs extends Plugin {
     public $valid_file_types = array(); 	// All singletons do not use valid file types
 
-    private $executable = array('Windows' => 'resources\\utility\\findbugs\\findbugs.bat -home resources/utility/findbugs $PLUGIN -textui -xml:withMessages -xargs -quiet',
-                                'Linux'   => './resources/utility/findbugs/findbugs -home ./resources/utility/findbugs $PLUGIN -textui -xml:withMessages -xargs -quiet');
+    public $executable = array('Windows' => '%SA_HOME%resources\\utility\\findbugs\\findbugs.bat -home %SA_HOME%resources/utility/findbugs $PLUGIN -textui -xml:withMessages -xargs -quiet',
+                               'Linux'   => '%SA_HOME%resources/utility/findbugs/findbugs -home %SA_HOME%resources/utility/findbugs $PLUGIN -textui -xml:withMessages -xargs -quiet');
 
-    public $installation_marker = "yasca-findbugs";
+    public $installation_marker = "findbugs";
 
     /**
      * This class is multi-target.
@@ -71,8 +71,8 @@ class Plugin_FindBugs extends Plugin {
 
         $executable = $this->executable[ getSystemOS() ];
 
-        if (file_exists("resources/utility/findbugs/plugin/fb-contrib-3.8.1.jar")) {
-            $executable = str_replace('$PLUGIN', "-pluginList resources/utility/findbugs/plugin/fb-contrib-3.8.1.jar", $executable);
+        if (file_exists("{$this->sa_home}resources/utility/findbugs/plugin/fb-contrib-3.8.1.jar")) {
+            $executable = str_replace('$PLUGIN', "-pluginList {$this->sa_home}resources/utility/findbugs/plugin/fb-contrib-3.8.1.jar", $executable);
         } else {
             $executable = str_replace('$PLUGIN', "", $executable);
         }

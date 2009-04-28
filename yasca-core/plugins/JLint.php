@@ -12,7 +12,7 @@ class Plugin_JLint extends Plugin {
 
     public $is_multi_target = true;
 
-    public $installation_marker = "yasca-jlint";
+    public $installation_marker = "jlint";
     
     function execute() {
         if (getSystemOS() !== 'Windows') return;        // Only execute on Windows
@@ -28,7 +28,7 @@ class Plugin_JLint extends Plugin {
         // Try to execute using native binary of via wine, if possible
         if (getSystemOS() == "Windows") {
             $yasca->log_message("Forking external process (JLint)...", E_USER_WARNING);
-            exec( "resources\\utility\\jlint.exe -source " . escapeshellarg($dir) . " " . escapeshellarg($dir), $jlint_results);
+            exec( "{$this->sa_home}resources\\utility\\jlint.exe -source " . escapeshellarg($dir) . " " . escapeshellarg($dir), $jlint_results);
             $yasca->log_message("External process completed...", E_USER_WARNING);
         } else if (getSystemOS() == "Linux") {
             if (preg_match("/no wine in/", `which wine`)) {
@@ -36,7 +36,7 @@ class Plugin_JLint extends Plugin {
                 return;
             } else {
                 $yasca->log_message("Forking external process (JLint)...", E_USER_WARNING);
-                exec( "wine resources/utility/jlint.exe -source " . escapeshellarg($dir) . " " . escapeshellarg($dir), $jlint_results);
+                exec( "wine {$this->sa_home}resources/utility/jlint.exe -source " . escapeshellarg($dir) . " " . escapeshellarg($dir), $jlint_results);
                 $yasca->log_message("External process completed...", E_USER_WARNING);
             }
         }

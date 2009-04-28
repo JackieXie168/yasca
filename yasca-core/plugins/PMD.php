@@ -9,14 +9,14 @@
 class Plugin_PMD extends Plugin {
     public $valid_file_types = array("java", "jsp");
 																																																											
-    private $executable = array('Windows' => 'java -cp "resources/utility/pmd/Yasca-PMD.jar;resources/utility/pmd/pmd14-4.2.5.jar;resources/utility/pmd/asm-3.1.jar;resources/utility/pmd/jaxen-1.1.1.jar;resources/utility/pmd/retroweaver-rt-2.0.5.jar;resources/utility/pmd/backport-util-concurrent.jar" net.sourceforge.pmd.PMD $DIR net.sourceforge.pmd.renderers.YascaRenderer',
-                                'Linux'   => 'java -cp "resources/utility/pmd/Yasca-PMD.jar:resources/utility/pmd/pmd14-4.2.5.jar:resources/utility/pmd/asm-3.1.jar:resources/utility/pmd/jaxen-1.1.1.jar:resources/utility/pmd/retroweaver-rt-2.0.5.jar:resources/utility/pmd/backport-util-concurrent.jar" net.sourceforge.pmd.PMD $DIR net.sourceforge.pmd.renderers.YascaRenderer');
+    public $executable = array('Windows' => 'java -cp "%SA_HOME%resources/utility/pmd/Yasca-PMD.jar;%SA_HOME%resources/utility/pmd/pmd14-4.2.5.jar;%SA_HOME%resources/utility/pmd/asm-3.1.jar;%SA_HOME%resources/utility/pmd/jaxen-1.1.1.jar;%SA_HOME%resources/utility/pmd/retroweaver-rt-2.0.5.jar;%SA_HOME%resources/utility/pmd/backport-util-concurrent.jar" net.sourceforge.pmd.PMD $DIR net.sourceforge.pmd.renderers.YascaRenderer',
+                               'Linux'   => 'java -cp "%SA_HOME%resources/utility/pmd/Yasca-PMD.jar:%SA_HOME%resources/utility/pmd/pmd14-4.2.5.jar:%SA_HOME%resources/utility/pmd/asm-3.1.jar:%SA_HOME%resources/utility/pmd/jaxen-1.1.1.jar:%SA_HOME%resources/utility/pmd/retroweaver-rt-2.0.5.jar:%SA_HOME%resources/utility/pmd/backport-util-concurrent.jar" net.sourceforge.pmd.PMD $DIR net.sourceforge.pmd.renderers.YascaRenderer');
     /**
      * This class is multi-target.
      */
     public $is_multi_target = true;
 
-    public $installation_marker = "yasca-pmd";
+    public $installation_marker = "pmd";
 
     public function Plugin_PMD($filename, &$file_contents) {
         parent::Plugin($filename, $file_contents);

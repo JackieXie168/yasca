@@ -10,8 +10,8 @@
 class Plugin_Pixy extends Plugin {
     public $valid_file_types = array("php", "php4");
 
-    private $executable = array('Windows' => "resources\\utility\\pixy\\pixy.bat",
-                    'Linux'   => "./resources/utility/pixy/pixy");
+    public $executable = array('Windows' => "%SA_HOMEresources\\utility\\pixy\\pixy.bat",
+                               'Linux'   => "%SA_HOMEresources/utility/pixy/pixy");
     /**
      * This class is multi-target.
      */
@@ -20,7 +20,7 @@ class Plugin_Pixy extends Plugin {
     /** Shortcuts the Java check because Pixy is not multi-target */
     private $java_not_found = false;
 
-    public $installation_marker = "yasca-pixy";
+    public $installation_marker = "pixy";
     
     /**
      * Executes the Pixy function. This calls out to pixy.bat which then calls Java, but

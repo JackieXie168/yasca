@@ -69,6 +69,16 @@ class Plugin {
     public $installation_marker = true;
 
     /**
+     * This is a reference to the static anylzers plugin directory
+     */
+    public $sa_home = "";
+
+    /**
+     * This sometimes contains the executable to be called.
+     */
+    public $executable = array();
+
+    /**
      * Interval marker used to prevent objects from being executed.
      */
     public $canExecute = true;
@@ -95,6 +105,12 @@ class Plugin {
                 $this->file_contents = explode("\n", $this->file_contents);
             foreach ($this->file_contents as $content) $content = trim($content);
             $this->is_valid_filetype = true;
+            $yasca =& Yasca::getInstance();
+            $this->sa_home = $yasca->options["sa_home"];
+            if (is_array($this->executable)) {
+                $fn_sa_home = create_function('&$a, &$b, $sa_home', '$a = str_replace("%SA_HOME%", $sa_home, $a); $b = str_replace("%SA_HOME%", $sa_home, $b);');
+                array_walk($this->executable, $fn_sa_home, $this->sa_home);
+            }
         }
         $this->initialized = true;
     }
@@ -142,8 +158,10 @@ class Plugin {
         }
 
         if ($this->installation_marker !== true) {	// installation_marker == true means, "no plugin installation needed"
-            if (!file_exists(Yasca::$SA_HOME . "resources/installed/" . $this->installation_marker)) {
+            if (!file_exists($yasca->options['sa_home'] . "resources/installed/" . $this->installation_marker)) {
                 Yasca::log_message("Plugin \"" . $this->installation_marker . "\" not installed. Download the package from www.yasca.org.", E_USER_WARNING);
+                Yasca::log_message("Plugin \"" . $yasca->options['sa_home'] . "resources/installed/" . $this->installation_marker . "\" not installed. Download the package from www.yasca.org.", E_USER_WARNING);
+
                 $no_execute[$this->installation_marker] = true;		// add to the cache so this only happens once
                 return false;
             }
@@ -211,19 +229,19 @@ class Plugin {
             if (count($ext) == 0) return true;      // $ext=() means all accepted
             foreach ($ext as $ek => $ev) {
                 if (isset($equiv_classes[$ev])) {
-                unset($ext[$ek]);
-                foreach ($equiv_classes[$ev] as $eqv) {
-                    array_push($ext, $eqv);
-                }
+                    unset($ext[$ek]);
+                    foreach ($equiv_classes[$ev] as $eqv) {
+                        array_push($ext, $eqv);
+                    }
                 }
             }
         /* Adding ability to use {foo.txt} instead of txt so that a specific file can be used */
             foreach ($ext as $ek => $ev) {
-            if (endsWith($filename, "." . $ev))
-            $ext_valid = true;
-            elseif (fnmatch($ev, $filename))
-            $ext_valid = true;
-        }
+                if (endsWith($filename, "." . $ev))
+                    $ext_valid = true;
+                elseif (fnmatch($ev, $filename))
+                    $ext_valid = true;
+            }
         }
         return $ext_valid;
     }

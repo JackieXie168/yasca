@@ -13,7 +13,7 @@ include_once("lib/Plugin.php");
 include_once("lib/common.php");
 include_once("lib/cache.php");
 
-define("VERSION", "1.3");
+define("VERSION", "2.0");
 
 /**
  * This class implements a generic code scanner.
@@ -78,8 +78,6 @@ class Yasca {
      * Holds the event array for callbacks
      */
     public $event_callback_list = array();
-
-    public static $SA_HOME = isset($_ENV["SA_HOME"]) ? $_ENV["SA_HOME"] : ".";
 
     /**
      * Creates a new Yasca scanner object using the options passed in.
@@ -172,7 +170,8 @@ class Yasca {
                     $plugin_obj = null;
                     continue;
                 }               
-                $plugin_obj = @new $plugin($target, $target_file_contents);             
+//TODO change this basck to @new
+                $plugin_obj = new $plugin($target, $target_file_contents);             
                 if (!is_subclass_of($plugin_obj, "Plugin") || !$plugin_obj->initialized) {
                     $this->log_message("Unable to instantiate plugin object of [$plugin] class. Plugin will be ignored.", E_USER_WARNING);
                     unset($this->plugin_list[array_search($plugin, $this->plugin_list)]);
@@ -419,6 +418,7 @@ class Yasca {
         $opt['source_required'] = false;
         $opt['output'] = false;         // will be filled in later when we know the report
         $opt['ignore-ext'] = "exe,zip,jpg,gif,png,pdf,class";
+        $opt['sa_home'] = isset($_ENV['SA_HOME']) ? $_ENV['SA_HOME'] : ".";
         $opt['report'] = "HTMLGroupReport";
         $opt['silent'] = false;
         $opt['debug'] = false;
@@ -431,8 +431,8 @@ class Yasca {
             switch($_SERVER["argv"][$i]) {
                 case "-v":
                 case "--version":
-                    print("Version " . constant("VERSION") . "\n");
-                    print("Copyright (c) 2008 Michael V. Scovetta\n");
+                    print("Yasca-Core version " . constant("VERSION") . "\n");
+                    print("Copyright (c) 2009 Michael V. Scovetta. See docs/license.txt for license information.\n");
                     exit(1);
                     break;
                 
@@ -475,6 +475,11 @@ class Yasca {
                 case "-f":
                 case "--fixes":
                     $opt['fixes'] = $_SERVER['argv'][++$i];
+                    break;
+
+                case "-s":
+                case "--sa_home":
+                    $opt['sa_home'] = $SERVER['argv'][++$i];
                     break;
                     
                 case "--source-required":
@@ -544,21 +549,22 @@ Usage: yasca [options] directory
 Perform analysis of program source code.
 
       --debug               additional debugging
-  -h, --help                show this help
   -d "QUERYSTRING"          pass the expanded query string to Yasca's components
+  -h, --help                show this help
   -i, --ignore-ext EXT,EXT  ignore these file extensions 
                               (default: exe,zip,jpg,gif,png,pdf,class)
       --ignore-file FILE    ignore findings from the specified xml file
       --source-required     only show findings that have source code available
   -f, --fixes FILE          include fixes, written to FILE (default: not included)
                               (EXPERIMENTAL)
-  -l, --level LEVEL         show findings at least LEVEL (1-5) (default: 5)
+  -l, --level LEVEL         show findings at least LEVEL (1-5) (default: 5=all)
+  -o, --output FILE         write output to FILE (default: unique file on
+                              desktop in Yasca directory)
   -p, --plugin DIR|FILE     load plugins from DIR or just load FILE (default: ./plugins)
   -px PATTERN[,PATTERN...]  exclude plugins matching PATTERN or any of "PATTERN,PATTERN"
                               (multiple patterns must be enclosed in quotes)
-  -o, --output FILE         write output to FILE (default: unique file on
-                              desktop in Yasca directory)
       --log FILE            write log entries to FILE
+  -s, --sa_home DIR         use this directory for 3rd party plugins (default: $SA_HOME)
   -r, --report REPORT       use REPORT template (default: HTMLGroupReport). Other options
                               include HTMLGroupReport, CSVReport, XMLReport, SQLReport, 
                               and DetailedReport. 
