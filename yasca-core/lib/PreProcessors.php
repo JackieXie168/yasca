@@ -52,14 +52,12 @@ function cfml_fix_tag_attributes($file_contents) {
     $result2 = array();
     foreach ($result as $tag) {
         if (!preg_match("/\<([^\s]+)\s(.*)\>/", $tag, $tag_attr_list)) {
-            print "doesn't match first regex\n";
             continue;
         }
 
         $cf_tag = $tag_attr_list[1];
         $cf_attr = $tag_attr_list[2];
         $attribute_list = preg_split("/\s+/", $cf_attr);
-
 
         sort($attribute_list);
 

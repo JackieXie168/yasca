@@ -149,13 +149,13 @@ class Plugin_Grep extends Plugin {
 
             $pre_matches = array();         // holds line numbers of pre_grep matches
 
-//            if (isset($this->preprocess) && $yasca->options["debug"]) {
+            if (isset($this->preprocess) && $yasca->options["debug"]) {
                 $yasca->log_message("Before pre-processing, file contents are: \n" . implode("\n", $this->file_contents), E_ALL);
-//            }
-            $file_contents = (isset($this->preprocess) ? call_user_func($this->preprocess, $this->file_contents) : $this->file_contents);
-//            if (isset($this->preprocess) && $yasca->options["debug"]) {
+            }
+            $file_contents = (isset($this->preprocess) ? @call_user_func($this->preprocess, $this->file_contents) : $this->file_contents);
+            if (isset($this->preprocess) && $yasca->options["debug"]) {
                 $yasca->log_message("After pre-processing, file contents are: \n" . implode("\n", $this->file_contents), E_ALL);
-//            }
+            }
 
             foreach ($this->grep as $grep) {
                 $orig_grep = $grep;
