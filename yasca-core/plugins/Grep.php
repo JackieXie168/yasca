@@ -87,6 +87,7 @@ class Plugin_Grep extends Plugin {
         }
         
         foreach ($grep_plugin_list as $grep_plugin) {
+            $yasca->log_message("Using Grep [$grep_plugin] to scan [$this->filename]", E_ALL);
             $grep_content = explode("\n", file_get_contents($grep_plugin));
             $this->initialize();        // clear out $this parameters
         
@@ -148,7 +149,13 @@ class Plugin_Grep extends Plugin {
 
             $pre_matches = array();         // holds line numbers of pre_grep matches
 
+//            if (isset($this->preprocess) && $yasca->options["debug"]) {
+                $yasca->log_message("Before pre-processing, file contents are: \n" . implode("\n", $this->file_contents), E_ALL);
+//            }
             $file_contents = (isset($this->preprocess) ? call_user_func($this->preprocess, $this->file_contents) : $this->file_contents);
+//            if (isset($this->preprocess) && $yasca->options["debug"]) {
+                $yasca->log_message("After pre-processing, file contents are: \n" . implode("\n", $this->file_contents), E_ALL);
+//            }
 
             foreach ($this->grep as $grep) {
                 $orig_grep = $grep;
@@ -190,7 +197,7 @@ class Plugin_Grep extends Plugin {
                      (count($pre_matches) > 0 && !any_within($pre_matches, $line_number+1, $this->lookahead_length)) ) {
                     continue;
                 }
-
+                $yasca->log_message("Found a result on line $line_number ({$this->name})", E_ALL);
                 $result = new Result();
                 $result->line_number = $line_number + 1;
                 $result->filename = $this->filename;

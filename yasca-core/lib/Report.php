@@ -5,7 +5,8 @@
  * This (abstract) class is the parent of the specific report renderers. It handles
  * the output stream creation, sorting, and other housekeeping details.  
  * @author Michael V. Scovetta <scovetta@users.sourceforge.net>
- * @version 1.3
+ * @version 2.0
+ * @license see doc/LICENSE
  * @package Yasca
  */
 class Report {
@@ -34,6 +35,8 @@ class Report {
      * @var array
      */
     public $results = array();
+
+    public $uses_file_output = true;
     
     public function Report(&$options, &$results) {
         $this->options =& $options;

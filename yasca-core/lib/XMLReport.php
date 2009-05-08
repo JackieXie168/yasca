@@ -7,7 +7,8 @@ include_once("lib/Report.php");
  *
  * This class renders scan results as XML.
  * @author Michael V. Scovetta <scovetta@users.sourceforge.net>
- * @version 1.1
+ * @version 2.0
+ * @license see doc/LICENSE
  * @package Yasca
  */
 class XMLReport extends Report {

@@ -5,7 +5,8 @@
  * This pacakge implements a simple engine for static analysis
  * of source code files. 
  * @author Michael V. Scovetta <scovetta@sourceforge.net>
- * @version 1.3
+ * @version 2.0
+ * @license see doc/LICENSE
  * @package Yasca
  */
 
@@ -45,7 +46,8 @@ function main() {
     $report->execute();
     $yasca->execute_callback("post-report");
     
-    Yasca::log_message("Results have been written to " . correct_slashes($yasca->options["output"]), E_USER_WARNING);
+    if ($report->uses_file_output) 
+        Yasca::log_message("Results have been written to " . correct_slashes($yasca->options["output"]), E_USER_WARNING);
     
     if ($yasca->options['debug']) print_r(profile("get"));
 }
@@ -81,7 +83,7 @@ function profile($cmd = false) {
     $delta = $now - $last_time;
     $last_time = $now;
     $trace = debug_backtrace();
-    $caller = $trace[1]['function'];
+    $caller = @$trace[1]['function'];
     @$log[$caller] += $delta;
     $total += $delta;
 }

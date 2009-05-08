@@ -10,8 +10,11 @@
 
                             INSTALLATION GUIDE
 
-    Due to possible licensing conflicts, Yasca is distributed as a
-    core package
+    Thank you for downloading Yasca! This installation guide will help
+    you install Yasca on either Windows or Linux. If you run into any
+    problems, please contact me at scovetta@users.sourceforge.net,
+    leave feedback at yasca.org, or open a bug on the SourceForge
+    project page. Feedback is always welcome!
 
 
     Installation Steps (Windows):
@@ -19,21 +22,43 @@
         1. Download yasca-core.zip and unzip it into a directory. For
            example, c:\yasca.
 
-	    2. If you want to install all plugins, run:
+	    2. If you wish to use any third-party plugins, download and
+           install them into the same directory. This directory does not
+           have to reside within Yasca-Core. For example, you can install
+           PMD into:
 
-             c:\yasca\resources\install-plugins.bat
+             c:\static-tools\
 
-           Otherwise, you can simply download the specific plugins that
-           you want to install and unzip each of them into the Yasca
-           installation directory.
+           For example:
 
-		3. Install Java 1.5 or later. This is required for a few of the
-           plugins. See doc/REQUIREMENTS for a full list.
+             unzip static-pmd.zip c:\static-tools\
+
+           Your directory structure should look like:
+             c:\static-tools\3rdParty-Binaries
+             c:\static-tools\3rdParty-Source
+             c:\static-tools\doc
+             c:\static-tools\resources
+             c:\static-tools\install.txt
 
 
-        4. From the c:\yasca directory, scan resources/test:
+        3. Point Yasca to this directory to pick up any available plugins.
+             
+             yasca -sa_home c:\static-tools\ <target directory>
 
-             C:\Yasca> yasca resources/test
+           Alternatively, you can set the SA_HOME environment variable to
+           the directory instead.
+
+             set SA_HOME=c:\static-tools\
+             yasca <target directory>
+
+
+		4. Note that for some plugins, you'll need to have Java installed.
+           See the installation documents for specific plugins to see what
+           the requirements are.
+
+        5. From the Yasca installation directory, scan resources\test:
+
+             c:\yasca> yasca resources\test
 
 
     Installation Steps (Linux):
@@ -42,15 +67,35 @@
            example, /opt/yasca.
 
 
-	    2. If you want to install all plugins, run:
+	    2. If you wish to use any third-party plugins, download and
+           install them into the same directory. This directory does not
+           have to reside within Yasca-Core. For example, you can install
+           PMD into:
 
-             /opt/yasca/resources/install-plugins
+             c:\static-tools\
 
-           You will need unzip and curl installed.
+           For example:
 
-           Otherwise, you can simply download the specific plugins that
-           you want to install and unzip each of them into the Yasca
-           installation directory.
+             unzip static-pmd.zip c:\static-tools\
+
+           Your directory structure should look like:
+             c:\static-tools\3rdParty-Binaries
+             c:\static-tools\3rdParty-Source
+             c:\static-tools\doc
+             c:\static-tools\resources
+             c:\static-tools\install.txt
+
+
+        3. Point Yasca to this directory to pick up any available plugins.
+             
+             yasca -sa_home c:\static-tools\ <target directory>
+
+           Alternatively, you can set the SA_HOME environment variable to
+           the directory instead.
+
+             set SA_HOME=c:\static-tools\
+             yasca <target directory>
+
 
         3. Verify that PHP 5 is installed:
 
@@ -60,6 +105,7 @@
              Copyright (c) 1997-2009 The PHP Group
              Zend Engine v2.2.0, Copyright (c) 1998-2009 Zend Technologies
 
+
         4. Verify that php-xml is installed:
 
              # php -m
@@ -68,6 +114,7 @@
              ...
              xml
              ...
+
 
 		5. Install Java 1.5 or later. This is required for a few of the
            plugins. See doc/REQUIREMENTS for a full list.
@@ -84,20 +131,18 @@
              # yasca resources/test
 
 
-    LICENSES
-    --------
-
-    All license files are stored in the doc/licenses directory.
+    LICENSE
+    -------
 
     The package "yasca-core" is distributed under a BSD-style license.
     You are free to modify this component and include it in other
-    products, even commercial ones.
+    products, even commercial ones. The official license is located in
+    doc/LICENSE.
 
     Other packages are distributed under their original license (usually
     GPL). The only modifications made to the original package is that 
     the directory structures have been altered so that they can be
     easily accessed by Yasca. The original binary and source code to
-    each of the packages have been included as well. These packages
-    are distributed under whatever license the underlying product is
-    distributed under.
-
+    each of the packages have been included as well. These products are
+    not part of Yasca and can be used by other products that implement
+    the same calling interface.

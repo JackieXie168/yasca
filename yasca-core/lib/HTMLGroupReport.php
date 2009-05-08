@@ -7,7 +7,8 @@ include_once("lib/Report.php");
  *
  * This class renders scan results as rich HTML.
  * @author Michael V. Scovetta <scovetta@users.sourceforge.net>
- * @version 1.2
+ * @version 2.0
+ * @license see doc/LICENSE
  * @package Yasca
  */
 class HTMLGroupReport extends Report {
@@ -749,12 +750,14 @@ class HTMLGroupReport extends Report {
                     <td class="header_title" nowrap>Yasca</td>
                     <td style="width: 100%;">
                     <div id="attachment_list" style="float:right;$attachment_list_style">Attachments: $attachment_list_select_box</div>
+                    <div>
                     <table style="border:0;">
-                        <tr><td class="header_left" nowrap>Version:</td><td class="header_right">$version [ <a target="_blank" href="http://yasca.sourceforge.net/check_version.php?current_version=$version">check for updates</a> ]</td></tr>
+                        <tr><td class="header_left" nowrap>Yasca Version:</td><td class="header_right">$version [ <a target="_blank" href="http://yasca.sourceforge.net/check_version.php?current_version=$version">check for updates</a> ]</td></tr>
                         <tr><td class="header_left" nowrap>Report Generated:</td><td class="header_right">$generation_date</td></tr>
                         <tr><td class="header_left" nowrap>Options:</td><td class="header_right">
                         [ <a href="javascript:void(0);" onclick="show_change_base(event);">change links</a> | <a href="javascript:void(0);" onclick="save_ignore_list(event);">save ignore list</a> | <a href="http://yasca.sourceforge.net/userguide.php" target="_blank">user guide</a> | <a href="http://yasca.sourceforge.net/feedback.php">send feedback</a> ]</td></tr>
                     </table>
+                    </div>
                     </td>
                 </tr>
               </table>

@@ -5,6 +5,7 @@
  * This object can be used to cache arbitrary data for the main application.
  * @author Michael V. Scovetta <scovetta@users.sourceforge.net>
  * @version 2.0
+ * @license see doc/LICENSE
  * @package Yasca
  */
 

@@ -9,7 +9,8 @@ include_once("lib/PreProcessors.php");
  *
  * This (abstract) class is the parent of all plugin classes. 
  * @author Michael V. Scovetta <scovetta@users.sourceforge.net>
- * @version 1.0
+ * @version 2.0
+ * @license see doc/LICENSE
  * @package Yasca
  */
 class Plugin {
@@ -83,13 +84,16 @@ class Plugin {
      */
     public $canExecute = true;
 
-    private static $ext_classes = array( "JAVA"   => array("java", "jsp", "jsw"),
-                                         "C"      => array("c", "cpp", "h"),
-                                         "HTML"   => array("html", "css", "js", "htm"),
-                                         "BINARY" => array("dll", "zip", "jar", "ear", "war"),
-                                         "PHP"    => array("php", "php5", "php4"),
-                                         "NET"    => array("aspx", "asp", "vb", "frm", "res", "cs"),
-                                         "COBOL"  => array("cobol", "cbl", "cob")
+    private static $ext_classes = array( "JAVA"       => array("java", "jsp", "jsw"),
+                                         "C"          => array("c", "cpp", "h"),
+                                         "HTML"       => array("html", "css", "js", "htm"),
+                                         "BINARY"     => array("dll", "zip", "jar", "ear", "war"),
+                                         "PHP"        => array("php", "php5", "php4"),
+                                         "NET"        => array("aspx", "asp", "vb", "frm", "res", "cs"),
+                                         "COBOL"      => array("cobol", "cbl", "cob"),
+                                         "PERL"       => array("pl"),
+                                         "PYTHON"     => array("py"),
+                                         "COLDFUSION" => array("cfm", "cfml")
                                   );
 
     /**
@@ -107,8 +111,9 @@ class Plugin {
             $this->is_valid_filetype = true;
             $yasca =& Yasca::getInstance();
             $this->sa_home = $yasca->options["sa_home"];
+
             if (is_array($this->executable)) {
-                $fn_sa_home = create_function('&$a, &$b, $sa_home', '$a = str_replace("%SA_HOME%", $sa_home, $a); $b = str_replace("%SA_HOME%", $sa_home, $b);');
+                $fn_sa_home = create_function('&$a, &$b, &$sa_home', '$a = str_replace("%SA_HOME%", $sa_home, $a); $b = str_replace("%SA_HOME%", $sa_home, $b);');
                 array_walk($this->executable, $fn_sa_home, $this->sa_home);
             }
         }
@@ -159,8 +164,7 @@ class Plugin {
 
         if ($this->installation_marker !== true) {	// installation_marker == true means, "no plugin installation needed"
             if (!file_exists($yasca->options['sa_home'] . "resources/installed/" . $this->installation_marker)) {
-                Yasca::log_message("Plugin \"" . $this->installation_marker . "\" not installed. Download the package from www.yasca.org.", E_USER_WARNING);
-                Yasca::log_message("Plugin \"" . $yasca->options['sa_home'] . "resources/installed/" . $this->installation_marker . "\" not installed. Download the package from www.yasca.org.", E_USER_WARNING);
+                Yasca::log_message("Plugin \"{$this->installation_marker}\" not installed. You can download the package from www.yasca.org.", E_USER_WARNING);
 
                 $no_execute[$this->installation_marker] = true;		// add to the cache so this only happens once
                 return false;

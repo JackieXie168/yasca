@@ -3,28 +3,30 @@
 include_once("lib/Report.php");
 
 /**
- * CSVReport Class
+ * ConsoleReport Class
  *
- * This class renders scan results as CSV.
+ * This class renders scan results on the console with no details.
  * @author Michael V. Scovetta <scovetta@users.sourceforge.net>
  * @version 2.0
  * @license see doc/LICENSE
  * @package Yasca
  */
 
-class CSVReport extends Report {
+class ConsoleReport extends Report {
     /**
      * The default extension used for reports of this type.
      */
-    public $default_extension = "csv";
+    public $default_extension = "";
 
+    public $uses_file_output = false;
+    
     /**
-     * Executes a CSVReport, with output going to $options['output']
+     * Executes a ConsoleReport, with output going to stdout.
      */ 
     function execute() {
         if (!$handle = $this->create_output_handle()) return;
         
-        fwrite($handle, $this->get_preamble());
+        print "Report Output:\n";
         
         $num_results_written = 0;
         foreach ($this->results as $result) {
@@ -51,27 +53,12 @@ class CSVReport extends Report {
             $category_link_field = "<a href=\"$category_link\" target=\"_blank\">$category</a>";
             if ($category_link == "") $category_link_field = $category;
             
-            fwrite($handle,
-                    "\"$row_id\"," . 
-                    "\"$category\"," .
-                    "\"$plugin_name\"," .
-                    "\"$severity_description\"," .
-                    "\"$filename_base$line_number_field\"," .
-                    "\"$filename\"," .
-                    "\"$source\"\n");                   
+            print "$row_id => $category: $filename_base$line_number_field: $source\n";
         }
-        
-        fwrite($handle, $this->get_postamble());        
-        fclose($handle);
+        if (count($this->results) == 0) {
+            print " No results found.\n";
+        }
     }
-    
-    function get_preamble() {
-        return '"#","Category","Plugin Name","Severity","Location","Full Location","Message"' . "\n";
-    }
-        
-    function get_postamble() {
-        return "";
-    }   
 }
 
 

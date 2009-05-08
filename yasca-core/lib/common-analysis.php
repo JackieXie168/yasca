@@ -3,6 +3,7 @@
 /**
  * This file contains miscellaneous analytical functions that assist in the analysis of
  * source code.
+ * @license see doc/LICENSE
  * @package Yasca
  */ 
 

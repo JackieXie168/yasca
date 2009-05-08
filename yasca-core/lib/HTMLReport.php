@@ -7,7 +7,8 @@ include_once("lib/Report.php");
  *
  * This class renders scan results as rich HTML.
  * @author Michael V. Scovetta <scovetta@users.sourceforge.net>
- * @version 1.0
+ * @version 2.0
+ * @license see doc/LICENSE
  * @package Yasca
  */
 class HTMLReport extends Report {

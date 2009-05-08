@@ -7,7 +7,8 @@ include_once("lib/Report.php");
  *
  * This class places all contents in a SQLLite Database.
  * @author Michael V. Scovetta <scovetta@users.sourceforge.net>
- * @version 1.3
+ * @version 2.0
+ * @license see doc/LICENSE
  * @package Yasca
  */
 class SQLReport extends Report {

@@ -1,5 +1,5 @@
 name = Weak Cryptographic Algorithm
-file_type = java,jsp
+file_type = JAVA,COLDFUSION,C
 grep = /\"(MD5|MD4|MD2|RC4|RC2|DES)\"/i
 grep = /DESEDE_ENCRYPTION_SCHEME|DES_ENCRYPTION_SCHEME/i
 category = Using a broken or risky cryptographic algorithm

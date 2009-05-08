@@ -5,7 +5,8 @@
  * This struct holds result information for a particular issue found. There will be
  * one Result object created for each such issue. 
  * @author Michael V. Scovetta <scovetta@users.sourceforge.net>
- * @version 1.3
+ * @version 2.0
+ * @license see doc/LICENSE
  * @package Yasca
  */
 class Result {

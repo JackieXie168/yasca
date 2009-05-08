@@ -23,14 +23,14 @@
 }
 @media screen {
 	* {
-		font-family: Verdana;
+		font-family: Calibri, Verdana;
 	}
 	body {
-		background-color: Gainsboro;
+		background-color: LightCyan;
 	}
 	table {
 		width: 100%;
-		font-size: smaller;
+		font-size: normal; /* changed from smaller */
 		empty-cells: show;
 	}
 	th {
@@ -142,19 +142,21 @@
 	}
 	.header_table td { 
 		border: 0; 
-		background-color: #99ffff; 
-		font-size: 12px;
+		background-color: LightSkyBlue; 
+		font-size: normal;
 	}
 	.header_table {
 		width: 100%;
-		background-color: #99ffff;
+		background-color: LightSkyBlue;
 		border: 1px ridge darkgray;
 	}
 	.header_title {
-		font-size: 28px !important;
+		font-size: 34px !important;
 		padding-left: 25px !important;
 		padding-right: 25px !important;
 		border-right:  1px ridge darkgray !important;
+        font-family: Candara, Calibri, Verdana, Serif;
+		font-weight: bold;
 	}
 	.header_left {
 		font-weight: bold;
@@ -207,7 +209,6 @@
 		margin-left: 5px;
 	}
 
-
 	.message {
 		overflow: hidden;
 		text-overflow: clip;
@@ -217,7 +218,7 @@
 		position: absolute;
 		width: 220px;
 		height: 70px;
-		font-size: 11px;
+		font-size: 12px;
 		border: 2px ridge brown;
 		background-color: white;
 		padding: 4px;
@@ -238,9 +239,9 @@
 		padding: 5px;
 	} 
 	select {
-		font-family: 'verdana';
+		font-family: Calibri, Verdana;
 		color: black;
-		font-size: smaller;
+		font-size: normal; /* changed from smaller */
 	}
 	.nowrap {
 		white-space: nowrap;
@@ -277,5 +278,4 @@
 		border: 2px ridge brown;
 		opacity: 95%;
 	}
-		
 }

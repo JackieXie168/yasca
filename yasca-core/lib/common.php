@@ -3,6 +3,7 @@
 /**
  * This file contains miscellaneous functions, as well as some PHP 5 functions that
  * will be included when running on a PHP 4 environment.
+ * @license see doc/LICENSE
  * @package Yasca
  */
  
@@ -422,13 +423,48 @@ function any_within($haystack, $needle, $max_distance = 10) {
     return false;
 }
 
-function correct_slashes($path) {
+/**
+ * @deprecated
+ */
+function correct_slashes_original($path) {
+    $path = str_replace("//", "/", $path);
+    $path = str_replace("\\\\", "\\", $path);
     if (isWindows()) {
-    $path = str_replace("/", "\\", $path);
+        $path = str_replace("/", "\\", $path);
     } else {
-    $path = str_replace("\\", "/", $path);
+        $path = str_replace("\\", "/", $path);
     }
     return $path;
 }
 
+/**
+ * This function corrects slashes based on the platform.
+ */
+function correct_slashes($path, $endWithSlash = false) {
+    $path = trim($path);
+
+    // Figure out which slash we're using
+    if (isWindows()) {
+        $path = str_replace("/", "\\", $path);
+
+        while(strchr($path,'\\\\'))
+            $path = str_replace("\\\\", "\\", $path);
+
+        if ($endWithSlash) {
+            $path = trim($path, "\\");
+            $path .= "\\";
+        }
+    } else {
+        $path = str_replace("\\", "/", $path);
+
+        while(strchr($path,'//'))
+            $path = str_replace("//", "/", $path);
+
+        if ($endWithSlash) {
+            $path = trim($path, "/");
+            $path .= "/";
+        }
+    }
+    return $path;
+}
 ?>

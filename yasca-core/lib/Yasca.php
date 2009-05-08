@@ -6,7 +6,8 @@
  * files and plugins, and executing those plugins. The output of this all is a list of 
  * Result objects that can be passed to a renderer.
  * @author Michael V. Scovetta <scovetta@users.sourceforge.net>
- * @version 1.3
+ * @version 2.0
+ * @license see doc/LICENSE
  * @package Yasca
  */
 include_once("lib/Plugin.php");
@@ -146,7 +147,10 @@ class Yasca {
         $num_executions = 0;
         
         foreach ($this->target_list as $target) {
-            $pinfo = pathinfo($target);
+
+            $this->log_message("Attempting to scan [$target]", E_ALL);
+
+  	        $pinfo = pathinfo($target);
             if (isset($pinfo['extension']) && in_array($pinfo['extension'], $this->options['ignore-ext'])) {
                 $total_executions -= count($this->plugin_list);     // compensate for ignored files
                 continue;
@@ -165,13 +169,12 @@ class Yasca {
                 $this->log_message("Initializing plugin [$plugin] on [$target]", E_USER_NOTICE);
                                 
                 if (!class_exists($plugin)) {
-                    $this->log_message("Missing plugin class [$plugin]. Plugin will be ignored.", E_USER_WARNING);
+                   $this->log_message("Missing plugin class [$plugin]. Plugin will be ignored.", E_USER_WARNING);
                     unset($this->plugin_list[array_search($plugin, $this->plugin_list)]);
                     $plugin_obj = null;
                     continue;
                 }               
-//TODO change this basck to @new
-                $plugin_obj = new $plugin($target, $target_file_contents);             
+                $plugin_obj = @new $plugin($target, $target_file_contents);             
                 if (!is_subclass_of($plugin_obj, "Plugin") || !$plugin_obj->initialized) {
                     $this->log_message("Unable to instantiate plugin object of [$plugin] class. Plugin will be ignored.", E_USER_WARNING);
                     unset($this->plugin_list[array_search($plugin, $this->plugin_list)]);
@@ -213,7 +216,7 @@ class Yasca {
                     $this->log_message("Memory Usage: [" . memory_get_usage(true) . "] after calling [$plugin] on [$target]", E_USER_WARNING);
                 }
             }
-            
+
             $target_file_contents = null;
             unset($target_file_contents);
         }
@@ -477,7 +480,7 @@ class Yasca {
                     $opt['fixes'] = $_SERVER['argv'][++$i];
                     break;
 
-                case "-s":
+                case "-sa":
                 case "--sa_home":
                     $opt['sa_home'] = $_SERVER['argv'][++$i];
                     break;
@@ -526,6 +529,10 @@ class Yasca {
         } elseif (is_dir($opt['output'])) {
             $opt['output'] .= "/Yasca-Report-" . date('YmdHis') . $extension;
         }
+
+//        $opt['sa_home'] = is_dir(trim($opt['sa_home'], "\\/ ")) ? $opt['sa_home'] : ".";
+        $opt['sa_home'] = correct_slashes($opt['sa_home'], true);
+        $this->log_message("Using Static Analyzers located at {$opt['sa_home']}", E_USER_WARNING);
         
         $opt['dir'] = realpath($opt['dir']);
     
@@ -564,10 +571,10 @@ Perform analysis of program source code.
   -px PATTERN[,PATTERN...]  exclude plugins matching PATTERN or any of "PATTERN,PATTERN"
                               (multiple patterns must be enclosed in quotes)
       --log FILE            write log entries to FILE
-  -s, --sa_home DIR         use this directory for 3rd party plugins (default: $SA_HOME)
+  -sa,--sa_home DIR         use this directory for 3rd party plugins (default: $SA_HOME)
   -r, --report REPORT       use REPORT template (default: HTMLGroupReport). Other options
                               include HTMLGroupReport, CSVReport, XMLReport, SQLReport, 
-                              and DetailedReport. 
+                              DetailedReport, and ConsoleReport. 
   -s, --silent              do not show any output
   -v, --version             show version information
 
