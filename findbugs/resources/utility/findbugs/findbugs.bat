@@ -1,4 +1,4 @@
-rem @echo off
+@echo off
 :: Launch FindBugs on a Windows system.
 :: Adapted from scripts found at http://www.ericphelps.com/batch/
 :: This will only work on Windows NT or later!
