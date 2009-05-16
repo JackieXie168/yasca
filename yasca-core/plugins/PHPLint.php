@@ -39,8 +39,11 @@ class Plugin_PHPLint extends Plugin {
         } else {    
             $filename = $this->filename;        // Linux
         }
+
+        $executable = $this->executable[getSystemOS()];
+        $executable = $this->replaceExecutableStrings($executable);
             
-        exec( $this->executable[getSystemOS()] . " " . escapeshellarg($filename),  $result_list);
+        exec( $executable . " " . escapeshellarg($filename),  $result_list);
 
         if ($yasca->options['debug'])
             $yasca->log_message("PHPLint returned: " . implode("\r\n", $result_list), E_ALL);

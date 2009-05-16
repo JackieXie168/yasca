@@ -249,5 +249,15 @@ class Plugin {
         }
         return $ext_valid;
     }
+
+    /**
+     * Replaces standard variables from executable strings.
+     * @param string $executable string to expand out
+     * @return new string with special variables replaced
+     */
+    public function replaceExecutableStrings($executable) {
+        return str_replace("%SA_HOME%", $this->sa_home, $executable);
+    }
+
 }
 ?>

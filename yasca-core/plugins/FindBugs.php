@@ -69,7 +69,8 @@ class Plugin_FindBugs extends Plugin {
         
         $yasca->log_message("Forking external process (FindBugs)...", E_USER_WARNING);
 
-        $executable = $this->executable[ getSystemOS() ];
+        $executable = $this->executable[getSystemOS()];
+        $executable = $this->replaceExecutableStrings($executable);
 
         if (file_exists("{$this->sa_home}resources/utility/findbugs/plugin/fb-contrib-3.8.1.jar")) {
             $executable = str_replace('$PLUGIN', "-pluginList {$this->sa_home}resources/utility/findbugs/plugin/fb-contrib-3.8.1.jar", $executable);

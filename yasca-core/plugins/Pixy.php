@@ -10,8 +10,8 @@
 class Plugin_Pixy extends Plugin {
     public $valid_file_types = array("php", "php4");
 
-    public $executable = array('Windows' => "%SA_HOMEresources\\utility\\pixy\\pixy.bat",
-                               'Linux'   => "%SA_HOMEresources/utility/pixy/pixy");
+    public $executable = array('Windows' => "%SA_HOME%resources\\utility\\pixy\\pixy.bat",
+                               'Linux'   => "%SA_HOME%resources/utility/pixy/pixy");
     /**
      * This class is multi-target.
      */
@@ -40,8 +40,11 @@ class Plugin_Pixy extends Plugin {
         
         $dir = $yasca->options['dir'];
         $pixy_results = array();
-            
-        exec( $this->executable[getSystemOS()] . " " . escapeshellarg($this->filename), $pixy_results);
+        
+        $executable = $this->executable[getSystemOS()];
+        $executable = $this->replaceExecutableStrings($executable);
+
+        exec( $executable . " " . escapeshellarg($this->filename), $pixy_results);
             
         if ($yasca->options['debug']) 
             $yasca->log_message("Pixy returned: " . implode("\r\n", $pixy_results), E_ALL);

@@ -69,8 +69,10 @@ class Plugin_PMD extends Plugin {
             
             $executable = $this->executable[ getSystemOS() ];
             $executable = str_replace('$DIR', escapeshellarg($dir), $executable);
+            $executable = $this->replaceExecutableStrings($executable);
 
             $yasca->log_message("Forking external process (PMD) for $ruleset...", E_USER_WARNING);
+            $yasca->log_message("Executing [" . $executable . " " . escapeshellarg($ruleset) . "]", E_ALL);
             exec( $executable . " " . escapeshellarg($ruleset), $pmd_results);
             $yasca->log_message("External process completed...", E_USER_WARNING);
             

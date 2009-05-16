@@ -33,9 +33,12 @@ class Plugin_CppCheck extends Plugin {
         
         $dir = $yasca->options['dir'];
         $cpp_results = array();
+
+        $executable = $this->executable[getSystemOS()];
+        $executable = $this->replaceExecutableStrings($executable);
             
         $yasca->log_message("Forking external process (cppcheck)...", E_USER_WARNING);
-        exec( $this->executable[getSystemOS()] . " -q --xml " . escapeshellarg($dir) . " 2>&1", $cpp_results);
+        exec( $executable . " -q --xml " . escapeshellarg($dir) . " 2>&1", $cpp_results);
         $yasca->log_message("External process completed...", E_USER_WARNING);
             
         if ($yasca->options['debug']) 

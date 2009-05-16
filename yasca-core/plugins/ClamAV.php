@@ -30,20 +30,23 @@ class Plugin_ClamAV extends Plugin {
 		$dir = $yasca->options['dir'];      
 		$result_list = array();
 
+                $executable = $this->executable[getSystemOS()];
+                $executable = $this->replaceExecutableStrings($executable);
+
 		if (getSystemOS() == "Windows") {
 			$yasca->log_message("Forking external process (ClamAV)...", E_USER_WARNING);
-			exec( $this->executable[getSystemOS()] . " " . escapeshellarg($dir),  $result_list);
-            if (count($result_list) == 0)
-                Yasca::log_message("Plugin \"ClamAV\" not installed. Download it at yasca.org.", E_USER_WARNING);
-			$yasca->log_message("External process completed...", E_USER_WARNING);
-		} else if (getSystemOS() == "Linux") {
-            if (preg_match("/no clamscan in/", `which clamscan`)) {
-			    $yasca->log_message("ClamAV not detected. Please install and ensure that 'clamscan' is on the system path.", E_USER_WARNING);
-                return;
-            }
-			$yasca->log_message("Forking external process (ClamAV)...", E_USER_WARNING);
-			exec( $this->executable[getSystemOS()] . " " . escapeshellarg($dir),  $result_list);
-			$yasca->log_message("External process completed...", E_USER_WARNING);
+			exec( $executable . " " . escapeshellarg($dir),  $result_list);
+                        if (count($result_list) == 0)
+                            Yasca::log_message("Plugin \"ClamAV\" not installed. Download it at yasca.org.", E_USER_WARNING);
+	            	$yasca->log_message("External process completed...", E_USER_WARNING);
+	        } else if (getSystemOS() == "Linux") {
+                    if (preg_match("/no clamscan in/", `which clamscan`)) {
+	                $yasca->log_message("ClamAV not detected. Please install and ensure that 'clamscan' is on the system path.", E_USER_WARNING);
+                        return;
+                    }
+		    $yasca->log_message("Forking external process (ClamAV)...", E_USER_WARNING);
+		    exec( $executable . " " . escapeshellarg($dir),  $result_list);
+		    $yasca->log_message("External process completed...", E_USER_WARNING);
 		}
 
 		if ($yasca->options['debug'])
