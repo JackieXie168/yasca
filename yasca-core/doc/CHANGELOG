@@ -36,3 +36,6 @@ Version 2.0 released on 2009-05-07
 	Added RATS plugin
     Added new minor plugins and many new rulesets.
 
+Version 2.01 released on 2009-05-18
+	Fixed a few bugs related to calling external plugins.
+	Added a few minor plugins, including one that finds banned functions (via Microsoft SDL)
