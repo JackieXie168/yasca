@@ -19,7 +19,7 @@ require_module 'standard';
 
 class PDOException extends Exception
 {
-	public $errorInfo = /*. (string) .*/ NULL;
+	public $errorInfo = /*. (array[int]mixed) .*/ NULL;
 	/*. DOC Corresponds to <@item PDO::errorInfo()> or <@item PDOStatement::errorInfo()> .*/
 }
 
@@ -34,7 +34,7 @@ class PDOStatement {
 /*. bool .*/ function closeCursor(){}
 /*. int .*/ function columnCount(){}
 /*. string .*/ function errorCode(){}
-/*. array[int]string .*/ function errorInfo(){}
+/*. array[int]mixed .*/ function errorInfo(){}
 /*. bool .*/ function execute(/*. args .*/){}
 /*. mixed .*/ function fetch(/*. args .*/){}
 /*. array[int]mixed .*/ function fetchAll(/*. args .*/){}

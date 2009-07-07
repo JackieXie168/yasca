@@ -5,6 +5,8 @@ See: <a href="http://www.php.net/manual/en/ref.ftp.php"><code>http://www.php.net
 
 .*/
 
+/*. require_module 'standard'; .*/
+
 define('FTP_ASCII', 1);
 define('FTP_TEXT', 1);
 define('FTP_BINARY', 1);
@@ -18,10 +20,12 @@ define('FTP_MOREDATA', 1);
 
 /*. resource .*/ function ftp_connect(/*. string .*/ $host /*., args .*/){}
 /*. resource .*/ function ftp_ssl_connect(/*. string .*/ $host /*., args .*/){}
-/*. bool .*/ function ftp_login(/*. resource .*/ $stream, /*. string .*/ $username, /*. string .*/ $password){}
+/*. bool .*/ function ftp_login(/*. resource .*/ $stream, /*. string .*/ $username, /*. string .*/ $password)
+	{ trigger_error("", E_WARNING); }
 /*. string .*/ function ftp_pwd(/*. resource .*/ $stream){}
 /*. bool .*/ function ftp_cdup(/*. resource .*/ $stream){}
-/*. bool .*/ function ftp_chdir(/*. resource .*/ $stream, /*. string .*/ $directory){}
+/*. bool .*/ function ftp_chdir(/*. resource .*/ $stream, /*. string .*/ $directory)
+	{ trigger_error("", E_WARNING); }
 /*. bool .*/ function ftp_exec(/*. resource .*/ $stream, /*. string .*/ $command){}
 /*. array .*/ function ftp_raw(/*. resource .*/ $stream, /*. string .*/ $command){}
 /*. string .*/ function ftp_mkdir(/*. resource .*/ $stream, /*. string .*/ $directory){}
@@ -48,5 +52,6 @@ define('FTP_MOREDATA', 1);
 /*. bool .*/ function ftp_site(/*. resource .*/ $stream, /*. string .*/ $cmd){}
 /*. bool .*/ function ftp_close(/*. resource .*/ $stream){}
 /*. bool .*/ function ftp_set_option(/*. resource .*/ $stream, /*. int .*/ $option, /*. mixed .*/ $value){}
-/*. mixed .*/ function ftp_get_option(/*. resource .*/ $stream, /*. int .*/ $option){}
+/*. mixed .*/ function ftp_get_option(/*. resource .*/ $stream, /*. int .*/ $option)
+	{ trigger_error("", E_WARNING); }
 ?>

@@ -256,7 +256,11 @@ class Plugin {
      * @return new string with special variables replaced
      */
     public function replaceExecutableStrings($executable) {
-        return str_replace("%SA_HOME%", $this->sa_home, $executable);
+        $executable = str_replace("%SA_HOME%", $this->sa_home, $executable);
+        foreach ($_ENV as $key => $value) {
+            $executable = str_replace("%" . $key . "%", $value, $executable);
+        }
+        return $executable;
     }
 
 }

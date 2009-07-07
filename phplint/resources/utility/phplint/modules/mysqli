@@ -406,15 +406,25 @@ class mysqli {
 /*. bool .*/ function mysqli_thread_safe(){}
 /*. mysqli_result .*/ function mysqli_use_result(/*. mysqli .*/ $link){}
 /*. int .*/ function mysqli_warning_count(/*. mysqli .*/ $link){}
-/*. void .*/ function mysqli_disable_reads_from_master(/*. mysqli .*/ $link){}
-/*. void .*/ function mysqli_disable_rpl_parse(/*. mysqli .*/ $link){}
-/*. void .*/ function mysqli_enable_reads_from_master(/*. mysqli .*/ $link){}
-/*. void .*/ function mysqli_enable_rpl_parse(/*. mysqli .*/ $link){}
-/*. bool .*/ function mysqli_master_query(/*. mysqli .*/ $link, /*. string .*/ $query){}
-/*. int .*/ function mysqli_rpl_parse_enabled(/*. mysqli .*/ $link){}
-/*. bool .*/ function mysqli_rpl_probe(/*. mysqli .*/ $link){}
-/*. int .*/ function mysqli_rpl_query_type(/*. string .*/ $query){}
-/*. bool .*/ function mysqli_send_query(/*. mysqli .*/ $link, /*. string .*/ $query){}
-/*. bool .*/ function mysqli_slave_query(/*. mysqli .*/ $link, /*. string .*/ $query){}
+/*. void .*/ function mysqli_disable_reads_from_master(/*. mysqli .*/ $link)
+	/*. DOC <@deprecated Removed.> .*/ {}
+/*. void .*/ function mysqli_disable_rpl_parse(/*. mysqli .*/ $link)
+	/*. DOC <@deprecated Removed.> .*/ {}
+/*. void .*/ function mysqli_enable_reads_from_master(/*. mysqli .*/ $link)
+	/*. DOC <@deprecated Removed.> .*/ {}
+/*. void .*/ function mysqli_enable_rpl_parse(/*. mysqli .*/ $link)
+	/*. DOC <@deprecated Removed.> .*/ {}
+/*. bool .*/ function mysqli_master_query(/*. mysqli .*/ $link, /*. string .*/ $query)
+	/*. DOC <@deprecated Removed.> .*/ {}
+/*. int .*/ function mysqli_rpl_parse_enabled(/*. mysqli .*/ $link)
+	/*. DOC <@deprecated Removed.> .*/ {}
+/*. bool .*/ function mysqli_rpl_probe(/*. mysqli .*/ $link)
+	/*. DOC <@deprecated Removed.> .*/ {}
+/*. int .*/ function mysqli_rpl_query_type(/*. string .*/ $query)
+	/*. DOC <@deprecated Removed.> .*/ {}
+/*. bool .*/ function mysqli_send_query(/*. mysqli .*/ $link, /*. string .*/ $query)
+	/*. DOC <@deprecated Removed.> .*/ {}
+/*. bool .*/ function mysqli_slave_query(/*. mysqli .*/ $link, /*. string .*/ $query)
+	/*. DOC <@deprecated Removed.> .*/ {}
 /*. bool .*/ function mysqli_set_charset (/*. mysqli .*/ $link, /*. string .*/ $charset){}
 ?>

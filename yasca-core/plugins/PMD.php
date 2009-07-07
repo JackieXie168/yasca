@@ -10,7 +10,8 @@ class Plugin_PMD extends Plugin {
     public $valid_file_types = array("java", "jsp");
 																																																											
     public $executable = array('Windows' => 'java -cp "./resources/utility/pmd/Yasca-PMD.jar;%SA_HOME%resources/utility/pmd/pmd14-4.2.5.jar;%SA_HOME%resources/utility/pmd/asm-3.1.jar;%SA_HOME%resources/utility/pmd/jaxen-1.1.1.jar;%SA_HOME%resources/utility/pmd/retroweaver-rt-2.0.5.jar;%SA_HOME%resources/utility/pmd/backport-util-concurrent.jar" net.sourceforge.pmd.PMD $DIR net.sourceforge.pmd.renderers.YascaRenderer',
-                               'Linux'   => 'java -cp "./resources/utility/pmd/Yasca-PMD.jar:%SA_HOME%resources/utility/pmd/pmd14-4.2.5.jar:%SA_HOME%resources/utility/pmd/asm-3.1.jar:%SA_HOME%resources/utility/pmd/jaxen-1.1.1.jar:%SA_HOME%resources/utility/pmd/retroweaver-rt-2.0.5.jar:%SA_HOME%resources/utility/pmd/backport-util-concurrent.jar" net.sourceforge.pmd.PMD $DIR net.sourceforge.pmd.renderers.YascaRenderer');
+                               'Linux'   => 'java -cp "./resources/utility/pmd/Yasca-PMD.jar:%SA_HOME%resources/utility/pmd/pmd14-4.2.5.jar:%SA_HOME%resources/utility/pmd/asm-3.1.jar:%SA_HOME%resources/utility/pmd/jaxen-1.1.1.jar:%SA_HOME%resources/utility/pmd/retroweaver-rt-2.0.5.jar:%SA_HOME%resources/utility/pmd/backport-util-concurrent.jar" net.sourceforge.pmd.PMD $DIR net.sourceforge.pmd.renderers.YascaRenderer',
+                               'Darwin'  => 'java -cp "./resources/utility/pmd/Yasca-PMD.jar:%SA_HOME%resources/utility/pmd/pmd14-4.2.5.jar:%SA_HOME%resources/utility/pmd/asm-3.1.jar:%SA_HOME%resources/utility/pmd/jaxen-1.1.1.jar:%SA_HOME%resources/utility/pmd/retroweaver-rt-2.0.5.jar:%SA_HOME%resources/utility/pmd/backport-util-concurrent.jar" net.sourceforge.pmd.PMD $DIR net.sourceforge.pmd.renderers.YascaRenderer');
     /**
      * This class is multi-target.
      */

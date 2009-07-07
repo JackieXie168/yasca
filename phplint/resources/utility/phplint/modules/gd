@@ -10,6 +10,12 @@ See: <a href="http://www.php.net/manual/en/ref.image.php"><code>http://www.php.n
 
 
 # FIXME: all these '1' are dummy values
+define('GD_VERSION', "?");
+define('GD_MAJOR_VERSION', 1);
+define('GD_MINOR_VERSION', 1);
+define('GD_RELEASE_VERSION', 1);
+define('GD_EXTRA_VERSION', "?");
+define("GD_BUNDLED", 1);
 define("IMG_GIF", 1);
 define("IMG_JPG", 1);
 define("IMG_JPEG", 1);
@@ -43,7 +49,30 @@ define("IMG_FILTER_SELECTIVE_BLUR", 1);
 define("IMG_FILTER_EMBOSS", 1);
 define("IMG_FILTER_MEAN_REMOVAL", 1);
 define("IMG_FILTER_SMOOTH", 1);
-define("GD_BUNDLED", 1);
+define('IMAGETYPE_GIF', 1);
+define('IMAGETYPE_JPEG', 1);
+define('IMAGETYPE_PNG', 1);
+define('IMAGETYPE_SWF', 1);
+define('IMAGETYPE_PSD', 1);
+define('IMAGETYPE_BMP', 1);
+define('IMAGETYPE_WBMP', 1);
+define('IMAGETYPE_XBM', 1);
+define('IMAGETYPE_TIFF_II', 1);
+define('IMAGETYPE_TIFF_MM', 1);
+define('IMAGETYPE_IFF', 1);
+define('IMAGETYPE_JB2', 1);
+define('IMAGETYPE_JPC', 1);
+define('IMAGETYPE_JP2', 1);
+define('IMAGETYPE_JPX', 1);
+define('IMAGETYPE_SWC', 1);
+define('IMAGETYPE_ICO', 1);
+define('PNG_NO_FILTER', 1);
+define('PNG_FILTER_NONE', 1);
+define('PNG_FILTER_SUB', 1);
+define('PNG_FILTER_UP', 1);
+define('PNG_FILTER_AVG', 1);
+define('PNG_FILTER_PAETH', 1);
+define('PNG_ALL_FILTERS', 1);
 
 
 /*. array .*/ function gd_info(){}

@@ -39,3 +39,10 @@ Version 2.0 released on 2009-05-07
 Version 2.01 released on 2009-05-18
 	Fixed a few bugs related to calling external plugins.
 	Added a few minor plugins, including one that finds banned functions (via Microsoft SDL)
+
+Version 2.1 released 2009-07-07
+	Updated Cppcheck to v1.33
+	Updated PHPLint to v0.8 (2009-05-17), Windows Native
+    Added FxCop plugin (requires tool installation from Microsoft)
+    Fixed bugs in ClamAV, RATS plugins
+    PHP Updated to v5.3.0 (Windows)

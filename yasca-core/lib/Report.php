@@ -54,7 +54,7 @@ class Report {
      * but should be overriden by a subclass.
      * @return true iff successful.
      */ 
-    function execute() {
+    protected function execute() {
         Yasca::log_message("Report.execute() called, but is abstract. Should have been overridden by a subclass.", E_USER_ERROR);
         return false;
     }
@@ -64,7 +64,7 @@ class Report {
      * @param integer $level level in the (1-5) range.
      * @return true iff the severity is sufficient.
      */
-    function is_severity_sufficient($level) {
+    protected function is_severity_sufficient($level) {
         return ($this->options['level'] >= $level);
     }
     
@@ -73,7 +73,7 @@ class Report {
      * same filename will be attempted to be placed in the temporary directory.
      * @return a resource handle to the file
      */
-    function &create_output_handle() {
+    protected function &create_output_handle() {
         $handle = 0;
         $output_file = $this->options["output"];
 
@@ -81,7 +81,7 @@ class Report {
             @mkdir(dirname($output_file));
         }
 
-	$output_file = dirname($output_file) . "/" . basename($output_file, ".html") . "." . $this->default_extension;
+	    $output_file = dirname($output_file) . "/" . basename($output_file, ".html") . "." . $this->default_extension;
         
         if (!$handle = @fopen($output_file, 'w')) {
             $output_file = rtrim(sys_get_temp_dir(), "\\/") . "/" . basename($output_file);
@@ -99,7 +99,7 @@ class Report {
      * @param integer $n severity number (1-5)
      * @return description, or 'Unknown' if not in the required range
      */ 
-    function get_severity_description($n) {
+    protected function get_severity_description($n) {
         if (!is_numeric($n)) return "Unknown " . ($n == "" ? "" : "($n)");
         
         if ($n == 5) { return "Informational"; }
@@ -116,7 +116,7 @@ class Report {
      * @param array $b array of data from Yasca.
      * @return 0, 1, or -1 as per comparator requirements.
      */ 
-    function result_list_comparator($a, $b) {
+    protected function result_list_comparator($a, $b) {
         if (!is_array($a) || !is_array($b)) return 0;
         if ($a['severity'] == $b['severity'])
             return ($a['filename']. $a['line_number'] < ($b['filename'] . $b['line_number']) ? 1 : -1);

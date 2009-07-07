@@ -103,7 +103,8 @@ class ReflectionMethod extends ReflectionFunctionAbstract implements Reflector
 	public /*. string .*/ function __toString(){}
 	public static /*. string .*/ function export(/*. string .*/ $class_name, /*. bool .*/ $return_)
 	{ throw new ReflectionException(); }
-	public /*. mixed .*/ function invoke(/*. object .*/ $obj /*., args .*/){}
+	public /*. mixed .*/ function invoke(/*. object .*/ $obj /*., args .*/)
+		/*. throws ReflectionException .*/ {}
 	public /*. mixed .*/ function invokeArgs(/*. array[]mixed .*/ $args_){}
 	public /*. bool .*/ function isFinal(){}
 	public /*. bool .*/ function isAbstract(){}
@@ -133,8 +134,10 @@ class ReflectionProperty implements Reflector
 	public /*. bool .*/ function isStatic(){}
 	public /*. bool .*/ function isDefault(){}
 	public /*. int .*/ function getModifiers(){}
-	public /*. mixed .*/ function getValue(object $obj){}
-	public /*. void .*/ function setValue(object $obj, /*. mixed .*/ $value){}
+	public /*. mixed .*/ function getValue(object $obj)
+		/*. throws ReflectionException .*/ {}
+	public /*. void .*/ function setValue(object $obj, /*. mixed .*/ $value)
+		/*. throws ReflectionException .*/ {}
 	public /*. void .*/ function setAccessible(){}
 	public /*. ReflectionClass .*/ function getDeclaringClass(){}
 	public /*. string .*/ function getDocComment(){}

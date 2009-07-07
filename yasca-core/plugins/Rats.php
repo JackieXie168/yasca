@@ -1,24 +1,25 @@
 <?php
+
 /**  
  * The Rats Plugin uses rats to discover potential vulnerabilities in or C/C++ files.  
  * This class is a Singleton that runs only once, returning all of the results that  
  * first time.  
+ *
  * Thank you to Laurent for contributing this plugin!
+ * Updated by Michael Maass, 06/25/2009 -- fixed bug where executable markers (%SA_HOME%) weren't properly replaced.
+ *
  * @extends Plugin  
  * @package Yasca  
  */  
 class Plugin_Rats extends Plugin {  
     public $valid_file_types = array("C", "PERL", "PYTHON");  
 
+    public $is_multi_target = true;
+
     public $installation_marker = "rats"; 
 
     public $executable = array('Windows' => "%SA_HOME%resources\\utility\\rats\\rats.exe",
                                'Linux' => "wine %SA_HOME%/resources/utility/rats/rats.exe");  
- 
-   /**  
-    * This class is multi-target.  
-    */  
-    public $is_multi_target = true;
      
    /**  
     * Executes the Rats executable. This calls out to rats.exe, with output being processed.
@@ -29,28 +30,30 @@ class Plugin_Rats extends Plugin {
         $alreadyExecuted = 1;  
      
         $yasca =& Yasca::getInstance();  
-     
         $dir = $yasca->options['dir'];  
         $raw_results = array();  
+
+        $executable = $this->executable[getSystemOS()];
+        $executable = $this->replaceExecutableStrings($executable);
 
         if (getSystemOS() == "Windows" ||
             (getSystemOS() == "Linux" && !preg_match("/no wine in/", `which wine`))) {
             $yasca->log_message("Forking external process (RATS)...", E_USER_WARNING);
-            exec( $this->executable[getSystemOS()] . " --quiet --xml " . escapeshellarg($dir) . " 2>&1", $raw_results);
-            $yasca->log_message("External process completed...", E_USER_WARNING);
+            exec( $executable . " --quiet --xml " . escapeshellarg($dir) . " 2>&1", $raw_results);
         } 
      
         if ($yasca->options['debug']) {  
             $yasca->log_message("RATS returned: " . implode("\r\n", $raw_results), E_ALL);  
         }  
         $raw_result = implode("\r\n", $raw_results);  
-     
+ 
         $dom = new DOMDocument();  
-        if (!@$dom->loadXML($raw_result)) {  
+        if (!$dom->loadXML($raw_result)) {  
             $yasca->log_message("RATS did not return a valid XML document. Ignoring.", E_USER_WARNING);  
             return;  
         }  
      
+	$yasca->log_message("External process completed...", E_USER_WARNING);
         foreach ($dom->getElementsByTagName("vulnerability") as $error_node) {  
             $severity = $error_node->getElementsByTagName("severity")->item(0)->nodeValue;  
             $category = $error_node->getElementsByTagName("type")->item(0)->nodeValue;  

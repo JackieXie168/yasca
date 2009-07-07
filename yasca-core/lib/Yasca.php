@@ -14,7 +14,7 @@ include_once("lib/Plugin.php");
 include_once("lib/common.php");
 include_once("lib/cache.php");
 
-define("VERSION", "2.0");
+define("VERSION", "2.1");
 
 /**
  * This class implements a generic code scanner.
@@ -571,7 +571,7 @@ Perform analysis of program source code.
   -px PATTERN[,PATTERN...]  exclude plugins matching PATTERN or any of "PATTERN,PATTERN"
                               (multiple patterns must be enclosed in quotes)
       --log FILE            write log entries to FILE
-  -sa,--sa_home DIR         use this directory for 3rd party plugins (default: $SA_HOME)
+  -sa,--sa_home DIR         use this directory for 3rd party plugins (default: \$SA_HOME)
   -r, --report REPORT       use REPORT template (default: HTMLGroupReport). Other options
                               include HTMLGroupReport, CSVReport, XMLReport, SQLReport, 
                               DetailedReport, and ConsoleReport. 
@@ -901,6 +901,18 @@ END;
             $yasca->results = $new_result;
         }
         Yasca::log_message("leaving remove_ignored_findings()", E_ALL);
+    }
+
+    /**
+     * Place a small advertisement within Yasca.
+     */
+    public static function getAdvertisementText($type="HTML") {
+        if ($type == "HTML") {
+            $ad = "Commercial support is now available for Yasca. Contact <a href=\"mailto:michael.scovetta@gmail.com\">michael.scovetta@gmail.com</a> for more information.";
+        } else {
+            $ad = "Commercial support is now available for Yasca. Contact michael.scovetta@gmail.com for more information.";
+        }
+        return $ad;
     }
 }
 ?>

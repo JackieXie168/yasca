@@ -109,7 +109,7 @@ define('E_ALL', 2047);
 define('E_COMPILE_ERROR', 64);
 define('E_COMPILE_WARNING', 128);
 define('E_CORE_ERROR', 16);
-define('E_CORE_WARNING', 32);
+define('E_CORE_WARNING', 32);  define('E_DEPRECATED', 8192);
 define('E_ERROR', 1);
 define('E_NOTICE', 8);
 define('E_PARSE', 4);
@@ -136,22 +136,6 @@ define('GLOB_NOSORT', 4);
 define('GLOB_ONLYDIR', 8192);
 define('HTML_ENTITIES', 1);
 define('HTML_SPECIALCHARS', 0);
-define('IMAGETYPE_BMP', 6);
-define('IMAGETYPE_GIF', 1);
-define('IMAGETYPE_IFF', 14);
-define('IMAGETYPE_JB2', 12);
-define('IMAGETYPE_JP2', 10);
-define('IMAGETYPE_JPC', 9);
-define('IMAGETYPE_JPEG', 2);
-define('IMAGETYPE_JPEG2000', 9);
-define('IMAGETYPE_JPX', 11);
-define('IMAGETYPE_PNG', 3);
-define('IMAGETYPE_PSD', 5);
-define('IMAGETYPE_SWF', 4);
-define('IMAGETYPE_TIFF_II', 7);
-define('IMAGETYPE_TIFF_MM', 8);
-define('IMAGETYPE_WBMP', 15);
-define('IMAGETYPE_XBM', 16);
 define('INF', 0.0); /*. DOC (dummy value) .*/
 define('INFO_ALL', -1);
 define('INFO_CONFIGURATION', 4);
@@ -245,7 +229,6 @@ define('NOEXPR', 327681);
 define('PATHINFO_BASENAME', 2);
 define('PATHINFO_DIRNAME', 1);
 define('PATHINFO_EXTENSION', 4);
-/*. if_php_ver_5 .*/ define('PATHINFO_FILENAME', 8); /*. end_if_php_ver .*/
 define('PATH_SEPARATOR', ':');
 define('PEAR_EXTENSION_DIR', '/usr/local/php-5.0.1/lib/php/extensions/no-debug-non-zts-20040412');
 define('PEAR_INSTALL_DIR', '');
@@ -307,6 +290,18 @@ define('UPLOAD_ERR_EXTENSION', 8);
 define('YESEXPR', 327680);
 define('ZEND_THREAD_SAFE', false);
 
+/*. if_php_ver_5 .*/
+define('PHP_DEBUG', 1);
+define('PHP_EXTRA_VERSION', "?");
+define('PHP_MAJOR_VERSION', 1);
+define('PHP_MAXPATHLEN', 1);
+define('PHP_MINOR_VERSION', 1);
+define('PHP_RELEASE_VERSION', 1);
+define('PHP_VERSION_ID', 1);
+define('PHP_ZTS', 1);
+define('__COMPILER_HALT_OFFSET__', 1);
+/*. end_if_php_ver .*/
+
 /* FIXME: $argc,$argv are actually defined only in the CLI and CGI versions
 and are set only if "register_argc_argv = on" in php.ini. */
 $argc = 0;
@@ -350,6 +345,7 @@ $argv = /*. (array[int]string) .*/ array();
 /*. string.*/ function zend_logo_guid(){}
 /*. string.*/ function php_sapi_name(){}
 /*. string.*/ function php_uname(/*. args .*/){}
+/*. string.*/ function php_ini_loaded_file(){}
 /*. string.*/ function php_ini_scanned_files(){}
 /*. int   .*/ function strnatcmp(/*.string.*/ $s1, /*.string.*/ $s2){}
 /*. int   .*/ function strnatcasecmp(/*.string.*/ $s1, /*.string.*/ $s2){}
@@ -512,7 +508,7 @@ $argv = /*. (array[int]string) .*/ array();
 /*. string.*/ function getenv(/*. string .*/ $varname){}
 /*. bool  .*/ function putenv(/*. string .*/ $setting){}
 /*. array[string][int]string .*/ function getopt(/*. string .*/ $options /*., args .*/){}
-/*. string.*/ function microtime(/*. args .*/){}
+/*. mixed.*/ function microtime(/*. args .*/){}
 /*. array[string]int .*/ function gettimeofday(){}
 /*. array[string]int .*/ function getrusage(/*. args .*/){}
 /*. string.*/ function uniqid(/*. string .*/ $prefix /*., args .*/){}
@@ -541,7 +537,9 @@ $argv = /*. (array[int]string) .*/ array();
 /*. void  .*/ function debug_zval_dump(/*. mixed .*/ $variable){}
 /*. bool  .*/ function print_r(/*. mixed .*/ $expr /*., args .*/){}
 /*. void  .*/ function register_shutdown_function(/*. mixed .*/ $func /*., args .*/){}
-/*. bool  .*/ function register_tick_function(/*. mixed .*/ $func /*., args .*/){}
+/*. bool  .*/ function register_tick_function(/*. mixed .*/ $func /*., args .*/)
+	/*. DOC <@deprecated See the manual for details.> .*/
+	{ trigger_error("", E_DEPRECATED); }
 /*. void  .*/ function unregister_tick_function(/*. string .*/ $func){}
 /*. mixed .*/ function highlight_file(/*. string .*/ $filename /*., args .*/){}
 /*. mixed .*/ function show_source(/*. string .*/ $filename /*., args .*/){}
@@ -629,7 +627,7 @@ if ( ini_get("magic_quotes_gpc") === "1" )
 	<@deprecated As of PHP 5, the dl() function is deprecated in every SAPI
 	except CLI. Use Extension Loading Directives method instead.>
 .*/
-{}
+{ trigger_error("", E_DEPRECATED); }
 
 /*. int   .*/ function pclose(/*. resource .*/ $handle){}
 /*. resource .*/ function popen(/*. string .*/ $cmd, /*. string .*/ $mode)
@@ -715,9 +713,11 @@ catch (Exception $e) {
 /*. bool  .*/ function fnmatch(/*. string .*/ $pattern, /*. string .*/ $str /*., args .*/){}
 # FIXME:
 /*. if_php_ver_4 .*/
-	/*. resource .*/ function fsockopen(/*.string.*/ $target /*., args .*/){}
+	/*. resource .*/ function fsockopen(/*.string.*/ $target /*., args .*/)
+		{ trigger_error("", E_WARNING); }
 /*. else .*/
-	/*. resource .*/ function fsockopen(/*.string.*/ $target, $port=0, &$errno=0, &$errstr="", $timeout=0.0){}
+	/*. resource .*/ function fsockopen(/*.string.*/ $target, $port=0, &$errno=0, &$errstr="", $timeout=0.0)
+		{ trigger_error("", E_WARNING); }
 /*. end_if_php_ver .*/
 /*. resource .*/ function pfsockopen(/*. string .*/ $hostname /*., args .*/){}
 /*. string.*/ function pack(/*. string .*/ $format /*., args .*/){}
@@ -795,7 +795,8 @@ class Directory {
 /*. bool  .*/ function openlog(/*. string .*/ $ident, /*. int .*/ $option, /*. int .*/ $facility){}
 /*. bool  .*/ function syslog(/*.int.*/ $priority, /*.string.*/ $msg){}
 /*. bool  .*/ function closelog(){}
-/*. void  .*/ function define_syslog_variables(){}
+/*. void  .*/ function define_syslog_variables()
+	{ trigger_error("", E_DEPRECATED); }
 /*. float .*/ function lcg_value(){}
 /*. string.*/ function metaphone(/*. string .*/ $str /*., args .*/){}
 /*. bool  .*/ function ob_start(/*. args .*/){}
@@ -815,13 +816,13 @@ class Directory {
 /*. bool  .*/ function krsort(/*. array .*/ $array_arg /*., args .*/){}
 /*. void  .*/ function natsort(/*. array .*/ $array_arg){}
 /*. void  .*/ function natcasesort(/*. array .*/ $array_arg){}
-/*. bool  .*/ function asort(/*. array .*/ &$a /*., args .*/){}
-/*. bool  .*/ function arsort(/*. array .*/ &$a /*., args .*/){}
-/*. bool  .*/ function sort(/*. array .*/ &$a /*., args .*/){}
+/*. bool  .*/ function asort(/*. array .*/ $a /*., args .*/){}
+/*. bool  .*/ function arsort(/*. array .*/ $a /*., args .*/){}
+/*. bool  .*/ function sort(/*. array .*/ $a /*., args .*/){}
 /*. bool  .*/ function rsort(/*. array .*/ &$a /*., args .*/){}
-/*. bool  .*/ function usort(/*. array .*/ &$a, /*. mixed .*/ $cmp_func){}
-/*. bool  .*/ function uasort(/*. array .*/ &$a, /*. mixed .*/ $cmp_func){}
-/*. bool  .*/ function uksort(/*. array .*/ &$a, /*. mixed .*/ $cmp_func){}
+/*. bool  .*/ function usort(/*. array .*/ $a, /*. mixed .*/ $cmp_func){}
+/*. bool  .*/ function uasort(/*. array .*/ $a, /*. mixed .*/ $cmp_func){}
+/*. bool  .*/ function uksort(/*. array .*/ $a, /*. mixed .*/ $cmp_func){}
 /*. bool  .*/ function shuffle(/*. array .*/ $array_arg){}
 /*. bool  .*/ function array_walk(/*. array .*/ $input, /*. mixed .*/ $funcname /*., args .*/){}
 /*. bool  .*/ function array_walk_recursive(/*. array .*/ $input, /*. mixed .*/ $funcname /*., args .*/){}
@@ -851,13 +852,17 @@ class Directory {
 /*. array[string]mixed .*/ function compact(/*. mixed .*/ $var_names /*., args .*/){}
 /*. array .*/ function range(/*. mixed .*/ $low, /*. mixed .*/ $high /*., args .*/){}
 /*. bool  .*/ function array_change_key_case(/*. array .*/ $a /*., args .*/){}
-/*. array[int]array .*/ function array_chunk(/*. array .*/ $a, /*. int .*/ $size /*., args .*/){}
-/*. array .*/ function array_combine(/*. array .*/ $keys, /*. array .*/ $values){}
-/*. array .*/ function array_count_values(/*. array .*/ $input){}
+/*. array[int]array .*/ function array_chunk(/*. array .*/ $a, /*. int .*/ $size /*., args .*/)
+	{ trigger_error("", E_WARNING); }
+/*. array .*/ function array_combine(/*. array .*/ $keys, /*. array .*/ $values)
+	{ trigger_error("", E_WARNING); }
+/*. array .*/ function array_count_values(/*. array .*/ $input)
+	{ trigger_error("", E_WARNING); }
 /*. array .*/ function array_diff(/*. array .*/ $arr1, /*. array .*/ $arr2 /*., args .*/){}
 /*. array .*/ function array_diff_assoc(/*. array .*/ $arr1, /*. array .*/ $arr2 /*., args .*/){}
 /*. array .*/ function array_diff_uassoc(/*. array .*/ $arr1, /*. array .*/ $arr2 /*., args .*/){}
-/*. array .*/ function array_fill(/*. int .*/ $start_key, /*. int .*/ $num, /*. mixed .*/ $val){}
+/*. array .*/ function array_fill(/*. int .*/ $start_key, /*. int .*/ $num, /*. mixed .*/ $val)
+	{ trigger_error("", E_WARNING); }
 /*. array .*/ function array_filter(/*. array .*/ $input /*., args .*/){}
 /*. array .*/ function array_flip(/*. array .*/ $input){}
 /*. array .*/ function array_intersect(/*. array .*/ $arr1, /*. array .*/ $arr2 /*., args .*/){}
@@ -995,6 +1000,10 @@ define('__METHOD__', 'DUMMY_CONSTANT_METHOD');
 { trigger_error("", E_WARNING); }
 
 /*. array .*/ function array_fill_keys(/*. array .*/ $keys, /*. mixed .*/ $value){}
+/*. array .*/ function array_intersect_key(/*. array .*/ $array1, /*. array .*/ $array2 /*., args .*/){}
+/*. array .*/ function array_intersect_ukey(/*. array .*/ $array1, /*. array .*/ $array2 /*., args .*/){}
+/*. array .*/ function array_diff_ukey(/*. array .*/ $array1, /*. array .*/ $array2 /*., args .*/){}
+/*. float .*/ function array_product(/*. array .*/ $array_){}
 /*. int .*/ function memory_get_peak_usage(/*. args .*/){}
 
 /*. string.*/ function set_exception_handler(/*. mixed .*/ $exception_handler){}
@@ -1008,10 +1017,14 @@ class Exception
 	protected /*.string.*/ $file; /*. DOC Source filename of exception .*/
 	protected /*.int   .*/ $line; /*. DOC Source line of exception .*/
 
-	/*.void.*/ function __construct($message = "", $code = 0){}
+	/*.void.*/ function __construct($message = "", $code = 0,
+		Exception $previous = NULL){}
 
 	final /*.string.*/ function getMessage()
 	/*. DOC Message of exception .*/ {}
+
+	final /*. Exception .*/ function getPrevious()
+	/*. DOC Return previous exception .*/ {}
 
 	final /*.int   .*/ function getCode()
 	/*. DOC Code of exception .*/ {}
@@ -1030,6 +1043,11 @@ class Exception
 
 	/*.string.*/ function __toString()
 	/*. DOC Formatted string for display .*/ {}
+
+	public /*. void .*/ function __clone()
+	/*. DOC Always gives a fatal error: exceptions are not clonable.
+	    FIXME: this method is `private' in official manual: why?
+	.*/ {}
 }
 
 class ErrorException extends Exception

@@ -18,7 +18,9 @@ properties.
 
 class SimpleXMLElement
 {
-	/*. void .*/ function __construct(/*. string .*/ $data  /*. , args .*/){}
+	/*. void .*/ function __construct(/*. string .*/ $data  /*. , args .*/)
+		/*. throws Exception .*/
+		{ trigger_error("", E_WARNING); }
 	/*. array[int]SimpleXMLElement .*/ function xpath(/*. string .*/ $path){}
 	/*. bool .*/ function registerXPathNamespace(/*. string .*/ $prefix, /*. string .*/ $ns){}
 	/*. string .*/ function asXML(/*. args .*/){}

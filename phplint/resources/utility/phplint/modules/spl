@@ -4,9 +4,7 @@
 	This modules is always available in PHP 5, but PHPLint holds it in a
 	separate module for performace reasons since it is still seldom used.
 
-	According to the manual page, the official documentation is available
-	here http://www.php.net/~helly/php/ext/spl/ that, in turn, sends back
-	to the file ext/spl/spl.php of the PHP 5 source tree.
+	See: <a href="http://www.php.net/manual/en/book.spl.php">www.php.net/manual/en/book.spl.php</a>.
 .*/
 
 /*. if_php_ver_4 .*/
@@ -29,18 +27,6 @@ define('CIT_CATCH_GET_CHILD', 1);
 /*. DOC <@deprecated use the proper class constant> .*/
 
 
-/*
-	FIXME: these classes are undefined in the manual:
-*/
-interface IteratorAggregate{}
-interface OuterIterator{}
-interface SeekableIterator{}
-interface Traversable{}
-class IteratorIterator{}
-class RecursiveFilterIterator{}
-class SplFileObject{}
-
-
 class LogicException extends Exception {}
 class BadFunctionCallException extends LogicException {}
 class DomainException extends LogicException {}
@@ -58,20 +44,15 @@ class UnderflowException extends RuntimeException {}
 class UnexpectedValueException extends RuntimeException {}
 
 
-/*. array[int]string .*/ function class_implements(/*. mixed .*/ $class_ /*. , args .*/){}
-/*. array[int]string .*/ function class_parents(/*. mixed .*/ $class_ /*. , args .*/){}
-/*. int .*/ function iterator_count(IteratorAggregate $iterator){}
-/*. array .*/ function iterator_to_array(IteratorAggregate $iterator /*. , args .*/){}
-/*. void .*/ function spl_autoload_call(/*. string .*/ $class_name)
-	/*. throws LogicException .*/{}
-/*. string .*/ function spl_autoload_extensions(/*. args .*/){}
-/*. array[int]string .*/ function spl_autoload_functions(){}
-/*. bool .*/ function spl_autoload_register(/*. args .*/)
-	/*. throws LogicException .*/{}
-/*. bool .*/ function spl_autoload_unregister(/*. mixed .*/ $autoload_function ){}
-/*. void .*/ function spl_autoload(/*. string .*/ $class_name /*. , args .*/){}
-/*. array[string]string .*/ function spl_classes(){}
-/*. string .*/ function spl_mixed_hash(/*. mixed .*/ $obj){}
+interface Traversable
+{
+}
+
+interface IteratorAggregate extends Traversable
+{
+	/*. Traversable .*/ function getIterator()
+		/*. throws Exception .*/;
+}
 
 
 interface Countable
@@ -79,8 +60,7 @@ interface Countable
 	/*. int .*/ function count();
 }
 
-
-interface Iterator
+interface Iterator extends Traversable
 {
 	/*. mixed .*/ function current();
 	/*. mixed .*/ function key();
@@ -89,10 +69,21 @@ interface Iterator
 	/*. bool  .*/ function valid();
 }
 
+
+interface OuterIterator extends Iterator
+{
+	/*. Iterator .*/ function getInnerIterator();
+}
+
 interface RecursiveIterator extends Iterator
 {
 	/*. mixed .*/ function getChildren();
 	/*. bool  .*/ function hasChildren();
+}
+
+interface SeekableIterator extends Iterator
+{
+	/*. void .*/ function seek (/*. int .*/ $index) /*. throws OutOfBoundsException .*/;
 }
 
 interface ArrayAccess
@@ -104,8 +95,29 @@ interface ArrayAccess
 	/*. void  .*/ function offsetUnset(/*. mixed .*/ $offset);
 }
 
+/*. forward interface SplSubject{} .*/
+
+interface SplObserver
+{
+	/*. void .*/ function update(SplSubject $subject);
+}
+
+interface SplSubject
+{
+	/*. void .*/ function attach(SplObserver $observer);
+	/*. void .*/ function detach(SplObserver $observer);
+	/*. void .*/ function notify();
+}
+
+interface Serializable
+{
+	/*. void .*/ function serialize();
+	/*. void .*/ function unserialize(/*. string .*/ $serialized);
+}
+
+
 class ArrayIterator
-implements Iterator, Traversable, ArrayAccess, SeekableIterator, Countable
+implements ArrayAccess, SeekableIterator, Countable
 {
 	const ARRAY_AS_PROPS = 2;
 	const STD_PROP_LIST = 1;
@@ -128,28 +140,60 @@ implements Iterator, Traversable, ArrayAccess, SeekableIterator, Countable
 }
 
 class ArrayObject
-implements IteratorAggregate, Traversable, ArrayAccess, Countable
+implements IteratorAggregate, ArrayAccess, Countable
 {
 	/*. void  .*/ function __construct(/*. array .*/ $input)
 		/*. throws InvalidArgumentException .*/{}
 	/*. void  .*/ function append(/*. mixed .*/ $newval){}
 	/*. int   .*/ function count(){}
-	/*. ArrayIterator .*/ function getIterator(){}
+	/*. Iterator .*/ function getIterator(){}
 	/*. bool  .*/ function offsetExists(/*. mixed .*/ $index){}
 	/*. mixed .*/ function offsetGet(/*. mixed .*/ $index){}
 	/*. void  .*/ function offsetSet(/*. mixed .*/ $index, /*. mixed .*/ $newval){}
 	/*. void  .*/ function offsetUnset(/*. mixed .*/ $index){}
 }
 
+class IteratorIterator
+implements OuterIterator
+{
+	/*. void  .*/ function __construct (Traversable $iterator, /*. string .*/ $classname=null){}
+	/*. mixed .*/ function current(){}
+	/*. mixed .*/ function key(){}
+	/*. void  .*/ function next(){}
+	/*. void  .*/ function rewind(){}
+	/*. bool  .*/ function valid(){}
+	/*. Iterator .*/ function getInnerIterator(){}
+}
+
+abstract class FilterIterator
+extends IteratorIterator
+{
+	/*. void .*/ function __construct(/*. Iterator .*/ $it) {parent::__construct($it);}
+	/*. Iterator .*/ function getInnerIterator() {}
+	/*. bool .*/ function valid(){}
+	/*. mixed .*/ function key(){}
+	/*. mixed .*/ function current(){}
+	/*. void .*/ function rewind(){}
+	/*. void .*/ function next(){}
+}
+
+abstract class RecursiveFilterIterator
+extends FilterIterator
+implements RecursiveIterator
+{
+	/*. mixed .*/ function getChildren(){}
+	/*. bool  .*/ function hasChildren(){}
+}
+
 class ParentIterator
 extends RecursiveFilterIterator
-implements RecursiveIterator, OuterIterator, Traversable, Iterator
 {
 	/*. void .*/ function rewind(){}
 	/*. void .*/ function next(){}
-	/*. void .*/ function __construct(/*. RecursiveIterator .*/ $it){}
+	/*. void .*/ function __construct(/*. RecursiveIterator .*/ $it){parent::__construct($it);}
 	/*. bool .*/ function hasChildren(){}
 	/*. ParentIterator .*/ function getChildren(){}
+	/*. Iterator .*/ function getInnerIterator(){}
 
 	# FIXME: adding missing implementations:
 	/*. mixed .*/ function current(){}
@@ -157,28 +201,35 @@ implements RecursiveIterator, OuterIterator, Traversable, Iterator
 	/*. bool  .*/ function valid(){}
 }
 
-/*. forward class RecursiveDirectoryIterator{} .*/
+/*. forward class SplFileObject{} .*/
 
 class SplFileInfo
 {
 	/*. void   .*/ function __construct( /*. string .*/ $file_name ){}
-	/*. int    .*/ function getATime(){}
+	/*. int    .*/ function getATime()
+		/*. throws RuntimeException .*/ {}
 	/*. string .*/ function getBasename(/*. args .*/){}
-	/*. int    .*/ function getCTime(){}
+	/*. int    .*/ function getCTime()
+		/*. throws RuntimeException .*/ {}
 	/*. self   .*/ function getFileInfo(/*. args .*/){}
 	/*. string .*/ function getFilename(){}
-	/*. int    .*/ function getGroup(){}
-	/*. int    .*/ function getInode(){}
-	/*. string .*/ function getLinkTarget(){}
+	/*. int    .*/ function getGroup()
+		/*. throws RuntimeException .*/ {}
+	/*. int    .*/ function getInode()
+		/*. throws RuntimeException .*/ {}
+	/*. string .*/ function getLinkTarget()
+		/*. throws RuntimeException .*/ {}
 	/*. int    .*/ function getMTime(){}
-	/*. int    .*/ function getOwner(){}
+	/*. int    .*/ function getOwner()
+		/*. throws RuntimeException .*/ {}
 	/*. string .*/ function getPath(){}
 	/*. self   .*/ function getPathInfo(/*. args .*/){}
 	/*. string .*/ function getPathname(){}
 	/*. int    .*/ function getPerms(){}
 	/*. string .*/ function getRealPath(){}
 	/*. int    .*/ function getSize(){}
-	/*. string .*/ function getType(){}
+	/*. string .*/ function getType()
+		/*. throws RuntimeException .*/ {}
 	/*. bool   .*/ function isDir(){}
 	/*. bool   .*/ function isExecutable(){}
 	/*. bool   .*/ function isFile(){}
@@ -191,9 +242,18 @@ class SplFileInfo
 	/*. string .*/ function __toString(){}
 }
 
+class SplFileObject
+extends SplFileInfo
+implements RecursiveIterator, SeekableIterator
+{
+	/*. mixed .*/ function getChildren(){}
+	/*. bool  .*/ function hasChildren(){}
+	/*. void .*/ function seek (/*. int .*/ $index){}
+}
+
 class DirectoryIterator
 extends SplFileInfo
-implements Iterator, Traversable  
+implements Iterator
 {
 	/*. void .*/ function __construct(/*. string .*/ $path)
 	{ parent::__construct($path); }
@@ -224,9 +284,24 @@ implements Iterator, Traversable
 	/*. bool .*/ function isLink(){}
 }
 
+class FilesystemIterator
+extends DirectoryIterator
+implements SeekableIterator
+{
+	/*. void .*/ function __construct(/*. string .*/ $path /*. , args .*/)
+	{ parent::__construct($path); }
+	/*. FilesystemIterator .*/ function current(){}
+	/*. int .*/ function getFlags(){}
+	/*. string .*/ function key(){}
+	/*. void .*/ function next(){}
+	/*. void .*/ function rewind(){}
+	/*. void .*/ function setFlags(/*. args .*/){}
+	/*. void .*/ function seek(/*. int .*/ $position){}
+}
+
 class RecursiveDirectoryIterator
 extends DirectoryIterator
-implements Traversable, Iterator, RecursiveIterator
+implements RecursiveIterator
 {
 	/*. void .*/ function rewind(){}
 	/*. void .*/ function next(){}
@@ -240,7 +315,7 @@ implements Traversable, Iterator, RecursiveIterator
 }
 
 class RecursiveIteratorIterator
-implements OuterIterator, Traversable, Iterator
+implements OuterIterator
 {
 	const
 		LEAVES_ONLY = 1,
@@ -258,26 +333,13 @@ implements OuterIterator, Traversable, Iterator
 	/*. void  .*/ function next(){}
 	/*. int   .*/ function getDepth(){}
 	/*. RecursiveIterator .*/ function getSubIterator(/*. args .*/){}
-}
-
-abstract class FilterIterator
-extends IteratorIterator
-implements OuterIterator, Traversable, Iterator
-{
-	/*. void .*/ function __construct(/*. Iterator .*/ $it) {}
-	/*. Iterator .*/ function getInnerIterator() {}
-	/*. bool .*/ function valid(){}
-	/*. mixed .*/ function key(){}
-	/*. mixed .*/ function current(){}
-	/*. void .*/ function rewind(){}
-	/*. void .*/ function next(){}
+	/*. Iterator .*/ function getInnerIterator(){}
 }
 
 class LimitIterator
 extends IteratorIterator
-implements OuterIterator, Traversable, Iterator
 {
-	/*. void .*/ function __construct(/*. Iterator .*/ $it /*., args .*/){}
+	/*. void .*/ function __construct(/*. Iterator .*/ $it /*., args .*/){parent::__construct($it);}
 	/*. void .*/ function rewind(){}
 	/*. bool .*/ function valid(){}
 	/*. void .*/ function next(){}
@@ -291,19 +353,26 @@ implements OuterIterator, Traversable, Iterator
 
 class CachingIterator
 extends IteratorIterator
-implements OuterIterator, Traversable, Iterator, ArrayAccess, Countable
+implements ArrayAccess, Countable
 {
 	const
 		CALL_TOSTRING = 1,
-		CATCH_GET_CHILD = 1;
+		CATCH_GET_CHILD = 16,
+		TOSTRING_USE_KEY = 2,
+		TOSTRING_USE_CURRENT = 4,
+		TOSTRING_USE_INNER = 8,
+		FULL_CACHE = 256;
 
-	/*. void .*/ function __construct(/*. Iterator .*/ $it /*., args .*/){}
+	/*. void .*/ function __construct(/*. Iterator .*/ $it /*., args .*/){parent::__construct($it);}
 	/*. void .*/ function rewind(){}
 	/*. bool .*/ function valid(){}
 	/*. void .*/ function next(){}
 	/*. bool .*/ function hasNext(){}
 	/*. string .*/ function __toString()
 		/*. throws BadMethodCallException .*/{}
+	/*. mixed .*/ function getCache(){}
+	/*. int .*/ function getFlags(){}
+	/*. Iterator .*/ function getInnerIterator(){}
 
 	# FIXME: adding missing implementations:
 	/*. mixed .*/ function current(){}
@@ -317,7 +386,7 @@ implements OuterIterator, Traversable, Iterator, ArrayAccess, Countable
 
 class RecursiveCachingIterator
 extends CachingIterator
-implements Countable, ArrayAccess, Iterator, Traversable, OuterIterator, RecursiveIterator
+implements RecursiveIterator
 {
 	/*. bool .*/ function hasChildren(){}
 	/*. RecursiveCachingIterator .*/ function getChildren(){}
@@ -336,8 +405,9 @@ implements Countable, ArrayAccess, Iterator, Traversable, OuterIterator, Recursi
 }
 
 class RegexIterator
+extends FilterIterator
 {
-	/*. void .*/ function __construct(/*. Iterator .*/ $it, /*. string .*/ $regex /*. , args .*/){}
+	/*. void .*/ function __construct(/*. Iterator .*/ $it, /*. string .*/ $regex /*. , args .*/){parent::__construct($it);}
 	/*. bool .*/ function accept(){}
 	/*. bool .*/ function getMode(){}
 	/*. bool .*/ function setMode(/*. int .*/ $new_mode)
@@ -347,15 +417,18 @@ class RegexIterator
 }
 
 class RecursiveRegexIterator
+extends RegexIterator
+implements RecursiveIterator
 {
-	/*. void .*/ function __construct(/*. RecursiveIterator .*/ $it, /*. string .*/ $regex /*. , args .*/){}
+	/*. void .*/ function __construct(/*. RecursiveIterator .*/ $it, /*. string .*/ $regex /*. , args .*/){parent::__construct($it, $regex);}
+	/*. bool  .*/ function hasChildren(){}
 	/*. RecursiveRegexIterator .*/ function getChildren(){}
 }
 
 
 class SimpleXMLIterator
 extends SimpleXMLElement
-implements RecursiveIterator, Traversable, Iterator, Countable
+implements RecursiveIterator, Countable
 {
 	/*. mixed .*/ function current(){}
 	/*. mixed .*/ function getChildren(){}
@@ -388,7 +461,8 @@ implements Iterator, ArrayAccess, Countable
 	/*. mixed .*/ function pop(){}
 	/*. void .*/ function push(/*. mixed .*/ $value){}
 	/*. void .*/ function rewind(){}
-	/*. void .*/ function setIteratorMode(/*. int .*/ $mode){}
+	/*. void .*/ function setIteratorMode(/*. int .*/ $mode)
+		/*. throws RuntimeException .*/ {}
 	/*. mixed .*/ function shift(){}
 	/*. mixed .*/ function top(){}
 	/*. void .*/ function unshift(/*. mixed .*/ $value){}
@@ -398,10 +472,10 @@ implements Iterator, ArrayAccess, Countable
 
 class SplStack
 extends SplDoublyLinkedList
-implements Iterator, ArrayAccess, Countable
 {
 	/*. void .*/ function __construct(){ parent::__construct(); }
-	/*. void .*/ function setIteratorMode(/*. int .*/ $mode){}
+	/*. void .*/ function setIteratorMode(/*. int .*/ $mode)
+		/*. throws RuntimeException .*/ {}
 
 	# FIXME: adding missing implementations:
 	/*. mixed .*/ function current(){}
@@ -419,12 +493,12 @@ implements Iterator, ArrayAccess, Countable
 
 class SplQueue
 extends SplDoublyLinkedList
-implements Iterator, ArrayAccess, Countable
 {
 	/*. void .*/ function __construct(){ parent::__construct(); }
 	/*. mixed .*/ function dequeue(){}
 	/*. void .*/ function enqueue(/*. mixed .*/ $value){}
-	/*. void .*/ function setIteratorMode(/*. int .*/ $mode){}
+	/*. void .*/ function setIteratorMode(/*. int .*/ $mode)
+		/*. throws RuntimeException .*/ {}
 
 	# FIXME: adding missing implementations:
 	/*. mixed .*/ function current(){}
@@ -461,7 +535,6 @@ implements Iterator, Countable
 
 class SplMaxHeap
 extends SplHeap
-implements Iterator, Countable
 {
 	/*. int .*/ function compare(/*. mixed .*/ $value1, /*. mixed .*/ $value2){}
 
@@ -477,7 +550,6 @@ implements Iterator, Countable
 
 class SplMinHeap
 extends SplHeap
-implements Iterator, Countable
 {
 	/*. int .*/ function compare(/*. mixed .*/ $value1, /*. mixed .*/ $value2){}
 
@@ -509,6 +581,77 @@ implements Iterator, Countable
 	/*. mixed .*/ function top(){}
 	/*. bool .*/ function valid(){}
 }
+
+
+class SplFixedArray
+implements Iterator, ArrayAccess, Countable
+/*. DOC --
+
+WARNING: PHPLint is very strict in checking method signature, and the int type
+does not match the overriden type mixed, so I had to change int into mixed here
+and there. Involved methods are: key, offsetExists, offsetGet, offsetSet,
+offsetUnset.
+.*/
+{
+	/*. void .*/ function __construct(/*. int .*/ $size){}
+	/*. int .*/ function count(){}
+	/*. mixed .*/ function current(){}
+	static /*. SplFixedArray .*/ function fromArray(/*. array .*/ $array_ /*., args .*/){}
+	/*. int .*/ function getSize(){}
+	#/*. int .*/ function key(){}
+	/*. mixed .*/ function key(){}
+	/*. void .*/ function next(){}
+	#/*. bool .*/ function offsetExists(/*. int .*/ $index){}
+	/*. bool .*/ function offsetExists(/*. mixed .*/ $index){}
+	#/*. mixed .*/ function offsetGet(/*. int .*/ $index){}
+	/*. mixed .*/ function offsetGet(/*. mixed .*/ $index){}
+	#/*. void .*/ function offsetSet(/*. int .*/ $index, /*. mixed .*/ $newval){}
+	/*. void .*/ function offsetSet(/*. mixed .*/ $index, /*. mixed .*/ $newval){}
+	#/*. void .*/ function offsetUnset(/*. int .*/ $index){}
+	/*. void .*/ function offsetUnset(/*. mixed .*/ $index){}
+	/*. void .*/ function rewind(){}
+	/*. int .*/ function setSize(/*. int .*/ $size){}
+	/*. array .*/ function toArray(){}
+	/*. bool .*/ function valid(){}
+}
+
+
+class SplObjectStorage
+implements Countable, Iterator, Serializable {
+	/*. void .*/ function addAll(/*. SplObjectStorage .*/ $storage){}
+	/*.bool.*/ function contains(/*. object .*/ $obj){}
+	/*.void.*/ function attach(/*. object .*/ $obj /*., args .*/){}
+	/*.void.*/ function detach(/*. object .*/ $obj){}
+	/*.int.*/ function count(){}
+	/*. mixed .*/ function current(){}
+	/*. mixed .*/ function key(){}
+	/*. void  .*/ function next(){}
+	/*. void  .*/ function rewind(){}
+	/*. bool  .*/ function valid(){}
+	/*. boolean .*/ function offsetExists(/*. object .*/ $object_){}
+	/*. mixed .*/ function offsetGet(/*. object .*/ $object_){}
+	/*. void .*/ function offsetSet(/*. object .*/ $object_, /*. mixed .*/ $info){}
+	/*. void .*/ function offsetUnset(/*. object .*/ $object_){}
+	/*. void .*/ function removeAll(/*. SplObjectStorage .*/ $storage){}
+	/*. void .*/ function serialize(){}
+	/*. void .*/ function unserialize(/*. string .*/ $serialized){}
+}
+
+
+/*. array[int]string .*/ function class_implements(/*. mixed .*/ $class_ /*. , args .*/){}
+/*. array[int]string .*/ function class_parents(/*. mixed .*/ $class_ /*. , args .*/){}
+/*. int .*/ function iterator_count(IteratorAggregate $iterator){}
+/*. array .*/ function iterator_to_array(IteratorAggregate $iterator /*. , args .*/){}
+/*. void .*/ function spl_autoload_call(/*. string .*/ $class_name)
+	/*. throws LogicException .*/{}
+/*. string .*/ function spl_autoload_extensions(/*. args .*/){}
+/*. array[int]string .*/ function spl_autoload_functions(){}
+/*. bool .*/ function spl_autoload_register(/*. args .*/)
+	/*. throws LogicException .*/{}
+/*. bool .*/ function spl_autoload_unregister(/*. mixed .*/ $autoload_function ){}
+/*. void .*/ function spl_autoload(/*. string .*/ $class_name /*. , args .*/){}
+/*. array[string]string .*/ function spl_classes(){}
+/*. string .*/ function spl_mixed_hash(/*. mixed .*/ $obj){}
 
 
 ?>

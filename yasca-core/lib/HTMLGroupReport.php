@@ -773,8 +773,11 @@ END;
         }
         
         function get_postamble() {
+            $ADVERTISEMENT = Yasca::getAdvertisementText("HTML");
+
             return <<<END
                 </table>
+                <div style="text-align:center;font-size:smaller;color:black;font-weight:bold;background-color:#99FFFF">{$ADVERTISEMENT}</div>
               </div>
             </body>
         </html>

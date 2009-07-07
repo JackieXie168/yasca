@@ -27,7 +27,11 @@ class Plugin_authentication_weak extends Plugin {
             if ( preg_match('/^(.{0,20})(user|username|logon|logonid|userid|login|loginid)\s*=\s*([^\s]+)/i', $this->file_contents[$i], $matches) ) {
                 $prefix = $matches[1];
                 $username = $matches[3];
-                
+
+                if (strlen(trim($username, "\"\';")) == 0) {		// Fixed Bug #2143037 
+                    continue;
+                }
+
                 for ($j=$i+1; $j<$i+$this->lookahead_length; $j++) {
                     if (!isset($this->file_contents[$j])) break;
                     $quote = preg_quote($prefix) . "pass(word)?\s*=\s*" . preg_quote($username) . "(1|123)?";

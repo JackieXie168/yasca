@@ -3,7 +3,7 @@ file_type = COLDFUSION
 preprocess = cfml_fix_tag_attributes
 grep = /\<cfobject .*(secure=\"[^(yes)]+){0,1}\" type=\"(\.net|dotnet)\"/i
 category = Insecure Object Call
-severity = 2
+severity = 3
 category_link = http://livedocs.adobe.com/coldfusion/8/htmldocs/help.html?content=Tags_m-o_09.html
 description = 
 	<p>
@@ -14,7 +14,7 @@ description =
 	<p>
 		<h4>References</h4>
 		<ul>
-			<li>TBD</li>
+			<li><a href="http://livedocs.adobe.com/coldfusion/8/htmldocs/help.html?content=Tags_m-o_09.html">Adobe LiveDocs</a></li>
 		</ul>
 	</p>
 END;

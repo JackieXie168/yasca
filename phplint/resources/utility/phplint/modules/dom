@@ -416,7 +416,8 @@ class DOMDocument extends DOMNode
 	/*. DOMAttr .*/ function createAttribute(/*. string .*/ $name){}
 	/*. DOMEntityReference .*/ function createEntityReference(/*. string .*/ $name){}
 	/*. DOMNodeList .*/ function getElementsByTagName(/*. string .*/ $tagname){}
-	/*. DOMNode .*/ function importNode(/*. DOMNode .*/ $importedNode, /*. boolean .*/ $deep){}
+	/*. DOMNode .*/ function importNode(/*. DOMNode .*/ $importedNode, /*. boolean .*/ $deep)
+		/*. throws DOMException .*/ {}
 	/*. DOMElement .*/ function createElementNS(/*. string .*/ $namespaceURI, /*. string .*/ $qualifiedName /*., args .*/){}
 	/*. DOMAttr .*/ function createAttributeNS(/*. string .*/ $namespaceURI, /*. string .*/ $qualifiedName){}
 	/*. DOMNodeList .*/ function getElementsByTagNameNS(/*. string .*/ $namespaceURI, /*. string .*/ $localName){}

@@ -12,7 +12,7 @@ description =
 <p>
         <h4>References</h4>
         <ul>
-		<li><a href="http://www.phpvs.net/2008/06/04/ten-php-best-practices-tips-that-will-get-you-a-job/">Ten PHP Best Practices That Will Get You a Job</a></li>
+			<li><a href="http://www.phpvs.net/2008/06/04/ten-php-best-practices-tips-that-will-get-you-a-job/">Ten PHP Best Practices That Will Get You a Job</a></li>
         </ul>
 </p>
 END;

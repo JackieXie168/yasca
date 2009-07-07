@@ -5,6 +5,8 @@ See: <a href="http://www.php.net/manual/en/ref.variant.php"><code>http://www.php
 
 .*/
 
+/*. require_module 'standard'; .*/
+class com_exception extends Exception {};
 
 
 /*. void .*/ function variant_set(/*. object .*/ $variant, /*. mixed .*/ $value){}
@@ -13,9 +15,11 @@ See: <a href="http://www.php.net/manual/en/ref.variant.php"><code>http://www.php
 /*. mixed .*/ function variant_sub(/*. mixed .*/ $left, /*. mixed .*/ $right){}
 /*. mixed .*/ function variant_mul(/*. mixed .*/ $left, /*. mixed .*/ $right){}
 /*. mixed .*/ function variant_and(/*. mixed .*/ $left, /*. mixed .*/ $right){}
-/*. mixed .*/ function variant_div(/*. mixed .*/ $left, /*. mixed .*/ $right){}
+/*. mixed .*/ function variant_div(/*. mixed .*/ $left, /*. mixed .*/ $right)
+	/*. throws com_exception .*/ {}
 /*. mixed .*/ function variant_eqv(/*. mixed .*/ $left, /*. mixed .*/ $right){}
-/*. mixed .*/ function variant_idiv(/*. mixed .*/ $left, /*. mixed .*/ $right){}
+/*. mixed .*/ function variant_idiv(/*. mixed .*/ $left, /*. mixed .*/ $right)
+	/*. throws com_exception .*/ {}
 /*. mixed .*/ function variant_imp(/*. mixed .*/ $left, /*. mixed .*/ $right){}
 /*. mixed .*/ function variant_mod(/*. mixed .*/ $left, /*. mixed .*/ $right){}
 /*. mixed .*/ function variant_or(/*. mixed .*/ $left, /*. mixed .*/ $right){}
