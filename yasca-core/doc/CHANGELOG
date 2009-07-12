@@ -43,6 +43,7 @@ Version 2.01 released on 2009-05-18
 Version 2.1 released 2009-07-07
 	Updated Cppcheck to v1.33
 	Updated PHPLint to v0.8 (2009-05-17), Windows Native
-    Added FxCop plugin (requires tool installation from Microsoft)
+    Added FxCop plugin (requires separate tool installation from Microsoft)
     Fixed bugs in ClamAV, RATS plugins
     PHP Updated to v5.3.0 (Windows)
+    New grep plugins added

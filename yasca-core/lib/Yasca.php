@@ -89,31 +89,29 @@ class Yasca {
         
         // Parse command line arguments if necessary
         $this->options = (count($options) == 0 ? $this->parse_command_line_arguments() : $options);
-        
+
         $this->ignore_list = isset($this->options['ignore-file']) ? $this->parse_ignore_file($this->options['ignore-file']) : array();
         $this->register_callback('post-scan', array(get_class($this), 'remove_ignored_findings'));
         
         $this->cache = new Cache(33554432);     // 32 meg cache
-        
+
         // Scan for target files    
-        $this->log_message("Scanning for files...", E_USER_NOTICE);
-        
+        Yasca::log_message("Scanning for files...", E_USER_NOTICE);
         if (is_file($this->options['dir'])) {       // Allow user to specify a single file
             $this->target_list = array($this->options['dir']);
         } else {
             $this->target_list = $this->dir_recursive($this->options['dir']);
             if (!is_array($this->target_list)) {
-                $this->log_message("Invalid target directory specified.", E_USER_ERROR);
+                Yasca::log_message("Invalid target directory specified.", E_USER_ERROR);
             }
         }
-        
+
         // Scan for plugins
-        $this->log_message("Scanning for plugins...", E_USER_NOTICE);
+        Yasca::log_message("Scanning for plugins...", E_USER_NOTICE);
         $this->include_plugins($this->options['plugin_dir']);
         if (!is_array($this->plugin_file_list)) {
-            $this->log_message("Invalid plugin directory specified.", E_USER_ERROR);
+            Yasca::log_message("Invalid plugin directory specified.", E_USER_ERROR);
         }
-        
     }
 
     /**
@@ -366,7 +364,12 @@ class Yasca {
             return;
         }
         
-        $yasca =& Yasca::getInstance();     
+        if (isset(Yasca::$instance)) {
+            $yasca =& Yasca::$instance;
+        } else {
+            print $message;
+            return;
+        }
         
         if (isset($yasca->options['silent']) && $yasca->options['silent']) {
              return;
@@ -518,6 +521,11 @@ class Yasca {
                     $opt['dir'] = $_SERVER['argv'][$i];
             }
         }
+
+        if ($opt['report'] == "MySQLReport" && count($opt['parameter']) == 0) {
+            $this->log_message("MySQLReport specified, but database connection details not passed. Aborting.", E_USER_WARNING);
+            exit(1);
+        }
         
         $opt['ignore-ext'] = str_replace(" ", "", $opt['ignore-ext']);
         $opt['ignore-ext'] = $opt['ignore-ext'] == "0" ? array() : explode(",", $opt['ignore-ext']);
@@ -530,9 +538,8 @@ class Yasca {
             $opt['output'] .= "/Yasca-Report-" . date('YmdHis') . $extension;
         }
 
-//        $opt['sa_home'] = is_dir(trim($opt['sa_home'], "\\/ ")) ? $opt['sa_home'] : ".";
         $opt['sa_home'] = correct_slashes($opt['sa_home'], true);
-        $this->log_message("Using Static Analyzers located at {$opt['sa_home']}", E_USER_WARNING);
+        $this->log_message("Using Static Analyzers located at [{$opt['sa_home']}]", E_USER_WARNING);
         
         $opt['dir'] = realpath($opt['dir']);
     
@@ -547,7 +554,7 @@ class Yasca {
     }
     
     /**
-     * Returns the help message (used in console mode.
+     * Returns the help message.
      * @return text content of the help message (aka usage)
      */
     function help() {
@@ -556,7 +563,7 @@ Usage: yasca [options] directory
 Perform analysis of program source code.
 
       --debug               additional debugging
-  -d "QUERYSTRING"          pass the expanded query string to Yasca's components
+  -d "QUERYSTRING"          pass the query string to Yasca's sub-components
   -h, --help                show this help
   -i, --ignore-ext EXT,EXT  ignore these file extensions 
                               (default: exe,zip,jpg,gif,png,pdf,class)
@@ -582,7 +589,7 @@ Examples:
   yasca c:\\source_code
   yasca /opt/dev/source_code
   yasca -px FindBugs,PMD,Antic,JLint /opt/dev/source_code
-  yasca -o c:\output.csv --report CSVReport "c:\\foo bar\\quux"
+  yasca -o c:\\output.csv --report CSVReport "c:\\foo bar\\quux"
   yasca -d "SQLReport.database=./my.db" -r SQLReport /opt/dev/source_code
 
 END;
@@ -908,9 +915,9 @@ END;
      */
     public static function getAdvertisementText($type="HTML") {
         if ($type == "HTML") {
-            $ad = "Commercial support is now available for Yasca. Contact <a href=\"mailto:michael.scovetta@gmail.com\">michael.scovetta@gmail.com</a> for more information.";
+            $ad = "Commercial support is now available for Yasca. Contact <a href=\"mailto:scovetta@users.sourceforge.net\">scovetta@users.sourceforge.net</a> for more information.";
         } else {
-            $ad = "Commercial support is now available for Yasca. Contact michael.scovetta@gmail.com for more information.";
+            $ad = "Commercial support is now available for Yasca. Contact scovetta@users.sourceforge.net for more information.";
         }
         return $ad;
     }

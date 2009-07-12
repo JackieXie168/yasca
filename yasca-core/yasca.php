@@ -26,7 +26,7 @@ include_once("lib/Report.php");
  */
 function main() {
     Yasca::log_message("Yasca " . constant("VERSION") . " - http://www.yasca.org/ - Michael V. Scovetta", E_USER_NOTICE, false, true);
-    Yasca::log_message(Yasca::getAdvertisementText("TEXT") . "\n\n", E_USER_NOTICE, false, true);
+    Yasca::log_message(Yasca::getAdvertisementText("TEXT") . "\n\n", E_USER_WARNING);
 
     Yasca::log_message("Initializing components...", E_USER_WARNING);
 
@@ -34,7 +34,7 @@ function main() {
 
     if ($yasca->options['debug']) profile("init");
     $yasca->execute_callback("pre-scan");
-    Yasca::log_message("Starting scan. This may take a few minutes to complete...", E_USER_WARNING);
+    $yasca->log_message("Starting scan. This may take a few minutes to complete...", E_USER_WARNING);
     $yasca->scan();
     
     Yasca::log_message("Executing post-scan callback functions.", E_ALL);

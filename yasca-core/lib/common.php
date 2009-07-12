@@ -461,7 +461,7 @@ function correct_slashes($path, $endWithSlash = false) {
             $path = str_replace("//", "/", $path);
 
         if ($endWithSlash) {
-            $path = trim($path, "/");
+            $path = rtrim($path, "/");
             $path .= "/";
         }
     }

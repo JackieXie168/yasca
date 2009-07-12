@@ -3,9 +3,9 @@
 include_once("lib/Report.php");
 
 /**
- * SQLLiteReport Class
+ * SQLReport Class
  *
- * This class places all contents in a SQLLite Database.
+ * This class places all contents in a SQLite Database.
  * @author Michael V. Scovetta <scovetta@users.sourceforge.net>
  * @version 2.0
  * @license see doc/LICENSE
@@ -94,7 +94,7 @@ class SQLReport extends Report {
     }
 
     /**
-     * Executes a SQLLiteReport, to the output file $options['output'] or ./results.db
+     * Executes a SQLiteReport, to the output file $options['output'] or ./results.db
      */ 
     function execute() {
         if (!isset($this->dbh)) $this->openDatabase();
