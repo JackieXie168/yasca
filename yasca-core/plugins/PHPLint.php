@@ -32,6 +32,7 @@ class Plugin_PHPLint extends Plugin {
         
         $result_list = array();
 
+/*
         if (getSystemOS() == "Windows") {
             $filename = $this->filename;
             $filename = str_replace(":", "", $filename);
@@ -39,6 +40,8 @@ class Plugin_PHPLint extends Plugin {
         } else {    
             $filename = $this->filename;        // Linux
         }
+*/
+        $filename = $this->filename;        // Linux
 
         $executable = $this->executable[getSystemOS()];
         $executable = $this->replaceExecutableStrings($executable);

@@ -38,13 +38,17 @@ class Plugin_CppCheck extends Plugin {
         $executable = $this->replaceExecutableStrings($executable);
             
         $yasca->log_message("Forking external process (cppcheck)...", E_USER_WARNING);
-        exec( $executable . " -q --unused-function --xml " . escapeshellarg($dir) . " 2>&1", $cpp_results);
+        exec( $executable . " -q --unused-functions --xml " . escapeshellarg($dir) . " 2>&1", $cpp_results);
         $yasca->log_message("External process completed...", E_USER_WARNING);
             
         if ($yasca->options['debug']) 
-            $yasca->log_message("PMD returned: " . implode("\r\n", $cpp_results), E_ALL);
+            $yasca->log_message("Cppcheck returned: " . implode("\r\n", $cpp_results), E_ALL);
     
-            $cpp_result = implode("\r\n", $cpp_results);
+        $cpp_result = implode("\r\n", $cpp_results);
+        if (preg_match("/No C or C\+\+ source files found\./", $cpp_result)) {
+            $yasca->log_message("No C/C++ files found for Cppcheck to scan. Returning.", E_ALL);
+            return;
+        }
             
         $dom = new DOMDocument();
         if (!@$dom->loadXML($cpp_result)) {

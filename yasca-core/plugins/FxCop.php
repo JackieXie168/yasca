@@ -51,27 +51,42 @@ class Plugin_FxCop extends Plugin {
         $arguments = $this->arguments[getSystemOS()];
         $arguments = $this->replaceExecutableStrings($arguments);
 
-        if (getSystemOS() == "Windows" ||
-            (getSystemOS() == "Linux" && !preg_match("/no wine in/", `which wine`))) {
+
+        if (getSystemOS() == "Windows") {
+            $yasca->log_message("Forking external process (FxCop)...", E_USER_WARNING);
+            $yasca->log_message("Executing: [" . $executable . $arguments . escapeshellarg($dir) . "] 2>&1", E_ALL);
+
+            exec($executable . $arguments . "\"" . escapeshellarg($dir) . "\" 2>&1", $output);
+
+            $output = implode("\n", $output);
+            $output = substr($output, stripos($output, "<"));
+
+            $yasca->log_message("FxCop Returned: $output", E_ALL);
+
+            $dom = @new DOMDocument();  
+
+            if (!$dom->loadXML($output)) {
+                $yasca->log_message("FxCop did not return a valid XML document. Ignoring.", E_USER_WARNING);  
+                return;
+            }
+
+        } elseif (getSystemOS() == "Linux" && !preg_match("/no wine in/", `which wine`)) {
             $yasca->log_message("Forking external process (FxCop)...", E_USER_WARNING);
             $yasca->log_message("Executing: [" . $executable . $arguments . escapeshellarg($dir) . "] 2>&1", E_ALL);
 
             exec($executable . $arguments . "\"" . escapeshellarg($dir) . "\" 2>&1", $output);
 
             $yasca->log_message("FxCop Returned: " . implode("\r\n", $output), E_ALL);
-        }
-     
-        if (!file_exists("scan.xml")) {
-            $yasca->log_message("Unable to find \"scan.xml\" output from FxCop.", E_USER_WARNING);
-            return;
+
+            $dom = @new DOMDocument();  
+
+            if (!file_exists("scan.xml" || !$dom->load("scan.xml"))) {
+                $yasca->log_message("FxCop did not return a valid XML document. Ignoring.", E_USER_WARNING);  
+                return;
+            }
+
         }
 
-        $dom = new DOMDocument();  
-        if (!$dom->load("scan.xml")) {  
-            $yasca->log_message("FxCop did not return a valid XML document. Ignoring.", E_USER_WARNING);  
-            return;  
-        }  
-     
         $yasca->log_message("External process completed...", E_USER_WARNING);
 
         //Process results

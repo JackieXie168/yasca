@@ -86,12 +86,12 @@ class Plugin {
 
     private static $ext_classes = array( "JAVA"       => array("java", "jsp", "jsw"),
                                          "C"          => array("c", "cpp", "h"),
-                                         "HTML"       => array("html", "css", "js", "htm"),
+                                         "HTML"       => array("html", "css", "js", "htm", "hta"),
                                          "BINARY"     => array("dll", "zip", "jar", "ear", "war"),
                                          "PHP"        => array("php", "php5", "php4"),
-                                         "NET"        => array("aspx", "asp", "vb", "frm", "res", "cs"),
+                                         "NET"        => array("aspx", "asp", "vb", "frm", "res", "cs", "ascx"),
                                          "COBOL"      => array("cobol", "cbl", "cob"),
-                                         "PERL"       => array("pl"),
+                                         "PERL"       => array("pl", "cgi"),
                                          "PYTHON"     => array("py"),
                                          "COLDFUSION" => array("cfm", "cfml")
                                   );

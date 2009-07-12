@@ -20,8 +20,8 @@ class Plugin_ClamAV extends Plugin {
 	public $executable = array('Windows' => "%SA_HOME%resources\\utility\\clamav\\clamscan.exe",
 			                   'Linux'   => "clamscan");
 
-	public $arguments = array('Windows' => " --no-summary -d %SA_HOME%resources\\utility\\clamav\\ -ri --detect-pua --no-mail --max-recursion=5 --max-dir-recursion=30 ",
-			                  'Linux'   => " --no-summary -ri --detect-pua --no-mail --max-recursion=5 --max-dir-recursion=30 ");
+	public $arguments = array('Windows' => " --no-summary -d %SA_HOME%resources\\utility\\clamav\\ -ri --detect-pua --max-recursion=5 --max-dir-recursion=30 ",
+			                  'Linux'   => " --no-summary -ri --detect-pua --max-recursion=5 --max-dir-recursion=30 ");
    
    	/**
 	* Executes ClamAV on the directory

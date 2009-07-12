@@ -149,6 +149,13 @@ class Plugin_Grep extends Plugin {
 
             $pre_matches = array();         // holds line numbers of pre_grep matches
 
+            // Perform UTF Conversion, if necessary
+            if (is_array($this->file_contents)) {
+                $this->file_contents = explode("\n", utf16_to_utf8(implode("\n", $this->file_contents)));
+             } else {
+                $this->file_contents = utf16_to_utf8($this->file_contents);
+            }
+
             if (isset($this->preprocess) && $yasca->options["debug"]) {
                 $yasca->log_message("Before pre-processing, file contents are: \n" . implode("\n", $this->file_contents), E_ALL);
             }

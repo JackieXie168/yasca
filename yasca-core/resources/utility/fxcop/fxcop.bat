@@ -12,8 +12,10 @@ set TGT=%~1
 
 cd "%FXCOP_PATH%"
 
+rem echo "%FXCOP_PATH%\FxCopCmd.exe" /c "/rule:%FXCOP_PATH%\Rules\SecurityRules.dll" "/rule:%FXCOP_PATH%\Rules\DesignRules.dll" /iit "/file:%TGT%"
+rem "%FXCOP_PATH%\FxCopCmd.exe" "/out:%TDEST%\scan.xml" "/rule:%FXCOP_PATH%\Rules\SecurityRules.dll" "/rule:%FXCOP_PATH%\Rules\DesignRules.dll" /iit "/file:%TGT%" 2>&1 > NUL
 
-"%FXCOP_PATH%\FxCopCmd.exe" "/out:%TDEST%\scan.xml" "/rule:%FXCOP_PATH%\Rules\SecurityRules.dll" "/rule:%FXCOP_PATH%\Rules\DesignRules.dll" /iit "/file:%TGT%" 2>&1 > NUL
+"%FXCOP_PATH%\FxCopCmd.exe" /savemessagestoreport:Excluded "/out:%TDEST%\scan.xml" "/r:+%FXCOP_PATH%\Rules\SecurityRules.dll" "/r:+%FXCOP_PATH%\Rules\UsageRules.dll" "/r:+%FXCOP_PATH%\Rules\PerformanceRules.dll" "/r:+%FXCOP_PATH%\Rules\PortabilityRules.dll" "/r:+%FXCOP_PATH%\Rules\MobilityRules.dll" "/r:+%FXCOP_PATH%\Rules\InteroperabilityRules.dll" "/r:+%FXCOP_PATH%\Rules\GlobalizationRules.dll" "/r:+%FXCOP_PATH%\Rules\NamingRules.dll" "/r:+%FXCOP_PATH%\Rules\DesignRules.dll" /iit "/f:%TGT%" 2>&1 > NUL
 
 goto end
 :notfound
@@ -27,8 +29,8 @@ goto enderror
 
 :end
 cd %TDEST%
-type scan.xml
-erase scan.xml
+if exist scan.xml type scan.xml
+if exist scan.xml erase scan.xml
 goto realend
 
 :enderror
