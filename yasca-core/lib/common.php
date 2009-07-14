@@ -313,7 +313,6 @@ function mime_extract_rfc2822_address($string) {
  */
 function get_owasp_vulnerability_content($url) {
     $matches = array();
-    print "$url\n";
     if (!preg_match('/(https?\:\/\/[^\/]+\/)/i', $url, $matches)) {
         return "";
     }
@@ -328,7 +327,6 @@ function get_owasp_vulnerability_content($url) {
     $html = trim($matches[1]);
     
     //$html = preg_replace('/href\s*=\s*"\//', 'href="$baseurl/', $html);
-    print $html;
     if (function_exists("tidy_repair_string")) {
         return tidy_repair_string($html);
     } else {

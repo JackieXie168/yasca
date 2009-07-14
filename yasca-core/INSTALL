@@ -101,10 +101,9 @@
 
 		     # php -v
 
-             PHP 5.2.9-1 (cli) (built: Mar  5 2009 20:02:28)
+             PHP 5.3.0 (cli) (built: Jun 29 2009 21:55:01)
              Copyright (c) 1997-2009 The PHP Group
-             Zend Engine v2.2.0, Copyright (c) 1998-2009 Zend Technologies
-
+             Zend Engine v2.3.0, Copyright (c) 1998-2009 Zend Technologies
 
         4. Verify that php-xml is installed:
 
@@ -131,10 +130,27 @@
              # yasca resources/test
 
 
+    Installation Steps (MySQLReport Report Generator):
+
+        1. Create a MySQL database.
+
+        2. Execute the etc/yasca.mysql script to create the necessary
+           table structure.
+
+        3. Use the "-d" command line option to pass the database credentials
+           to the Yasca engine. For example:
+
+           DB_CREDS="db_server=localhost:3306&database=yasca
+                     &db_usernname=yasca&db_password=yasca123"
+
+           yasca -r MySQLReport -d "$DB_CREDS" /opt/source_code
+
+
+
     LICENSE
     -------
 
-    The package "yasca-core" is distributed under a BSD-style license.
+    The package "yasca-core" is distributed under a revised-BSD license.
     You are free to modify this component and include it in other
     products, even commercial ones. The official license is located in
     doc/LICENSE.
