@@ -1,14 +1,12 @@
 name = Sleep Usage  
-file_type = java
-grep = /sleep\(/i
+file_type = JAVA
+grep = /\.sleep\(/i
 category = Stability: Sleeping in a Servlet
-severity = 2
+severity = 3
+tags = servlet
 description =
 <p>
-	Resources should usually be included using relative links, so they can work even if the system directory
-	or mount point changes. In this case, the finding is that a link to a local Windows resource (such as
-	<b>c:\my source code\some file.txt</b> exists in the code base. Unless the target production platform is 
-	Windows, and there is a compelling need for referencing an absolute path, this should be changed.
+    Sleeping within a Servlet is considered a bad practice, prohibited by the J2EE specification. 
 </p>
 <p>
         <h4>References</h4>

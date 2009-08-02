@@ -1,5 +1,5 @@
 name = Cross Site Scripting via #url# or #form# in Cold Fusion
-file_type = cfm
+file_type = COLDFUSION
 grep = /<input .*value=\"\#(url|form)/i
 grep = / =\s*\'\#(url|form)\..*\#\';/i
 

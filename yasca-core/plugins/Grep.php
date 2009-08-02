@@ -28,6 +28,7 @@ class Plugin_Grep extends Plugin {
     public $category;
     public $category_link;
     public $severity = 5;
+    public $tags;
     public $description;
     public $preprocess;
     public $is_multi_target = true;
@@ -49,7 +50,11 @@ class Plugin_Grep extends Plugin {
         $this->category = "";
         $this->category_link = "";
         $this->severity = 5;
-        $this->description = "";
+
+        unset($this->description);
+        unset($this->tags);
+        unset($this->preprocess);
+        
     }
     
     function execute() {
@@ -103,6 +108,7 @@ class Plugin_Grep extends Plugin {
                 elseif (preg_match('/^\s*preprocess\s*=\s*(.*)/i', $grep, $matches)) $this->preprocess = trim($matches[1]);
                 elseif (preg_match('/^\s*lookahead_length\s*=\s*(.*)/i', $grep, $matches)) $this->lookahead_length = $matches[1];
                 elseif (preg_match('/^\s*fix\s*=\s*(.*)/i', $grep, $matches)) $this->fix = $matches[1];
+                elseif (preg_match('/^\s*tags\s*=\s*(.*)/i', $grep, $matches)) $this->tags = $matches[1];
                 elseif (preg_match('/^\s*category_link\s*=\s*(.*)/i', $grep, $matches)) $this->category_link = $matches[1];
                 elseif (preg_match('/^\s*severity\s*=\s*(.*)/i', $grep, $matches)) $this->severity = $matches[1];
                 elseif (preg_match('/^\s*description\s*=\s*(.*)/i', $grep, $matches)) {
@@ -161,7 +167,7 @@ class Plugin_Grep extends Plugin {
             }
             $file_contents = (isset($this->preprocess) ? @call_user_func($this->preprocess, $this->file_contents) : $this->file_contents);
             if (isset($this->preprocess) && $yasca->options["debug"]) {
-                $yasca->log_message("After pre-processing, file contents are: \n" . implode("\n", $this->file_contents), E_ALL);
+                $yasca->log_message("After pre-processing with {$this->preprocess} for $grep_plugin, file contents are: \n" . implode("\n", $file_contents), E_ALL);
             }
 
             foreach ($this->grep as $grep) {
