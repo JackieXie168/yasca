@@ -19,7 +19,6 @@ description =
 			<li><a href="http://www.owasp.org/index.php/XSS">http://www.owasp.org/index.php/XSS</a></li>
 			<li><a href="http://www.acunetix.com/cross-site-scripting/scanner.htm">Acunetix Web Vulnerability Scanner (<span style="color:red;font-weight:bold;">free</span>, but only does XSS scanning)</a></li>
 			<li><a href="http://www.ibm.com/developerworks/tivoli/library/s-csscript/">Cross-site Scripting article from IBM</a></li>
-			<li><a href="http://designin.web.boeing.com/crossSiteScripting.asp">Boeing XSS Bulletin</a></li>
 		</ul>
 	</p>
 END;
