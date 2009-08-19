@@ -2,7 +2,9 @@ name = SQL Injection
 file_type = java,jsp,php,php5
 
 ;Java Vulnerabilities
-grep = /\"select .*from .*\+/i
+grep = /\"(select|delete) .*from .*\+/i
+grep = /\"insert\s+into\.* .*\+/i
+grep = /\"update.*set.*\+/i
 grep = /\".*call .*\"\s*\+\s*(req(uest)?)\.getParameter/i
 grep = /prepareCall.*\".*call .*"\s*\+\s*[a-zA-Z0-9_]+/i
 
@@ -13,8 +15,8 @@ grep = /prepareCall.*\".*call .*"\s*\+\s*[a-zA-Z0-9_]+/i
 ;	$sql = "select SomeStoredProc('$_GET[\"bar\"]')";
 ;	$sql = "select SomeStoredProc('" . $_GET["bar"] . "')";
 ;
-grep = /\"select .*from .*'\$_(GET|POST|REQUEST)\[/i
-grep = /\"select .*from .*\.\s*\$_(GET|POST|REQUEST)\[/i
+grep = /\"(select|delete) .*from .*'\$_(GET|POST|REQUEST)\[/i
+grep = /\"(select|delete) .*from .*\.\s*\$_(GET|POST|REQUEST)\[/i
 grep = /\"select ([a-z0-9_]*)\(\s*'\$_(GET|POST|REQUEST)\[/i
 grep = /\"select ([a-z0-9_]*)\(\s*'\"\s*\.\s*\$_(GET|POST|REQUEST)\[/i
 
@@ -22,3 +24,11 @@ category = SQL Injection
 severity = 1
 category_link = http://www.fortifysoftware.com/vulncat/java/java_input_sql_injection.html
 ; TODO: Improve this - doesn't work in cases like "select * from " + "x where foo=foo"
+description =
+<p>
+	<h4>References</h4>
+	<ul>
+		<li><a href="http://en.wikipedia.org/wiki/Sql_injection">Wikipedia SQLi Article</a></li>
+	</ul>
+</p>
+END;
