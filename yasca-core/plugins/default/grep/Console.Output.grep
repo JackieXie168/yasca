@@ -1,6 +1,6 @@
 name = Use of a System Output Stream
 file_type = java,jsp
-grep = /System\.out\.print|System\.err\.print/i
+grep = /^\s*System\.out\.print|^\s*System\.err\.print/i
 category = Poor Logging Practice: Use of a System Output Stream
 category_link = http://www.owasp.org/index.php?title=Poor_Logging_Practice:_Use_of_a_System_Output_Stream
 severity = 5
