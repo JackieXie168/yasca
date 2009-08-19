@@ -1,9 +1,9 @@
 name = Possible SQL Injection
 file_type = cs,aspx,vb,asp
-grep = /sql.*=.*\"\s*\&/i
-grep = /CommandText\s*=\s*.*\"\s*\&/i
-grep = /\.Execute\(.*\"\s*\&/i
+grep = /(update|insert|delete|select)[^\+\;]*\&\s*(Request(\.form\(\s*\"(.*)\"\s*\)|\.QueryString\(\s*\"(.*)\"\s*\)|\(\s*\"(.*)\"\s*\))|Session\(\s*\"(.*)\"\s*\))\s*\&*/i
+grep = /(update|insert|delete|select)[^\+\;]*\+[^\"]/i
 category = Possible SQL Injection
+preprocess = asp_remove_line_continuation
 severity = 2
 description = 
 <p>
