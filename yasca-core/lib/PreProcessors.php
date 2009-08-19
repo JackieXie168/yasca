@@ -67,4 +67,13 @@ function cfml_fix_tag_attributes($file_contents) {
     }
     return $result2;
 }
+
+//This function is used to remove line continuation
+//characters and their accompanying crlf to cause
+//asp code lines to not be split across multiple lines
+function asp_remove_line_continuation($file_contents) {
+    $file_contents = implode("\n", $file_contents);
+    $file_contents = preg_replace("/_\s*/", "", $file_contents);
+    return explode("\n", $file_contents);
+}
 ?>
