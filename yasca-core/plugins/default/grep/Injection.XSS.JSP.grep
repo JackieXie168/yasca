@@ -1,6 +1,6 @@
 name = Cross Site Scripting via request.getParameter() in JSP
-file_type = jsp
-grep = /\<\%=\s*request\.(getParameter|getQueryString)\s*\(/i
+file_type = jsp,java
+grep = /(\<\%=\s*request\.(getParameter|getQueryString)\s*\(|print\(.*\+*\s+request\.(getParameter|getQueryString)\s*\+*|print\(request\.(getParameter|getQueryString))/i
 fix = return preg_replace("/\<\%=\s*request\.(getParameter|getQueryString)\s*\(\"([^\"]*)\"\)\%\>/i", "<%=org.yasca.util.htmlEncode(request.getParameter(\"$2\"))%>", $match);
 category = Cross-Site Scripting
 severity = 1
