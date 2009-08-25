@@ -33,17 +33,18 @@ class Cache {
     }
     
     function put($key, $value) {
-        if (strlen($value) > $this->max_size) return false;     // is it too big to begin with?
-        while ($this->size + strlen($value) > $this->max_size) {
-            $this->evict();
-        }
+        //if (strlen($value) > $this->max_size) return false;     // is it too big to begin with?
+        //while ($this->size + strlen($value) > $this->max_size) {
+        //    $this->evict();
+        //}
         
         unset($this->data[$key]);
         $this->data[$key] = $value;
         $this->data_age[$key] = ++$this->age;
-        $this->size += strlen($value);
+        //$this->size += strlen($value);
     }
     
+
     function put_file_contents($filename) {
         if (is_file($filename) && is_readable($filename)) {
             $contents = file_get_contents($filename);
@@ -58,15 +59,25 @@ class Cache {
         $c = $this->get($c_filename);
         print $this->max_size - $this->size . " ";
         if ($c == false) {
-            print "X [$c_filename] \n";
             if (is_file($filename) && is_readable($filename)) {
                 $this->put($c_filename, file_get_contents($filename));
             }
             return $this->get($filename);
         } else {
-            print ". [$c_filename]\n";
             return $c;
         }
+    }
+
+    function put_file($filename) {
+        if (is_file($filename) && is_readable($filename)) {
+            $contents = file($filename);
+
+            $this->put($filename, &$contents);
+        }
+    }
+    
+    function get_file($filename) {
+        return $this->get($filename);
     }
     
     function get($key) {
