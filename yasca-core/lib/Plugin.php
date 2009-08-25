@@ -102,6 +102,9 @@ class Plugin {
      * @param mixed $file_contents array or string of the file contents.
      */
     public function Plugin($filename, &$file_contents) {
+	$yasca =& Yasca::getInstance();
+        $this->sa_home = $yasca->options["sa_home"];
+
         if (Plugin::check_in_filetype($filename, $this->valid_file_types)) {
             $this->filename = $filename;
             $this->file_contents = $file_contents;
@@ -109,8 +112,6 @@ class Plugin {
                 $this->file_contents = explode("\n", $this->file_contents);
             foreach ($this->file_contents as $content) $content = trim($content);
             $this->is_valid_filetype = true;
-            $yasca =& Yasca::getInstance();
-            $this->sa_home = $yasca->options["sa_home"];
 
             if (is_array($this->executable)) {
                 $fn_sa_home = create_function('&$a, &$b, &$sa_home', '$a = str_replace("%SA_HOME%", $sa_home, $a); $b = str_replace("%SA_HOME%", $sa_home, $b);');
