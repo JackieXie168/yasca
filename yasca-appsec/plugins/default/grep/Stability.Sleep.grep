@@ -1,0 +1,19 @@
+name = Sleep Usage  
+file_type = JAVA
+grep = /\.sleep\(/i
+category = Stability: Sleeping in a Servlet
+severity = 3
+tags = servlet
+description =
+<p>
+    Sleeping within a Servlet is considered a bad practice, prohibited by the J2EE specification. 
+</p>
+<p>
+        <h4>References</h4>
+        <ul>
+            <li><a href="http://www.servlets.com/archive/servlet/ReadMsg?msgId=637109&listName=tomcat-user">Message regarding alternative</a></li>
+			<li><a href="http://www.theserverside.com/discussions/thread.tss?thread_id=46465">An alternative</a></li>
+			<li><a href="http://www.fortify.com/vulncat/java/j2ee_badpractices_threads.html">Bad Practice shown at Fortify</a></li>
+        </ul>
+</p>
+END;
