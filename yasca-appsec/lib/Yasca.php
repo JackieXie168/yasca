@@ -93,7 +93,7 @@ class Yasca {
         $this->ignore_list = isset($this->options['ignore-file']) ? $this->parse_ignore_file($this->options['ignore-file']) : array();
         $this->register_callback('post-scan', array(get_class($this), 'remove_ignored_findings'));
         
-        //$this->cache = new Cache(33554432);     // 32 meg cache		// removed - not actually used yet
+        $this->cache = new Cache(33554432);     // 32 meg cache		// removed - not actually used yet
 
         // Scan for target files    
         Yasca::log_message("Scanning for files...", E_USER_NOTICE);
