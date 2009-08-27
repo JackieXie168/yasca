@@ -1,5 +1,5 @@
 name = Use of a short open tag
-file_type = php
+file_type = PHP
 grep = /<\?\s/
 category = Best Practice: Short Open Tag
 category_link = http://www.phpvs.net/2008/06/04/ten-php-best-practices-tips-that-will-get-you-a-job/

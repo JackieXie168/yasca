@@ -24,7 +24,7 @@ description =
 <p>
 	<h4>References</h4>
 	<ul>
-		<li>TODO</li>
+		<li><a target="_blank" href="http://en.wikipedia.org/wiki/Off-by-one_error">Off-by-One Error</a> (Wikipedia)</li>
 	</ul>
 </p>
 END;

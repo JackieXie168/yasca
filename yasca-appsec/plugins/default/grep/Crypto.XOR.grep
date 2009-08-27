@@ -1,7 +1,7 @@
-name = Use of XOR-based Encryption
-file_type = java,jsp
+name = Weak Cryptographic Algorithm: XOR
+file_type = JAVA
 grep = /([a-z0-9_]+)\[[^\]]+\\1\.length/i
-category = Using a broken or risky cryptographic algorithm
+category = Cryptography
 category_link = http://www.owasp.org/index.php?title=Using_a_broken_or_risky_cryptographic_algorithm
 severity = 4
 description = 
@@ -25,9 +25,7 @@ description =
 <p>
 	<h4>References</h4>
 	<ul>
-		<li>TODO</li>
-		<li>(<a href="http://www.owasp.org/">OWASP</a>) 
-		<a href="http://www.owasp.org/index.php?title=Using_a_broken_or_risky_cryptographic_algorithm">Using a Broken or Risky Cryptographic Algorithm</a></li>
+		<li><a target="_blank" href="http://www.owasp.org/index.php?title=Using_a_broken_or_risky_cryptographic_algorithm">Using a Broken or Risky Cryptographic Algorithm</a></li>
 	</ul>
 </p>
 END;
