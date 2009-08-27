@@ -93,7 +93,8 @@ class Plugin {
                                          "COBOL"      => array("cobol", "cbl", "cob"),
                                          "PERL"       => array("pl", "cgi"),
                                          "PYTHON"     => array("py"),
-                                         "COLDFUSION" => array("cfm", "cfml")
+                                         "COLDFUSION" => array("cfm", "cfml"),
+                                         "XML"        => array("xml", "xsl", "xslt")
                                   );
 
     /**

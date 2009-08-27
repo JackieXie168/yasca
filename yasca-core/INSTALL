@@ -23,15 +23,17 @@
            example, c:\yasca.
 
 	    2. If you wish to use any third-party plugins, download and
-           install them into the same directory. This directory does not
-           have to reside within Yasca-Core. For example, you can install
-           PMD into:
+           install them into the same directory. These tools must be
+           downloaded from the Yasca project page because I've placed
+           files in specific locations so that Yasca can find them. 
+           The directory that you unzip the plugins into does not have to
+           reside within Yasca-Core. For example, you can install PMD into:
 
              c:\static-tools\
 
            For example:
 
-             unzip static-pmd.zip c:\static-tools\
+             unzip yasca-2.1-pmd.zip c:\static-tools\
 
            Your directory structure should look like:
              c:\static-tools\3rdParty-Binaries
@@ -68,15 +70,17 @@
 
 
 	    2. If you wish to use any third-party plugins, download and
-           install them into the same directory. This directory does not
-           have to reside within Yasca-Core. For example, you can install
-           PMD into:
+           install them into the same directory. These tools must be
+           downloaded from the Yasca project page because I've placed
+           files in specific locations so that Yasca can find them. 
+           The directory that you unzip the plugins into does not have to
+           reside within Yasca-Core. For example, you can install PMD into:
 
              c:\static-tools\
 
            For example:
 
-             unzip static-pmd.zip c:\static-tools\
+             unzip yasca-2.1-pmd.zip c:\static-tools\
 
            Your directory structure should look like:
              c:\static-tools\3rdParty-Binaries

@@ -1,7 +1,7 @@
-name = Use of Math.random()
-file_type = java,jsp
+name = Weak Cryptographic Algorithm: Math.random()
+file_type = JAVA
 grep = /Math\.random\(/i
-category = Non-cryptographic pseudo-random number generator
+category = Cryptography
 category_link = http://www.owasp.org/index.php?title=Non-cryptographic_pseudo-random_number_generator
 severity = 4
 description = 
@@ -19,15 +19,15 @@ description =
 	is still very small. Unless your application need huge amounts of random numbers, the
 	SecureRandom class should not pose a burden.
 	
-	Other providers are available, such as <b>IBMJCE4758</b> for z/OS
+	Other providers are available, such as <b>IBMJCE4758</b> for z/OS.
 	
 </p>
 <p>
 	<h4>References</h4>
 	<ul>
-		<li><a href="http://www.owasp.org/index.php?title=Using_a_broken_or_risky_cryptographic_algorithm">Using a Broken or Risky Cryptographic Algorithm</a></li>
-		<li><a href="http://www-03.ibm.com/servers/eserver/zseries/software/java/jcecca14.html">Java Cryptography Extension for z/OS</a></li>
-		<li><a href="http://java.sun.com/javase/6/docs/technotes/guides/security/StandardNames.html">Java 6.0 Security Guide Names</a></li> 
+		<li><a target="_blank" href="http://www.owasp.org/index.php?title=Using_a_broken_or_risky_cryptographic_algorithm">Using a Broken or Risky Cryptographic Algorithm</a></li>
+		<li><a target="_blank" href="http://www-03.ibm.com/servers/eserver/zseries/software/java/jcecca14.html">Java Cryptography Extension for z/OS</a></li>
+		<li><a target="_blank" href="http://java.sun.com/javase/6/docs/technotes/guides/security/StandardNames.html">Java 6.0 Security Guide Names</a></li> 
 	</ul>
 </p>
 END;

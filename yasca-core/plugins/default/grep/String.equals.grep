@@ -5,13 +5,16 @@ category = Code Correctness
 severity = 2
 description =
 <p>
-        Using the == or != operators should never be used to compare String content. This is
+    Using the == or != operators should never be used to compare String content. This is
 	because of how Java allocates String objects, and can be illustrated with the following
 	example:
-	<code>
+
+<code>
   System.out.println("foo" == new String("foo"));
-	</code>  
+</code>  
+
 	The output of this code is <b>false</b>. 
+
 </p>
 <p>
     <h4>References</h4>

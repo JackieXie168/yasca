@@ -65,10 +65,10 @@ description =
 <p>
 	<h4>References</h4>
 	<ul>
-            <li><a href="http://msdn.microsoft.com/en-us/library/bb288454.aspx" target=_"blank">Security Development Lifecycle (SDL) Banned Function Call</a></li>
-            <li><a href="http://www.usenix.org/events/usenix99/full_papers/millert/millert_html/index.html">strlcpy and strlcat - Consistent, Safe String Copy and Concatenation</a></li>
+            <li><a target="_blank" href="http://msdn.microsoft.com/en-us/library/bb288454.aspx" target=_"blank">Security Development Lifecycle (SDL) Banned Function Call</a></li>
+            <li><a target="_blank" href="http://www.usenix.org/events/usenix99/full_papers/millert/millert_html/index.html">strlcpy and strlcat - Consistent, Safe String Copy and Concatenation</a></li>
             <li>Howard, Michael, David LeBlanc, and John Viega. 19 Deadly Sins of Software Development. New York, NY: McGraw-Hill, 2005. Chapter 1, "Buffer Overruns."</li>
-            <li><a href="http://www.owasp.org/ndex.php/Dangerous_Function">OWASP: Dangerous Function</a></li>
+            <li><a target="_blank" href="http://www.owasp.org/ndex.php/Dangerous_Function">OWASP: Dangerous Function</a></li>
 	</ul>
 </p>
 END;

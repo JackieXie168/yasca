@@ -1,7 +1,7 @@
 name = Script Tag Used in JavaScript file
 file_type = js
 grep = /^\s*<script/i
-category = Bug: Script Tag in JavaScript file
+category = Code Correctness
 severity = 2
 description =
 <p>

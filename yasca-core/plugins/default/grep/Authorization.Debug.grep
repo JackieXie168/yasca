@@ -1,5 +1,5 @@
 name = 'Debug' Parameter Found
-file_type = java,jsp
+file_type = JAVA
 grep = /\.\s*getParameter.+debug.*\)/i
 category = Authorization: 'Debug' Parameter Found
 severity = 2

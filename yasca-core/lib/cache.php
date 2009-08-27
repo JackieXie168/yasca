@@ -32,7 +32,7 @@ class Cache {
         return isset($this->data[$key]);
     }
     
-    function put($key, $value) {
+    function put($key, &$value) {
         //if (strlen($value) > $this->max_size) return false;     // is it too big to begin with?
         //while ($this->size + strlen($value) > $this->max_size) {
         //    $this->evict();
@@ -72,7 +72,7 @@ class Cache {
         if (is_file($filename) && is_readable($filename)) {
             $contents = file($filename);
 
-            $this->put($filename, &$contents);
+            $this->put($filename, $contents);
         }
     }
     
