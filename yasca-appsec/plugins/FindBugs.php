@@ -10,8 +10,8 @@
 class Plugin_FindBugs extends Plugin {
     public $valid_file_types = array(); 	// All singletons do not use valid file types
 
-    public $executable = array('Windows' => '%SA_HOME%resources\\utility\\findbugs\\findbugs.bat -home %SA_HOME%resources/utility/findbugs $PLUGIN -textui -xml:withMessages -xargs -quiet',
-                               'Linux'   => '%SA_HOME%resources/utility/findbugs/findbugs -home %SA_HOME%resources/utility/findbugs $PLUGIN -textui -xml:withMessages -xargs -quiet');
+    public $executable = array('Windows' => '%SA_HOME%resources\\utility\\findbugs\\findbugs.bat -home %SA_HOME%resources/utility/findbugs $PLUGIN -include resources\\utility\\FindBugs\\filter.xml -textui -xml:withMessages -xargs -quiet',
+                               'Linux'   => '%SA_HOME%resources/utility/findbugs/findbugs -home %SA_HOME%resources/utility/findbugs $PLUGIN -include resources/utility/FindBugs/filter.xml -textui -xml:withMessages -xargs -quiet');
 
     public $installation_marker = "findbugs";
 
