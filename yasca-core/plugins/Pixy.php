@@ -88,8 +88,11 @@ class Plugin_Pixy extends Plugin {
                 $result->source = $result->source[0];
                 $result->description = $yasca->get_adjusted_description("Pixy", $rule, "<p>description</p><h4>Example:</h4><pre class=\"fixedwidth\">example</pre>");
 
-                $result->source_context = array_slice( file($vFilename), max( $result->line_number-(($this->context_size+1)/2), 0), $this->context_size );
-                array_push($this->result_list, $result);
+		$result->source_context = array_slice( file($vFilename), max( $result->line_number-(($this->context_size+1)/2), 0), $this->context_size );
+
+		if (!in_array($result, $this->result_list)) {
+		    array_push($this->result_list, $result);
+		}
 	    }
 	}
     }
