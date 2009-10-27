@@ -19,8 +19,7 @@ class Plugin_FxCop extends Plugin {
     public $executable = array('Windows' => "%SA_HOME%resources\\utility\\FxCop\\FxCopCmd.exe",
 	    'Linux' => "wine %SA_HOME%/resources/utility/FxCop/FxCopCmd.exe");
 
-    public $arguments = array('Windows' => " /out:scan.xml /rule:%SA_HOME%resources\\utility\\FxCop\\Rules\\SecurityRules.dll /iit /gac ",
-			'Linux' => " /out:scan.xml /rule:%SA_HOME%resources/utility/FxCop/Rules/SecurityRules.dll /iit /gac ");
+    public $arguments;
 
     private $severity = array('informational'   => 5,
                               'warning'         => 4,
@@ -79,7 +78,13 @@ class Plugin_FxCop extends Plugin {
      
         $yasca =& Yasca::getInstance();  
         $dir = $yasca->options['dir'];  
-        $stat_msgs = array();  
+	$stat_msgs = array();  
+
+	$report_file = tempnam(getcwd(), "sca");
+
+    	$this->arguments = array('Windows' => " /out:\"$report_file\" /rule:%SA_HOME%resources\\utility\\FxCop\\Rules\\SecurityRules.dll /iit /gac ",
+			'Linux' => " /out:\"$report_file\" /rule:%SA_HOME%resources/utility/FxCop/Rules/SecurityRules.dll /iit /gac ");
+
 
 	$executable = $this->executable[getSystemOS()];
 	$executable = $this->replaceExecutableStrings($executable);
@@ -95,7 +100,7 @@ class Plugin_FxCop extends Plugin {
 
             $dom = @new DOMDocument();  
 
-            if (!file_exists("scan.xml") || !$dom->load("scan.xml")) {
+            if (!file_exists($report_file) || !$dom->load($report_file)) {
                 $yasca->log_message("FxCop did not return a valid XML document. Ignoring.", E_USER_WARNING);  
                 return;
             }	
@@ -107,7 +112,7 @@ class Plugin_FxCop extends Plugin {
 
             $dom = @new DOMDocument();  
 
-            if (!file_exists("scan.xml") || !$dom->load("scan.xml")) {
+            if (!file_exists($report_file) || !$dom->load($report_file)) {
                 $yasca->log_message("FxCop did not return a valid XML document. Ignoring.", E_USER_WARNING);  
                 return;
             }	
@@ -133,7 +138,7 @@ class Plugin_FxCop extends Plugin {
 	    $this->process_messages($type);	    
 	}  
 
-	@unlink("scan.xml");
+	@unlink($report_file);
     }  
 
     function process_messages($node) {
