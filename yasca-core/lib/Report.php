@@ -9,60 +9,118 @@
  * @license see doc/LICENSE
  * @package Yasca
  */
-class Report {
+abstract class Report {
+   	const default_type = 'HTMLGroupReport';
+   	
+   	/**
+   	 * Returns the default directory path of which to place a report.
+   	 * @param boolean $end_with_slashes Whether to end the directory string with a directory separator.
+   	 * @return string The default directory path. May not necessarily be fully qualified.
+   	 */
+    	public static function default_dir($end_with_slash = true){
+    		$profile_dir = isset($_SERVER['USERPROFILE']) ? $_SERVER['USERPROFILE'] : $_SERVER['HOME'];
+    		return $profile_dir . DIRECTORY_SEPARATOR .
+    			"Desktop" . DIRECTORY_SEPARATOR . "Yasca" . 
+    			($end_with_slash ? DIRECTORY_SEPARATOR : "");
+    	}
+
+	 /**
+	 * Instantiates a new Report object of type passed in.
+	 * @param string $report_type The name of the type of report to load.
+	 */
+	public static function instantiate_report($report_type){
+		$report_type = trim($report_type);
+		if (!isset($report_type) || $report_type == "") {
+			$report_type = self::default_type;
+		}
+		//Canonicalize if we've been given a path
+		elseif (($cleaned_path = realpath($report_type)) !== false){
+			//Protect against path traversal
+			$pinfo = pathinfo($cleaned_path);
+			if ($pinfo !== false){
+				$report_type = $pinfo['filename'];
+			}
+		}
+
+
+		@include_once("lib/$report_type.php");
+		
+		$yasca =& Yasca::getInstance();
+
+		if (!class_exists($report_type) || !is_subclass_of($report_type, "Report")) {
+			$yasca->log_message("Report class [$report_type] was not found or is not a subclass of Report." .
+				" Defaulting to " . self::default_type . ".", E_USER_WARNING);
+			
+			$report_type = $yasca->options['report'] = self::default_type;
+			@include_once("lib/$report_type.php");
+		}
+		$report_obj = new $report_type($yasca->options, $yasca->results);
+		
+		return $report_obj;
+	}
+	
+	
     /**
      * The default extension used for reports of this type.
+     * Must be overridden.
+     * @var string
      */
-    public $default_extension = "html";
+    public $default_extension;
+    
+    /**
+     * The default filename for a report of this type.
+     * @return string The default filename with the proper extension. No path information is included.
+     */
+    public function default_filename(){
+    	return "Yasca-Report-" . date('YmdHis') . "." . $this->default_extension;
+    }
+    
     
     /**
      * Options parsed from the command line.
-     * @access private
      * @var array
      */
-    public $options = array();
+    protected $options = array();
     
     /**
      * Include a digital signature in the report file?
-     * @access private
      * @var boolean
+     * @deprecated
      */
-    public $use_digital_signature = true;
+    protected $use_digital_signature = true;
     
     /**
      * The results of the scan.
-     * @access private
      * @var array
      */
-    public $results = array();
+    protected $results = array();
 
+    /**
+     * Whether or not the reader of this report should expect a file to be
+     * created when execute() is called.
+     * @var boolean
+     */
     public $uses_file_output = true;
     
+    /**
+     * @param array $options Array of command line switches
+     * @param array $results Array of Result objects.
+     */
     public function Report(&$options, &$results) {
         $this->options =& $options;
-        if (!is_numeric($this->options['level']) ||
-            intval($this->options['level']) < 1 ||
-            intval($this->options['level']) > 5) {
-            $this->options['level'] = 5;
-        }
         $this->results =& $results;
     }
     
     /**
-     * The execute function renders the particular report. Since this is
-     * is an abstract class, this function should never actually be called,
-     * but should be overriden by a subclass.
+     * The execute function renders the particular report.
      * @return true iff successful.
      */ 
-    protected function execute() {
-        Yasca::log_message("Report.execute() called, but is abstract. Should have been overridden by a subclass.", E_USER_ERROR);
-        return false;
-    }
+    public abstract function execute();
     
     /**
      * Tests whether the severity is sufficient to warrant including in the output.
      * @param integer $level level in the (1-5) range.
-     * @return true iff the severity is sufficient.
+     * @return boolean true iff the severity is sufficient.
      */
     protected function is_severity_sufficient($level) {
         return ($this->options['level'] >= $level);
@@ -71,35 +129,48 @@ class Report {
     /**
      * Creates an output handle to write the report to. If the requested file is not writeable, the
      * same filename will be attempted to be placed in the temporary directory.
-     * @return a resource handle to the file
+     * @return resource A resource handle to the file
      */
     protected function &create_output_handle() {
         $handle = 0;
-        $output_file = $this->options["output"];
-
+        $output_file =& $this->options["output"];
+        $output_file = correct_slashes($output_file, false);
+        if (endsWith($output_file,DIRECTORY_SEPARATOR)){
+			$output_file .= $this->default_filename();
+		} 
+		
         if (!file_exists(dirname($output_file))) {
-            @mkdir(dirname($output_file));
+            @mkdir(dirname($output_file),0777, true);
         }
-
-	    $output_file = dirname($output_file) . "/" . basename($output_file, ".html") . "." . $this->default_extension;
         
+        //Basic, but weak, protection against c18n flaws.
+        //Also enforces that the file extension matches the report type.
+	    $output_file = dirname($output_file) . DIRECTORY_SEPARATOR . 
+	    	basename($output_file, "." . $this->default_extension) . 
+	    	"." . $this->default_extension;
+	    
         if (!$handle = @fopen($output_file, 'w')) {
-            $output_file = rtrim(sys_get_temp_dir(), "\\/") . "/" . basename($output_file);
-            if (!$handle = @fopen($output_file, 'w')) {
-                Yasca::log_message("Unable to write to the report file [$output_file]. ", E_USER_WARNING);
+            $backup_file = tempnam("","sca") . "." . $this->default_extension;
+            if (!$handle = @fopen($backup_file, 'w')) {
+                Yasca::log_message("Unable to create report file at the provided location nor [$backup_file]. ", E_USER_WARNING);
                     return false;
+            }else{
+            	Yasca::log_message("Unable to create report file at the provided location." .
+            		"Backup file at [$backup_file] used instead. ", E_USER_WARNING);
+            	$output_file = $backup_file;
             }
         }
-        $this->options["output"] = $output_file;
         return $handle;
     }
+    
+
 
     /**
      * Translated a severity number into a description.
      * @param integer $n severity number (1-5)
-     * @return description, or 'Unknown' if not in the required range
+     * @return string Description, or 'Unknown' if not in the required range
      */ 
-    protected function get_severity_description($n) {
+    protected static function get_severity_description($n) {
         if (!is_numeric($n)) return "Unknown " . ($n == "" ? "" : "($n)");
         
         if ($n == 5) { return "Informational"; }
@@ -116,7 +187,7 @@ class Report {
      * @param array $b array of data from Yasca.
      * @return 0, 1, or -1 as per comparator requirements.
      */ 
-    protected function result_list_comparator($a, $b) {
+    protected static function result_list_comparator($a, $b) {
         if (!is_array($a) || !is_array($b)) return 0;
         if ($a['severity'] == $b['severity'])
             return ($a['filename']. $a['line_number'] < ($b['filename'] . $b['line_number']) ? 1 : -1);
