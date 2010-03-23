@@ -14,13 +14,15 @@ class Plugin_injection_xss_net extends Plugin {
 		$SINK=1;
 		$xss_array=array(); //Array to store the sources/sinks of the XSS problems
 		$line_numbers=array();
+		
+		$count = count($this->file_contents);
 
-        for ($i=0; $i<count($this->file_contents); $i++) {
+        for ($i=0; $i<$count; $i++) {
 	    if (preg_match('/\s*([a-zA-Z0-9\_]+)\s*\=\s*Request(\.RawUrl|\.QueryString|\.Params)/i', 
 		    $this->file_contents[$i], $matches)) {
                 $variable_name = $matches[1];
 
-                for ($j=$i+1; $j<count($this->file_contents); $j++) {
+                for ($j=$i+1; $j<$count; $j++) {
                     if (preg_match('/Response.Write\(.*(\+*|\&*)\s*' . $variable_name . '(\+*|\&*)\s*/', $this->file_contents[$j])) {
 						if ( !isset($xss_array[$variable_name][$SOURCE]) )
 						{
@@ -68,7 +70,6 @@ class Plugin_injection_xss_net extends Plugin {
 				<h4>References</h4>
 				<ul>
 					<li><a href="http://www.owasp.org/index.php/XSS">http://www.owasp.org/index.php/XSS</a></li>
-					<li><a href="http://designin.web.boeing.com/crossSiteScripting.asp">Application Security Web Site </a></li>
 					<li><a href="http://www.ibm.com/developerworks/tivoli/library/s-csscript/">Cross-site Scripting article from IBM</a></li>
 				</ul>
 			</p>
