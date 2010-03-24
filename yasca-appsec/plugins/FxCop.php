@@ -166,8 +166,7 @@ class Plugin_FxCop extends Plugin {
 
 		$output = array();
 		exec($exec_statement, $output);
-print($exec_statement);
-print_r($output);
+
 		if ($yasca->options['debug']) {
 			$output = implode("\r\n",$output);
 			$yasca->log_message("FxCop returned: " . $output, E_ALL);
