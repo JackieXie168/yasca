@@ -311,11 +311,37 @@ function any_within($haystack, $needle, $max_distance = 10) {
 }
 
 /**
+ * 
+ * @param array $array The array to search
+ * @param closure $closure A closure accepting one parameter for an item in the array and that returns true/false. 
+ * @return boolean true iff there is at least one item in the array where $closure($item) returns true.
+ */
+function array_any($array, $closure){
+	foreach($array as $item){
+		if ($closure($item)) return true;
+	}
+	return false;
+}
+
+/**
+ * 
+ * @param array $array The array to search
+ * @param closure $closure A closure accepting one parameter for an item in the array and that returns true/false. 
+ * @return mixed The first &$item in the array that satisfies $closure($item), or null if none exist.
+ */
+function &array_first($array, $closure){
+	foreach($array as &$item){
+		if ($closure($item)) return $item;
+	}
+	return null;
+}
+
+/**
  * This function corrects slashes based on the platform.
  * If $endWithSlash is false and $path ends in a slash, the ending slash is preserved.
  */
 function correct_slashes($path, $endWithSlash = false) {
-    return preg_replace("/^(\\+|\/+)/", DIRECTORY_SEPARATOR, 
+    return preg_replace("/(\\+|\/+)/", DIRECTORY_SEPARATOR, 
     	trim($endWithSlash ? $path . DIRECTORY_SEPARATOR : $path));
 }
 
