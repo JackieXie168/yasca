@@ -1,8 +1,7 @@
 <?php
 
 /**
- * This file contains miscellaneous functions, as well as some PHP 5 functions that
- * will be included when running on a PHP 4 environment.
+ * This file contains miscellaneous functions
  * @license see doc/LICENSE
  * @package Yasca
  */
@@ -11,22 +10,31 @@
  * Does the provided string start with a specific substring? Case sensitive.
  * @param string $str string to search
  * @param string $sub substring to look for in $str
- * @return true iff $str starts with $sub.
+ * @return boolean true iff $str starts with $sub.
  */
 function startsWith( $str, $sub ) {
    return ( substr( $str, 0, strlen( $sub ) ) === $sub );
 }
 
+/**
+ * Does the provided string end with a specific substring? Case sensitive.
+ * @param string $str string to search
+ * @param string $sub substring to look for in $str
+ * @return boolean true iff $str ends with $sub.
+ */
 function endsWith( $str, $sub ) {
    return ( substr( $str, strlen( $str ) - strlen( $sub ) ) === $sub );
 }
 
+/**
+ * @return boolean true iff success
+ */
 function flatten_array($value, $key, &$array) {
-    if (!is_array($value))
-        array_push($array,$value);
-    else
-        array_walk($value, 'flatten_array', $array);
- 
+	return array_walk_recursive($value, 
+		function ($v, $k) use (&$array){
+		        array_push($array, $value);
+		        return true;
+		});
 }
 
 function ellipsize($string, $limit, $repl = "...", $strip_tags = true) {
@@ -50,106 +58,6 @@ function unlink_recursive($dir, $del_self = false) {
     if ($del_self){
         closedir($dh);
         @rmdir($dir);
-    }
-}
-
-/* PHP 4 Functions */
-
-if(PHP_VERSION < "5.0.0") {
-    function strripos($haystack, $needle, $offset=0) {
-        if($offset<0){
-            $temp_cut = strrev(  substr( $haystack, 0, abs($offset) )  );
-        }
-        else{
-            $temp_cut = strrev(  substr( $haystack, $offset )  );
-        }
-        $pos = strlen($haystack) - (strpos($temp_cut, strrev($needle)) + $offset + strlen($needle));
-        if ($pos == strlen($haystack)) { $pos = 0; }
-       
-        if(strpos($temp_cut, strrev($needle))===false){
-             return false;
-        }
-        else return $pos;
-    }
-}
-
-if(!function_exists("stripos")){
-    function stripos($haystack, $needle, $offset=0) {
-        return strpos(strtolower($haystack), strtolower($needle), $offset);
-    }
-}
-
-if( !function_exists('memory_get_usage') ) {
-    function memory_get_usage() {
-        //If its Windows
-        //Tested on Win XP Pro SP2. Should work on Win 2003 Server too
-        //Doesn't work for 2000
-        //If you need it to work for 2000 look at http://us2.php.net/manual/en/function.memory-get-usage.php#54642
-        if ( substr(PHP_OS,0,3) == 'WIN')
-        {
-               if ( substr( PHP_OS, 0, 3 ) == 'WIN' )
-                {
-                    $output = array();
-                    exec( 'tasklist /FI "PID eq ' . getmypid() . '" /FO LIST', $output );
-       
-                    return preg_replace( '/[\D]/', '', $output[5] ) * 1024;
-                }
-        }else
-        {
-            //We now assume the OS is UNIX
-            //Tested on Mac OS X 10.4.6 and Linux Red Hat Enterprise 4
-            //This should work on most UNIX systems
-            $pid = getmypid();
-            $output = array();
-            exec("ps -eo%mem,rss,pid | grep $pid", $output);
-            $output = explode("  ", $output[0]);
-            //rss is given in 1024 byte units
-            return $output[1] * 1024;
-        }
-    }
-}
-
-if ( !function_exists('file_put_contents') ) {
-    define('FILE_APPEND', 1);
-    function file_put_contents($n, $d, $flag = false) {
-        $mode = ($flag == FILE_APPEND || strtoupper($flag) == 'FILE_APPEND') ? 'a' : 'w';
-        $f = @fopen($n, $mode);
-        if ($f === false) {
-            return 0;
-        } else {
-            if (is_array($d)) $d = implode($d);
-            $bytes_written = fwrite($f, $d);
-            fclose($f);
-            return $bytes_written;
-        }
-    }
-}
-
-if ( !function_exists('sys_get_temp_dir') )
-{
-    // Based on http://www.phpit.net/
-    // article/creating-zip-tar-archives-dynamically-php/2/
-    function sys_get_temp_dir()
-    {
-        // Try to get from environment variable
-        if ( !empty($_ENV['TMP']) ) {
-            return realpath( $_ENV['TMP'] );
-        } elseif ( !empty($_ENV['TMPDIR']) ) {
-            return realpath( $_ENV['TMPDIR'] );
-        } elseif ( !empty($_ENV['TEMP']) ) {
-            return realpath( $_ENV['TEMP'] );
-        } else {
-            // Try to use system's temporary directory
-            // as random name shouldn't exist
-            $temp_file = tempnam( md5(uniqid(rand(), TRUE)), '' );
-            if ( $temp_file ) {
-                $temp_dir = realpath( dirname($temp_file) );
-                unlink( $temp_file );
-                return $temp_dir;
-            } else {
-                return FALSE;
-            }
-        }
     }
 }
 
@@ -177,13 +85,14 @@ function base64_decode_safe($text) {
 /** 
  * Checks to see if $needle is anywhere within any of the components of $haystack.
  * Works recursively.
+ * @return boolean
  */
 function substr_in_array($needle, $haystack) {
     if (!is_string($needle) ||
         !is_array($haystack)) {
         return false;
     }
-  
+    
     for ($i=0; $i<count($haystack); $i++) {
         if (is_array($haystack[$i])) {
             return substr_in_array($needle, $haystack[$i]);
@@ -192,28 +101,6 @@ function substr_in_array($needle, $haystack) {
         }
     }
     return false;
-}
-
-/**
- * Checks to see if the given filename has a passed extension. $filename does not have
- * to be an actual existing file.
- * @param string $filename filename to check
- * @param mixed $ext string extension or array of extensions to check. Should not include a period.
- * @return true iff filename matches one of the extensions, or if $ext was an empty array.
- */
-function check_in_filetype($filename, $ext = array()) {
-    $ext_valid = false;
-    if (is_array($ext)) {
-        if (count($ext) == 0) return true;      // $ext=() means all accepted
-        for ($i=0; $i<count($ext); $i++) { 
-            if (endsWith($filename, "." . $ext[$i])) {
-                $ext_valid = true;
-            }
-        }
-    } else {
-        $ext_valid = endsWith($filename, ".$ext");
-    }
-    return $ext_valid;
 }
 
 /**
@@ -246,23 +133,15 @@ function collapse_dir($dest_dir, $file_type_list=array(), $start_dir=".", &$tran
     }
 }
 
-if (!function_exists('fnmatch')) {
-        function fnmatch($pattern, $string) {
-            return @preg_match(
-                '/^' . strtr(addcslashes($pattern, '/\\.+^$(){}=!<>|'),
-                array('*' => '.*', '?' => '.?')) . '$/i', $string
-            );
-        }
-}
-
 /**
  * Generates a random alphanumeric string.
+ * Warning: Do not use for cryptographic purposes.
  */
 function random_string($length=10) {
-    $pattern = "1234567890abcdefghijklmnopqrstuvwxyz";
-    $key  = $pattern{rand(0,36)};
+    $pattern = "1234567890abcdefghijklmnopqrstuvwxyz"; 
+    $key  = $pattern[rand(0,36)];
     for($i=1;$i<$length;$i++) {
-        $key .= $pattern{rand(0,36)};
+        $key .= $pattern[rand(0,36)];
     }
     return $key;
 }
@@ -354,7 +233,8 @@ function find_similar_text($haystack, $needle, $minimum_similarity = 0) {
 
 function find_matching_prefix_length($a, $b) {
     $k=0;
-    for ($i=0; $i<strlen($a); $i++) {
+    $len_a = strlen($a);
+    for ($i=0; $i<$len_a; $i++) {
         if (substr($b, $i, 1) == substr($a, $i, 1)) {
             $k++;
         } else {
@@ -364,8 +244,9 @@ function find_matching_prefix_length($a, $b) {
 }
 
 /**
- * Extracts class name from a file.
+ * Extracts the first class name from a file.
  * @param string $filename filename to scan 
+ * @return string Name of the first class in the file or False.
  */
 function get_class_from_file($filename) {
     $fc = file_get_contents($filename);
@@ -378,34 +259,42 @@ function get_class_from_file($filename) {
 }
 
 function getSystemOS() {
-    @ob_start();
-    @phpinfo(1);
-    $info = @ob_get_contents();
-    @ob_end_clean();
-    
-    if (preg_match('/System \=\> ([^\s]+)/mi', $info, $matches)) {
-    return $matches[1];
-    }
-    return "Unknown";
+	static $result = null;
+	if (!isset($result)){
+	    @ob_start();
+	    @phpinfo(1);
+	    $info = @ob_get_contents();
+	    @ob_end_clean();
+	    
+	    if (preg_match('/System \=\> ([^\s]+)/mi', $info, $matches)) {
+	    	$result = $matches[1];
+	    }else {
+	    	$result = "Unknown";
+	    }
+	}
+	return $result;
 }
 
 function isWindows() {
-    return getSystemOS() == 'Windows';
+	return getSystemOS() == 'Windows';
 }
 
 function isLinux() {
     return getSystemOS() == 'Linux';
 }
 
+function wineExists(){
+	static $result;
+	if (!isset($result))
+		$result = !preg_match("/no wine in/", `which wine`);
+	return $result;
+}
+
 function is_valid_regex($regex) {
     $orig_err = error_reporting(0);
     preg_match($regex, "");
     error_reporting($orig_err);
-    if (preg_last_error() == PREG_NO_ERROR) {
-    return true;
-    } else {
-    return false;
-    }
+    return (preg_last_error() == PREG_NO_ERROR);
 }
 
 function any_within($haystack, $needle, $max_distance = 10) {
@@ -422,55 +311,23 @@ function any_within($haystack, $needle, $max_distance = 10) {
 }
 
 /**
- * @deprecated
- */
-function correct_slashes_original($path) {
-    $path = str_replace("//", "/", $path);
-    $path = str_replace("\\\\", "\\", $path);
-    if (isWindows()) {
-        $path = str_replace("/", "\\", $path);
-    } else {
-        $path = str_replace("\\", "/", $path);
-    }
-    return $path;
-}
-
-/**
  * This function corrects slashes based on the platform.
+ * If $endWithSlash is false and $path ends in a slash, the ending slash is preserved.
  */
 function correct_slashes($path, $endWithSlash = false) {
-    $path = trim($path);
-
-    // Figure out which slash we're using
-    if (isWindows()) {
-        $path = str_replace("/", "\\", $path);
-
-        while(strchr($path,'\\\\'))
-            $path = str_replace("\\\\", "\\", $path);
-
-        if ($endWithSlash) {
-            $path = rtrim($path, "\\");
-            $path .= "\\";
-        }
-    } else {
-        $path = str_replace("\\", "/", $path);
-
-        while(strchr($path,'//'))
-            $path = str_replace("//", "/", $path);
-
-        if ($endWithSlash) {
-            $path = rtrim($path, "/");
-            $path .= "/";
-        }
-    }
-    return $path;
+    return preg_replace("/^(\\+|\/+)/", DIRECTORY_SEPARATOR, 
+    	trim($endWithSlash ? $path . DIRECTORY_SEPARATOR : $path));
 }
 
 /** 
  * Converts UTF-16 to UTF-8 character sets.
  * Thanks to http://www.moddular.org/log/utf16-to-utf8
+ * @todo Instead, use http://www.php.net/manual/en/book.mbstring.php
+ * @var string
  */
-function utf16_to_utf8($str) {
+function utf16_to_utf8($str) {	
+	if (strlen($str) <= 2) return $str;
+	
     $c0 = ord($str[0]);
     $c1 = ord($str[1]);
 
@@ -482,8 +339,12 @@ function utf16_to_utf8($str) {
         return $str;
     }
 
-    $str = substr($str, 2);
     $len = strlen($str);
+    //An odd number of bytes indicates that $str is not UTF-16.
+    if ($len % 2 != 0) return $str;
+    
+    $str = substr($str, 2);
+    $len -= 2;
     $dec = '';
     for ($i = 0; $i < $len; $i += 2) {
         $c = ($be) ? ord($str[$i]) << 8 | ord($str[$i + 1]) : 
