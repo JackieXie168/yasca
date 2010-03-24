@@ -2,7 +2,7 @@
 /**
  * Yasca Engine, Yasca Static Analysis Tool
  * 
- * This pacakge implements a simple engine for static analysis
+ * This package implements a simple engine for static analysis
  * of source code files. 
  * @author Michael V. Scovetta <scovetta@sourceforge.net>
  * @version 2.1
@@ -25,31 +25,36 @@ include_once("lib/Report.php");
  * Main entry point for the Yasca engine.
  */
 function main() {
-    Yasca::log_message("Yasca " . constant("VERSION") . " - http://www.yasca.org/ - Michael V. Scovetta", E_USER_NOTICE, false, true);
-    Yasca::log_message(Yasca::getAdvertisementText("TEXT") . "\n\n", E_USER_WARNING);
-
-    Yasca::log_message("Initializing components...", E_USER_WARNING);
-
-    $yasca =& Yasca::getInstance(); 
+	$options = Yasca::parse_command_line_arguments();
+	if (!$options['silent']){
+	    Yasca::log_message("Yasca " . constant("VERSION") . " - http://www.yasca.org/ - Michael V. Scovetta", E_USER_NOTICE, false, true);
+	    Yasca::log_message(Yasca::getAdvertisementText("TEXT") . "\n\n", E_USER_WARNING);
+	
+	    Yasca::log_message("Initializing components...", E_USER_WARNING);
+	}
+	
+   	$yasca =& Yasca::getInstance($options); 
+    $yasca->log_message("Using Static Analyzers located at [{$yasca->options['sa_home']}]", E_USER_WARNING);
 
     if ($yasca->options['debug']) profile("init");
     $yasca->execute_callback("pre-scan");
     $yasca->log_message("Starting scan. This may take a few minutes to complete...", E_USER_WARNING);
     $yasca->scan();
     
-    Yasca::log_message("Executing post-scan callback functions.", E_ALL);
+    $yasca->log_message("Executing post-scan callback functions.", E_ALL);
     $yasca->execute_callback("post-scan");
 
-    Yasca::log_message("Executing pre-report callback functions.", E_ALL);    
+    $yasca->log_message("Executing pre-report callback functions.", E_ALL);    
     $yasca->execute_callback("pre-report");
-    Yasca::log_message("Creating report...", E_USER_WARNING);
     
-    $report = $yasca->instantiate_report($yasca->results);
+    $yasca->log_message("Creating report...", E_USER_WARNING);
+    $report = $yasca->instantiate_report();
     $report->execute();
+    
     $yasca->execute_callback("post-report");
     
     if ($report->uses_file_output) 
-        Yasca::log_message("Results have been written to " . correct_slashes($yasca->options["output"]), E_USER_WARNING);
+        $yasca->log_message("Results have been written to " . correct_slashes($yasca->options["output"]), E_USER_WARNING);
     
     if ($yasca->options['debug']) print_r(profile("get"));
 }
@@ -69,7 +74,7 @@ function profile($cmd = false) {
             unregister_tick_function('__profile__');
             foreach($log as $function => $time) {
                 if($function != '__profile__') {
-                        $by_function[$function] = round($time / $total * 100, 2);
+                        $by_function[$function] = $time;
                 }
             }
             arsort($by_function);
@@ -85,7 +90,7 @@ function profile($cmd = false) {
     $delta = $now - $last_time;
     $last_time = $now;
     $trace = debug_backtrace();
-    $caller = @$trace[1]['function'];
+    $caller = @$trace[1]['function'] . " at " . @$trace[1]['class'];
     @$log[$caller] += $delta;
     $total += $delta;
 }
