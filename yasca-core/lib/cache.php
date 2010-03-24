@@ -11,7 +11,7 @@
 
 class Cache {
 
-    private $max_size;              // default 2k cache
+    private $max_size;              // default 5k cache
     private $data;
     
     private $data_size;             
@@ -20,7 +20,7 @@ class Cache {
     private $data_age;              // used for cache evictions
     private $age;
     
-    function __construct($max_size = 5100) {
+    function __construct($max_size = 5120) {
         $this->max_size = $max_size;
         $this->data = array();
         $this->data_age = array();
@@ -47,9 +47,7 @@ class Cache {
 
     function put_file_contents($filename) {
         if (is_file($filename) && is_readable($filename)) {
-            $contents = file_get_contents($filename);
-
-            $this->put($filename, $contents);
+            $this->put($filename, file_get_contents($filename));
         }
     }
     
@@ -70,9 +68,8 @@ class Cache {
 
     function put_file($filename) {
         if (is_file($filename) && is_readable($filename)) {
-            $contents = file($filename);
-
-            $this->put($filename, $contents);
+        	$file = file($filename);
+            $this->put($filename, $file);
         }
     }
     
