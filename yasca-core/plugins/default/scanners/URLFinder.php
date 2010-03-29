@@ -7,15 +7,26 @@
  */
 class Plugin_URLFinder extends Plugin {
     public $valid_file_types = array();
-    public $invalid_file_types = array("jar", "exe", "zip", "war", "tar", "ear", "lib", "dll");
     
-    private static $CACHE_ID = 'Plugin_URLFinder.url_list,Unique URLs';
+	public function Plugin_URLFinder($filename, &$file_contents){
+		parent::Plugin($filename, $file_contents);
+		// Handle this separately, since it's valid on all files EXCEPT those listed below
+		// TODO White-list checking instead of blacklist checking. An 80 meg media file in the directory will crash yasca.
+		if ($this->check_in_filetype($filename, array("jar", "zip", "dll", "war", "tar", "ear",
+													  "jpg", "png", "gif", "exe", "bin", "lib",
+													  "svn-base", "7z", "rar",
+													  "mov", "wmv", "mp3"))) {
+			$this->is_valid_filetype = false;
+		}
+	}
+    
+    protected static $CACHE_ID = 'Plugin_URLFinder.url_list,Unique URLs';
     
     function execute() {
         $yasca =& Yasca::getInstance();
             
-        $url_list = isset($yasca->general_cache[Plugin_URLFinder::$CACHE_ID]) ? 
-                          $yasca->general_cache[Plugin_URLFinder::$CACHE_ID] : 
+        $url_list = isset($yasca->general_cache[self::$CACHE_ID]) ? 
+                          $yasca->general_cache[self::$CACHE_ID] : 
                           array();
         
         $matches = preg_grep('/([a-z0-9\-\_][a-z0-9\-\_\.]+\.com)[^a-z0-9]/i', $this->file_contents);
@@ -32,33 +43,32 @@ class Plugin_URLFinder extends Plugin {
         }
         sort($url_list);
         
-        $yasca->general_cache[Plugin_URLFinder::$CACHE_ID] = $url_list;
-        $yasca->add_attachment(Plugin_URLFinder::$CACHE_ID);
-                
-        $yasca->register_callback('post-scan', array(get_class($this), 'report_callback'));
+        $yasca->general_cache[self::$CACHE_ID] = $url_list;
+        $yasca->add_attachment(self::$CACHE_ID);
         
-        $matchs = null;
+        $matches = null;
         $url_list = null;
+        
+        static $already_added = false;
+        if ($already_added) return;
+        $already_added = true;
+        
+        $id = self::$CACHE_ID;
+        $yasca->register_callback('post-scan', function () use ($id) {
+        	$yasca =& Yasca::getInstance();
+        	$url_list = $yasca->general_cache[$id];
+	
+	        $html = '<table style="width:95%;">';
+	        $html .= '<th>URL</th><th>Filename</th>';
+	        foreach ($url_list as $url) {
+	            $url_array = explode(",", $url, 2);
+	            $html .= "<tr><td>{$url_array[0]}</td><td><a target=\"_blank\" ";
+	            $html .= "href=\"file://{$url_array[1]}\">{$url_array[1]}</a></td></tr>";
+	        }
+	        $html .= "</table>";
+	        $yasca->general_cache[$id] = $html; 
+   	 	});
     }
     
-    /**
-     * Callback function for turning the URL list into an HTML table.
-     */
-    public static function report_callback() {
-        $yasca =& Yasca::getInstance(); 
-        $url_list = isset($yasca->general_cache[Plugin_URLFinder::$CACHE_ID]) ? 
-                          $yasca->general_cache[Plugin_URLFinder::$CACHE_ID] : 
-                          array();
-
-        $html = '<table style="width:95%;">';
-        $html .= '<th>URL</th><th>Filename</th>';
-        foreach ($url_list as $url) {
-            $url_array = explode(",", $url, 2);
-            $html .= "<tr><td>" . $url_array[0] . "</td><td><a target=\"_blank\" href=\"file://" . $url_array[1] . "\">" . $url_array[1] . "</a></td></tr>";
-        }
-        $html .= "</table>";
-        
-        $yasca->general_cache[Plugin_URLFinder::$CACHE_ID] = $html; 
-    }
 }
 ?>

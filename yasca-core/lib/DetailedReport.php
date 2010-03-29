@@ -117,7 +117,7 @@ END;
         fclose($handle);
     }
     
-    function get_preamble() {
+    protected function get_preamble() {
         $generation_date = date('Y-m-d H:i:s');
         $version = constant("VERSION");
         $yasca =& Yasca::getInstance();
@@ -183,7 +183,7 @@ END;
 END;
         }
         
-        function get_postamble() {
+        protected function get_postamble() {
             return <<<END
             </body>
         </html>

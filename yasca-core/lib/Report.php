@@ -17,12 +17,12 @@ abstract class Report {
    	 * @param boolean $end_with_slashes Whether to end the directory string with a directory separator.
    	 * @return string The default directory path. May not necessarily be fully qualified.
    	 */
-    	public static function default_dir($end_with_slash = true){
-    		$profile_dir = isset($_SERVER['USERPROFILE']) ? $_SERVER['USERPROFILE'] : $_SERVER['HOME'];
-    		return $profile_dir . DIRECTORY_SEPARATOR .
-    			"Desktop" . DIRECTORY_SEPARATOR . "Yasca" . 
-    			($end_with_slash ? DIRECTORY_SEPARATOR : "");
-    	}
+    public static function default_dir($end_with_slash = true){
+    	$profile_dir = isset($_SERVER['USERPROFILE']) ? $_SERVER['USERPROFILE'] : $_SERVER['HOME'];
+    	return $profile_dir . DIRECTORY_SEPARATOR .
+    		"Desktop" . DIRECTORY_SEPARATOR . "Yasca" . 
+    	($end_with_slash ? DIRECTORY_SEPARATOR : "");
+    }
 
 	 /**
 	 * Instantiates a new Report object of type passed in.

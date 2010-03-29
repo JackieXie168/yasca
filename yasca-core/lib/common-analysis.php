@@ -18,8 +18,10 @@ function find_member_variables($file_contents, &$line_matches) {
     
     if (!is_array($file_contents))
         $file_contents = explode("\r\n", $file_contents);
+       
+    $count = count($file_contents);
         
-    for ($i=0; $i<count($file_contents); $i++) {
+    for ($i=0; $i<$count; $i++) {
         $line = $file_contents[$i];
         if (strstr($line, "{")) {
             ++$b;
@@ -40,9 +42,7 @@ function find_member_variables($file_contents, &$line_matches) {
             }
 
         }
-    }
-    unset($file_contents);
-    
+    }    
     return $variables;
 }
 
@@ -56,8 +56,9 @@ function get_method_contents($file_contents, $method_name) {
     
     if (!is_array($file_contents))
         $file_contents = explode("\r\n", $file_contents);
-        
-    for ($i=0; $i<count($file_contents); $i++) {
+    
+    $count = count($file_contents);
+    for ($i=0; $i<$count; $i++) {
         $line = $file_contents[$i];
         
         $b += substr_count($line, "{");
