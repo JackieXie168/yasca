@@ -99,7 +99,7 @@ class HTMLReport extends Report {
         fclose($handle);
     }
     
-    function get_preamble() {
+    protected function get_preamble() {
         $generation_date = date('Y-m-d H:i:s');
         $version = constant("VERSION");
         $yasca =& Yasca::getInstance();
@@ -514,7 +514,7 @@ class HTMLReport extends Report {
 END;
         }
         
-        function get_postamble() {
+        protected function get_postamble() {
             return <<<END
                 </table>
               </div>

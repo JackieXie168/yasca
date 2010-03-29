@@ -33,7 +33,7 @@ class MySQLReport extends Report {
     /*
      * Opens the database.
      */
-    private function openDatabase() {
+    protected function openDatabase() {
         $yasca =& Yasca::getInstance();
 
         $params = $yasca->options['parameter'];
@@ -123,7 +123,7 @@ class MySQLReport extends Report {
         $this->dbh = null;
     }
 
-    function get_description_id($description) {
+    protected function get_description_id($description) {
         $description = mysql_escape_string($description);
         $result = mysql_query("select description_id from yasca_description where description='$description'", $this->dbh);
         if (mysql_num_rows($result) == 0) {
@@ -135,7 +135,7 @@ class MySQLReport extends Report {
         }
     }
 
-    function get_category_id($name, $url) {
+    protected function get_category_id($name, $url) {
         $name = mysql_escape_string($name);
         $url = mysql_escape_string($url);
         $result = mysql_query("select category_id from yasca_category where name='$name' and url = '$url'");
@@ -149,11 +149,11 @@ class MySQLReport extends Report {
 
     }
 
-    function get_preamble() {
+    protected function get_preamble() {
         return "";
     }
     
-    function get_postamble() {
+    protected function get_postamble() {
         return "";
     }   
 }

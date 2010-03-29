@@ -59,7 +59,7 @@ class XMLReport extends Report {
         fclose($handle);
     }
     
-    function get_preamble() {
+    protected function get_preamble() {
         return <<<EOT
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!DOCTYPE YascaXMLResults [
@@ -79,12 +79,12 @@ class XMLReport extends Report {
 EOT;
     }
         
-    function get_postamble() {
+    protected function get_postamble() {
         return "";
     }
     
     
-    function array2json($arr) {
+    protected function array2json($arr) {
         $parts = array();
         $is_list = false;
         if (!isset($arr) || !is_array($arr)) {

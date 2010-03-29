@@ -24,7 +24,6 @@ class ConsoleReport extends Report {
      * Executes a ConsoleReport, with output going to stdout.
      */ 
     function execute() {
-        if (!$handle = $this->create_output_handle()) return;
         
         print "Report Output:\n";
         

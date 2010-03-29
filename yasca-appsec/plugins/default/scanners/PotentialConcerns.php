@@ -24,18 +24,18 @@ class Plugin_PotentialConcerns extends Plugin {
     public $preprocess;
     public $is_multi_target = true;
     
-    private static $union_valid_file_types;
-    private static $concerns_dir = 'plugins/default/scanners/concerns/';
+    protected static $union_valid_file_types;
+    protected static $concerns_dir = 'plugins/default/scanners/concerns/';
     public static $findings = array(array());
 
     public $installation_marker = true;
 
-    private static $CACHE_ID = 'Plugin_PotentialConcerns.potential_concerns,Potential Concerns';
+    protected static $CACHE_ID = 'Plugin_PotentialConcerns.potential_concerns,Potential Concerns';
     
     /**
      * Re-initializes the variables back to their original state.
      */
-    function initialize() {
+    protected function initialize() {
         $this->name = "";
         $this->valid_file_types = array();
         $this->grep = array();
@@ -51,39 +51,40 @@ class Plugin_PotentialConcerns extends Plugin {
         unset($this->preprocess);
     }
 
-    function concerns_list() {
+    protected function concerns_list() {
     	$concerns = array();
 
-	if ($handle = opendir(self::$concerns_dir)) {
-	    while (false !== ($file = readdir($handle))) {
-		if ($file != "." && $file != ".." &&
-		    is_file(self::$concerns_dir . $file)) {
-		    array_push($concerns, self::$concerns_dir . $file);
+		if ($handle = opendir(self::$concerns_dir)) {
+		    while (false !== ($file = readdir($handle))) {
+		    	if ($file == "." || $file == "..") continue;
+				if (is_file(self::$concerns_dir . $file)) {
+				    array_push($concerns, self::$concerns_dir . $file);
+				}
+		    }
+	
+		    closedir($handle);
 		}
-	    }
 
-	    closedir($handle);
-	}
-
-	return $concerns;
+		return $concerns;
     }
     
-    function have_finding(&$haystack, $file, $description) {
-	for ($i = 0; $i < count($haystack); $i++) {
-	    if (!isset($haystack[$i]['file'])) continue;
-
-	    if 	($haystack[$i]['file'] == $file &&
-		 $haystack[$i]['description'] == $description) {
-		return $i;	     
-	    }
-	}
-
-	return -1;
+    protected function have_finding(&$haystack, $file, $description) {
+		for ($i = 0; $i < count($haystack); $i++) {
+		    if (!isset($haystack[$i]['file'])) continue;
+	
+		    if 	($haystack[$i]['file'] == $file &&
+			 $haystack[$i]['description'] == $description) {
+			return $i;	     
+		    }
+		}
+	
+		return -1;
     }
 
     function execute() {
+    	
         $grep_plugin_list = array();
-	$yasca =& Yasca::getInstance();
+		$yasca =& Yasca::getInstance();
 
         foreach ($this->concerns_list() as $grep_plugin) {
             if (endsWith($grep_plugin, ".grep") ) {                
@@ -114,6 +115,13 @@ class Plugin_PotentialConcerns extends Plugin {
         if (!Plugin::check_in_filetype($this->filename, Plugin_PotentialConcerns::$union_valid_file_types)) {
             return;
         }
+        
+    	    // Perform UTF Conversion, if necessary
+            if (is_array($this->file_contents)) {
+                $this->file_contents = explode("\n", utf16_to_utf8(implode("\n", $this->file_contents)));
+            } else {
+                $this->file_contents = utf16_to_utf8($this->file_contents);
+            }
         
         foreach ($grep_plugin_list as $grep_plugin) {
             $yasca->log_message("Using Grep [$grep_plugin] to scan [$this->filename]", E_ALL);
@@ -183,12 +191,7 @@ class Plugin_PotentialConcerns extends Plugin {
 
             $pre_matches = array();         // holds line numbers of pre_grep matches
 
-	    // Perform UTF Conversion, if necessary
-            if (is_array($this->file_contents)) {
-                $this->file_contents = explode("\n", utf16_to_utf8(implode("\n", $this->file_contents)));
-            } else {
-                $this->file_contents = utf16_to_utf8($this->file_contents);
-            }
+
 
             if (isset($this->preprocess) && $yasca->options["debug"]) {
                 $yasca->log_message("Before pre-processing, file contents are: \n" . implode("\n", $this->file_contents), E_ALL);
@@ -213,6 +216,7 @@ class Plugin_PotentialConcerns extends Plugin {
                 $matches = preg_grep('/' . $grep . '/' . $modifier, $file_contents);
 
                 if (preg_match("/^__(.*)/", $orig_grep)) {          // for pre_grep
+                	error_reporting($orig_error_level);
                     $pre_matches = array_keys($matches);
                     continue;
                 }
@@ -250,25 +254,25 @@ class Plugin_PotentialConcerns extends Plugin {
 		    }
                 }
             }
-	}
+		}
 
-        $yasca->general_cache[Plugin_PotentialConcerns::$CACHE_ID] = $this->print_findings();
+        $yasca->general_cache[Plugin_PotentialConcerns::$CACHE_ID] = $this->findings_to_string();
         $yasca->add_attachment(Plugin_PotentialConcerns::$CACHE_ID);
     }
 
-    function print_findings() {
-	$report = '';
-	for ($i = 0; $i < count(self::$findings); $i++) {
-	    if (!isset(self::$findings[$i]['file'])) continue;
-
-	    $fileLink = sprintf("<a title=\"%s\" target=\"_blank\" href=\"file://%s\" source_code_link=\"true\">%s</a>",
-		self::$findings[$i]['file'], self::$findings[$i]['file'], basename(self::$findings[$i]['file'])); 
-
-	    $report .= sprintf("%s %s %s<br/><br/>\n",  $fileLink,
-		self::$findings[$i]['lines'], self::$findings[$i]['description']);
-	}
-
-	return $report;
+    protected static function findings_to_string() {
+		$report = '';
+		for ($i = 0; $i < count(self::$findings); $i++) {
+		    if (!isset(self::$findings[$i]['file'])) continue;
+	
+		    $fileLink = sprintf("<a title=\"%s\" target=\"_blank\" href=\"file://%s\" source_code_link=\"true\">%s</a>",
+			self::$findings[$i]['file'], self::$findings[$i]['file'], basename(self::$findings[$i]['file'])); 
+	
+		    $report .= sprintf("%s %s %s<br/><br/>\n",  $fileLink,
+			self::$findings[$i]['lines'], self::$findings[$i]['description']);
+		}
+	
+		return $report;
     }
 }
 ?>

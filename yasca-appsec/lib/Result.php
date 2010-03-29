@@ -10,17 +10,76 @@
  * @package Yasca
  */
 class Result {
-    public $filename;                   // name of the file
-    public $severity = 5;               // informational
-    public $category = "General";       // default value
-    public $category_link;              // URL pointing to information about the category
-    public $plugin_name;                // name of the plugin
-    public $is_source_code = true;      // format the message as source code?   
-    public $source;                     // source line or message
-    public $source_context;             // source code around the source line
-    public $proposed_fix;               // proposed fix for the source line (if available)
-    public $line_number = 0;            // line number within the source file
-    public $description = "";           // description (long, html) of the item
-    public $custom = array();           // for any other custom variables that a Plugin wants
+	/**
+	 *  Name of the file
+	 *  @var string
+	 */
+    public $filename;
+    
+    /**
+     * Informational. Default is 5.
+     * @var int
+     */
+    public $severity = 5;
+    
+    /**
+     * Category of result. Default is "General".
+     * @var string
+     */
+    public $category = "General";  
+
+    /**
+     * URL pointing to information about the category
+     * @var string
+     */
+    public $category_link; 
+    
+    /**
+     * Name of the plugin
+     * @var string
+     */
+    public $plugin_name;        
+
+    /**
+     * Format the message as source code?
+     * @var boolean
+     */
+    public $is_source_code = true;
+      
+    /**
+     * Source line or message
+     * @var string
+     */
+    public $source; 
+    
+    /**
+     * Source code around the source line
+     * @var string
+     */
+    public $source_context;
+    /**
+     * proposed fix for the source line (if available)
+     * @var string
+     */
+    public $proposed_fix;      
+    
+    /**
+     * Line number within the source file
+     * @var int
+     */
+    
+    public $line_number = 0;
+    
+    /**
+     * Description (long, html) of the item
+     * @var string
+     */
+    public $description = "";
+    
+    /**
+     * For any other custom variables that a Plugin wants
+     * @var mixed
+     */
+    public $custom = array();
 }
 ?>

@@ -139,7 +139,7 @@ class HTMLGroupReport extends Report {
         fclose($handle);
     }
     
-    function get_preamble() {
+    protected function get_preamble() {
         $generation_date = date('Y-m-d H:i:s');
         $version = constant("VERSION");
         $yasca =& Yasca::getInstance();
@@ -772,7 +772,7 @@ class HTMLGroupReport extends Report {
 END;
         }
         
-        function get_postamble() {
+        protected function get_postamble() {
             $ADVERTISEMENT = Yasca::getAdvertisementText("HTML");
 
             return <<<END
@@ -784,7 +784,7 @@ END;
 END;
         }   
 
-    function has_attachments() {
+    protected function has_attachments() {
         $yasca =& Yasca::getInstance();
         if (count($yasca->attachment_list) > 0) {
             return true;
@@ -794,7 +794,7 @@ END;
     /** 
      * Generates a list of DIVs that contain the attachment contents.
      */
-    function generate_attachment_list() {
+    protected function generate_attachment_list() {
         $yasca =& Yasca::getInstance();
         $yasca->log_message("There were " . count($yasca->attachment_list) . " attachments found.", E_USER_NOTICE);
         $html = "";
@@ -825,7 +825,7 @@ END;
     /**
      * Generates a dropdown select box to choose a particular attachment to show.
      */
-    function generate_attachment_select_box() {
+    protected function generate_attachment_select_box() {
         $yasca =& Yasca::getInstance();
         $html = '<select id="attachment_select_box" onchange="show_attachment(this.selectedIndex);">';
         $html .= '<option></option>';

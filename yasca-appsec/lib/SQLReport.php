@@ -152,7 +152,7 @@ class SQLReport extends Report {
         $this->dbh = null;
     }
 
-    function get_description_id($description) {
+    protected function get_description_id($description) {
         $sth = $this->dbh->prepare("select description_id from description where description=?");
         $sth->bindParam(1, $description);
         $sth->execute();
@@ -168,7 +168,7 @@ class SQLReport extends Report {
         }
     }
 
-    function get_category_id($name, $url) {
+    protected function get_category_id($name, $url) {
         $sth = $this->dbh->prepare("select category_id from category where name=? and url = ?");
         $sth->bindParam(1, $name);
         $sth->bindParam(2, $url);
@@ -187,11 +187,11 @@ class SQLReport extends Report {
 
     }
 
-    function get_preamble() {
+    protected function get_preamble() {
         return "";
     }
         
-    function get_postamble() {
+    protected function get_postamble() {
         return "";
     }   
 }

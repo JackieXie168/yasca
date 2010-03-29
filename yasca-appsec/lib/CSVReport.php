@@ -65,11 +65,11 @@ class CSVReport extends Report {
         fclose($handle);
     }
     
-    function get_preamble() {
+    protected function get_preamble() {
         return '"#","Category","Plugin Name","Severity","Location","Full Location","Message"' . "\n";
     }
         
-    function get_postamble() {
+    protected function get_postamble() {
         return "";
     }   
 }
