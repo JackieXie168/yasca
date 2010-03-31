@@ -31,7 +31,7 @@ class Plugin_PMD extends Plugin {
      * Gets the specific rulesets to be included. The rule is that any plugin that has
      * an .xml extension is fair game, except for those starting with an underscore (_).
      */
-    function get_rulesets() {
+    protected function get_rulesets() {
         $yasca =& Yasca::getInstance();
         $rulepaths = $yasca->plugin_file_list;
         $rpatharray = array();
@@ -59,19 +59,20 @@ class Plugin_PMD extends Plugin {
 
         $yasca =& Yasca::getInstance();
         
-        if (!$this->check_for_java()) {
+        if (!$this->check_for_java(1.40)) {
             $yasca->log_message("The PMD Plugin requires JRE 1.4 or later.", E_USER_WARNING);
             return;
         }
         
         $dir = $yasca->options['dir'];
+        
+        $executable = $this->executable[ getSystemOS() ];
+        $executable = str_replace('$DIR', escapeshellarg($dir), $executable);
+        $executable = $this->replaceExecutableStrings($executable);
+            
         foreach ($this->get_rulesets() as $ruleset) {
             $pmd_results = array();
             
-            $executable = $this->executable[ getSystemOS() ];
-            $executable = str_replace('$DIR', escapeshellarg($dir), $executable);
-            $executable = $this->replaceExecutableStrings($executable);
-
             $yasca->log_message("Forking external process (PMD) for $ruleset...", E_USER_WARNING);
             $yasca->log_message("Executing [" . $executable . " " . escapeshellarg($ruleset) . "]", E_ALL);
             exec( $executable . " " . escapeshellarg($ruleset), $pmd_results);
@@ -86,11 +87,10 @@ class Plugin_PMD extends Plugin {
                     break 2;
                 }
             }
-            $pmd_result = implode("\r\n", $pmd_results);
+            $pmd_result = implode($pmd_results);
             
             $dom = new DOMDocument();
-            if (
-                !@$dom->loadXML($pmd_result)) {
+            if (!@$dom->loadXML($pmd_result)) {
                  $yasca->log_message("PMD did not return valid XML via ruleset [$ruleset]", E_USER_WARNING);
                  continue;
             }

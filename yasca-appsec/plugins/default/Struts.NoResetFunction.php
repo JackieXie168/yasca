@@ -14,6 +14,7 @@ class Plugin_struts_noresetfunction extends Plugin {
         
         $matches = array();
         $reset_function = get_method_contents($this->file_contents, "reset");
+        $line_number = 0; //@TODO Determine how to calculate this.
         
         if (count($reset_function) == 0) {
             $result = new Result();
