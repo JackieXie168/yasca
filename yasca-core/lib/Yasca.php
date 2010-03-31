@@ -139,6 +139,23 @@ class Yasca {
 			if (!is_array($this->target_list)) {
 				$this->log_message("Invalid target directory specified.", E_USER_ERROR);
 			}
+			$ignore_list = $this->options['ignore-ext'];
+			$max_filesize = $this->max_mem / 3;
+			$this->target_list = array_filter($this->target_list, function ($target) use ($ignore_list, $max_filesize){
+				$pinfo = pathinfo($target);
+				if (isset($pinfo['extension']) && in_array($pinfo['extension'], $ignore_list))
+					return false;
+				
+				if (!is_readable($target)) {
+					Yasca::log_message("Unable to read [$target]. File will be ignored.", E_USER_WARNING);
+					return false;
+				}
+				if (filesize($target) >= $max_filesize){
+					Yasca::log_message("$target is too big to load into Yasca. Skipping...", E_USER_NOTICE);
+					return false;
+				}
+				return true;
+			});
 		}
 
 		// Scan for plugins
@@ -200,40 +217,14 @@ class Yasca {
 		$total_executions = count($this->target_list) * count($this->plugin_list);
 		$num_executions = 0;
 
+		
 		foreach ($this->target_list as $target) {
-
 			$this->log_message("Attempting to scan [$target]", E_ALL);
-
-			$pinfo = pathinfo($target);
-			if (isset($pinfo['extension']) && in_array($pinfo['extension'], $this->options['ignore-ext'])) {
-				$total_executions -= count($this->plugin_list);     // compensate for ignored files
-				continue;
-			}
-
-			if (!is_readable($target)) {
-				$this->log_message("Unable to read [$target]. File will be ignored.", E_USER_WARNING);
-				unset($this->target_list[array_search($target, $this->target_list)]);
-				continue;
-			}
-
 			$target_file_contents = null; //Lazy load, but pass a handle around.
 			
-			if (filesize($target) > $this->max_mem / 3){
-				$this->log_message("$target is too big to load into Yasca. Skipping...", E_USER_NOTICE);
-				unset($this->target_list[array_search($target, $this->target_list)]);
-				continue;
-			}
-
 			foreach ($this->plugin_list as $plugin) {
 				$this->log_message("Initializing plugin [$plugin] on [$target]", E_USER_NOTICE);
-
-				if (!class_exists($plugin)) {
-					//This path appears unreachable; the plugin could not be in plugin_list
-					//if the class did not exist due to the checking by include_plugin.
-					$this->log_message("Missing plugin class [$plugin]. Plugin will be ignored.", E_USER_WARNING);
-					unset($this->plugin_list[array_search($plugin, $this->plugin_list)]);
-					continue;
-				}
+				
 				$plugin_obj = new $plugin($target, $target_file_contents);
 				if (!$plugin_obj->initialized) {
 					$this->log_message("Unable to instantiate plugin object of [$plugin] class. Plugin will be ignored.", E_USER_WARNING);
@@ -254,7 +245,8 @@ class Yasca {
 				}
 				$plugin_obj->run();
 				
-				$this->log_message("Plugin [$plugin] returned " . count($plugin_obj->result_list) . " results. ", E_USER_NOTICE);
+				if ($this->options['verbose'])
+					$this->log_message("Plugin [$plugin] returned " . count($plugin_obj->result_list) . " results. ", E_USER_NOTICE);
 
 				if (is_callable($this->progress_callback)) {
 					call_user_func($this->progress_callback, array("progress", ((100 * ++$num_executions) / $total_executions)));
@@ -263,7 +255,7 @@ class Yasca {
 				$this->results = array_merge($this->results, $plugin_obj->result_list);
 
 				if ($this->options['debug']) {
-					$this->log_message("Memory Usage: [" . memory_get_usage(true) . "] after calling [$plugin] on [$target]", E_USER_WARNING);
+					$this->log_message("Memory Usage: [" . memory_get_usage(true) . "] after calling [$plugin] on [$target]", E_ALL);
 				}
 			}
 		}
@@ -326,7 +318,8 @@ class Yasca {
 				}  else {
 					$this->log_message("Including plugin file [$plugin_file].", E_USER_NOTICE);
 					include($plugin_file);
-					if (!is_subclass_of($class_name, "Plugin")){
+					if (!class_exists($class_name) || 
+						!is_subclass_of($class_name, "Plugin")){
 						$this->log_message("Found $class_name in plugin file [$plugin_file], but it is not a Plugin.", E_USER_WARNING);
 					}
 					else{

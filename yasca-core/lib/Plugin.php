@@ -175,9 +175,11 @@ abstract class Plugin {
 			if (!isset($result->category_link)) $result->category_link = "";
 			if (!isset($result->plugin_name)) $result->plugin_name = get_class($this);
 			if (!isset($result->description)) $result->description = "";
-			if (!isset($result->source_context)) $result->source_context = array_slice( $this->file_contents, max( $result->line_number-(($this->context_size+1)/2), 0), $this->context_size );
+			if (!isset($result->source_context) &&
+				isset($this->file_contents)) $result->source_context = array_slice( $this->file_contents, max( $result->line_number-(($this->context_size+1)/2), 0), $this->context_size );
 			if (!isset($result->source)) {
-				if ($result->line_number > 0) {
+				if ($result->line_number > 0 &&
+					isset($this->file_contents)) {
 					$result->source = $this->file_contents[ $result->line_number-1 ];
 				} else {
 					$result->source = "";
