@@ -22,7 +22,7 @@ class Plugin_PotentialConcerns extends Plugin {
     public $severity = 5;
     public $description;
     public $preprocess;
-    public $is_multi_target = true;
+    public $is_multi_target = false;
     
     protected static $union_valid_file_types;
     protected static $concerns_dir = 'plugins/default/scanners/concerns/';
@@ -58,7 +58,7 @@ class Plugin_PotentialConcerns extends Plugin {
 		    while (false !== ($file = readdir($handle))) {
 		    	if ($file == "." || $file == "..") continue;
 				if (is_file(self::$concerns_dir . $file)) {
-				    array_push($concerns, self::$concerns_dir . $file);
+				    $concerns[] = self::$concerns_dir . $file;
 				}
 		    }
 	
@@ -243,15 +243,15 @@ class Plugin_PotentialConcerns extends Plugin {
                         continue;
                     }
 
-		    if (($i = $this->have_finding(self::$findings, $this->filename, 
-			    $this->description)) == -1) {
-			$i = count(self::$findings);
-			self::$findings[$i]['file'] = $this->filename;
-			self::$findings[$i]['description'] = $this->description;
-			self::$findings[$i]['lines'] = sprintf("%d", $line_number+1);		    
-		    } else {
-			self::$findings[$i]['lines'] .= ", " . sprintf("%d", $line_number+1);	
-		    }
+				    if (($i = $this->have_finding(self::$findings, $this->filename, 
+					    $this->description)) == -1) {
+					$i = count(self::$findings);
+					self::$findings[$i]['file'] = str_replace($yasca->options['dir'], "", correct_slashes($this->filename));
+					self::$findings[$i]['description'] = $this->description;
+					self::$findings[$i]['lines'] = sprintf("%d", $line_number+1);		    
+				    } else {
+					self::$findings[$i]['lines'] .= ", " . sprintf("%d", $line_number+1);	
+				    }
                 }
             }
 		}

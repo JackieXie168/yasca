@@ -14,7 +14,7 @@ class Plugin_StringFinder extends Plugin {
 		// TODO White-list checking instead of blacklist checking. An 80 meg media file in the directory will crash yasca.
 		if ($this->check_in_filetype($filename, array("jar", "zip", "dll", "war", "tar", "ear",
 													  "jpg", "png", "gif", "exe", "bin", "lib",
-													  "svn-base", "7z", "rar",
+													  "svn-base", "7z", "rar", "gz",
 													  "mov", "wmv", "mp3"))) {
 			$this->is_valid_filetype = false;
 		}
@@ -25,23 +25,42 @@ class Plugin_StringFinder extends Plugin {
     function execute() {
         $yasca =& Yasca::getInstance();
             
-        $string_list = isset($yasca->general_cache[self::$CACHE_ID]) ? 
-                             $yasca->general_cache[self::$CACHE_ID] : 
-                             array();
-        
-        $matches = preg_grep('/\"([^\"]+)\"/', $this->file_contents);
-        foreach ($matches as $match) {
-            preg_match('/\"([^\"]+)\"/', $match, $submatches);
-            $str = $submatches[1];
-            if (preg_match('/[^\x20-\x7F]/', $str)) continue;
-            $str = htmlentities($str);
-            if (in_array($str, $string_list)) continue;
-            array_push($string_list, $str);
+        if (!isset($yasca->general_cache[self::$CACHE_ID])){ 
+        	$yasca->general_cache[self::$CACHE_ID] = array();
+        	$yasca->add_attachment(self::$CACHE_ID);
         }
-        sort($string_list);
         
-        $yasca->general_cache[self::$CACHE_ID] = $string_list;
-        $yasca->add_attachment(self::$CACHE_ID);
+        $cache =& $yasca->general_cache[self::$CACHE_ID];
+               
+        $matches = preg_grep('/(\"([^\"]+?)\"|\'([^\']+?)\')/', $this->file_contents);
+        $matches = preg_grep('/[^\x20-\x7F]/', $matches, PREG_GREP_INVERT);
+        foreach ($matches as $match) {
+            preg_match_all('/(\"([^\"]+?)\"|\'([^\']+?)\')/', $match, $submatches);
+            $submatches = $submatches[3]; //The other submatches array elements have cruft around them
+            foreach ($submatches as $str){
+	            if (isset($cache[$str])) continue;
+	            $cache[$str] = true;
+            }
+        }
+        
+        
+        static $already_added = false;
+    	if ($already_added) return;
+    	$already_added = true;
+    	
+        $id = self::$CACHE_ID;
+        $yasca->register_callback('post-scan', function () use ($id) {
+        	$yasca =& Yasca::getInstance();
+        	$strings = array_keys($yasca->general_cache[$id]);
+        	//This is likely a massive array, so clear out the cache'd array early so we don't choke php
+        	unset($yasca->general_cache[$id]);
+        	array_walk($strings, function (&$line) {
+        		$line = htmlentities($line);
+        	});
+        	sort($strings);
+        	$yasca->general_cache[$id] = $strings;
+   	 	});
+        
     }
 }
 ?>
