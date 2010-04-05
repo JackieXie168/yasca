@@ -75,7 +75,7 @@ class MySQLReport extends Report {
         $yasca =& Yasca::getInstance();
         $sth = false;
 
-        $target_dir = $this->options['dir'];
+        $target_dir = "." . DIRECTORY_SEPARATOR;
         $username = $this->options['parameter']['username'];
 
         $target_dir = $this->options['parameter']['filename'];

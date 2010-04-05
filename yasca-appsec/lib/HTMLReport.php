@@ -36,7 +36,7 @@ class HTMLReport extends Report {
                 $t =& $result->custom['translation'];
                 $filename = $t[basename($filename, ".$ext")];
             }
-            $filename = str_replace("\\", "/", $filename);
+            $filename = correct_slashes($filename);
 
             $source_context = "";
             if (is_array($result->source_context)) {
@@ -103,7 +103,10 @@ class HTMLReport extends Report {
         $generation_date = date('Y-m-d H:i:s');
         $version = constant("VERSION");
         $yasca =& Yasca::getInstance();
-        $target_list = str_replace("/", "\\", implode("<br>", $yasca->target_list));
+        $target_list = implode("<BR/>",array_map(function ($target) use ($yasca) {
+					return str_replace($yasca->options['dir'], "", correct_slashes($target));
+				}
+				,$yasca->target_list));
         $stylesheet_content = file_get_contents("etc/style.css");
         
         return <<<END

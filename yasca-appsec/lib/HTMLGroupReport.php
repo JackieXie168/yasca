@@ -20,7 +20,7 @@ class HTMLGroupReport extends Report {
     /**
      * Executes an HTMLReport, with output going to $options['output']
      */ 
-    function execute() {
+    public function execute() {
         if (!$handle = $this->create_output_handle()) return;
         
         fwrite($handle, $this->get_preamble());
@@ -47,7 +47,7 @@ class HTMLGroupReport extends Report {
                 $t =& $result->custom['translation'];
                 $filename = $t[basename($filename, ".$ext")];
             }
-            $filename = str_replace("\\", "/", $filename);
+            $filename = correct_slashes($filename);
 
             $source_context = "";
             if (is_array($result->source_context)) {
@@ -144,7 +144,7 @@ class HTMLGroupReport extends Report {
         $version = constant("VERSION");
         $yasca =& Yasca::getInstance();
         $stylesheet_content = file_get_contents("resources/style.css");
-        $base_dir = str_replace("/", "\\", $yasca->options['dir']); 
+        $base_dir = "." . DIRECTORY_SEPARATOR; 
         $attachment_list_select_box = $this->generate_attachment_select_box();
         $attachment_list = $this->generate_attachment_list();
         $attachment_list_style = $this->has_attachments() ? "" : "display:none;";

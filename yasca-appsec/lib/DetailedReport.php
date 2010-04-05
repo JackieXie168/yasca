@@ -31,14 +31,13 @@ class DetailedReport extends Report {
         foreach ($this->results as $result) {
             if (!$this->is_severity_sufficient($result->severity))
                 continue;
-            $filename = $result->filename;
+            $filename = correct_slashes($result->filename);
             $pinfo = pathinfo($filename);
             $ext = $pinfo['extension'];
             if (isset($result->custom['translation'])) {
                 $t =& $result->custom['translation'];
                 $filename = $t[basename($filename, ".$ext")];
             }
-            $filename = str_replace("\\", "/", $filename);
 
             $source_context = "";
             if (is_array($result->source_context)) {
@@ -121,7 +120,10 @@ END;
         $generation_date = date('Y-m-d H:i:s');
         $version = constant("VERSION");
         $yasca =& Yasca::getInstance();
-        $target_list = str_replace("/", "\\", implode("<br>", $yasca->target_list));
+        $target_list = implode("<BR/>",array_map(function ($target) use ($yasca) {
+					return str_replace($yasca->options['dir'], "", correct_slashes($target));
+				}
+				,$yasca->target_list));
         $stylesheet_content = file_get_contents("etc/style.css");
         
         return <<<END
