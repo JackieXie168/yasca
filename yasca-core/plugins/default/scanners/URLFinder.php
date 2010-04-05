@@ -14,7 +14,7 @@ class Plugin_URLFinder extends Plugin {
 		// TODO White-list checking instead of blacklist checking. An 80 meg media file in the directory will crash yasca.
 		if ($this->check_in_filetype($filename, array("jar", "zip", "dll", "war", "tar", "ear",
 													  "jpg", "png", "gif", "exe", "bin", "lib",
-													  "svn-base", "7z", "rar",
+													  "svn-base", "7z", "rar", "gz",
 													  "mov", "wmv", "mp3"))) {
 			$this->is_valid_filetype = false;
 		}
@@ -25,29 +25,25 @@ class Plugin_URLFinder extends Plugin {
     function execute() {
         $yasca =& Yasca::getInstance();
             
-        $url_list = isset($yasca->general_cache[self::$CACHE_ID]) ? 
-                          $yasca->general_cache[self::$CACHE_ID] : 
-                          array();
-        
-        $matches = preg_grep('/([a-z0-9\-\_][a-z0-9\-\_\.]+\.com)[^a-z0-9]/i', $this->file_contents);
-        foreach ($matches as $match) {
-            preg_match('/([a-z0-9\-\_][a-z0-9\-\_\.]+\.com)[^a-z0-9]/i', $match, $submatches);
-            $url = $submatches[1];                          // only have to worry about [1]
-            if (preg_match('/package /', $url)) continue;
-            if (preg_match('/import /', $url)) continue;
-            if (preg_match('/^\s*\*/', $url)) continue;     // probably in a comment
-    
-            $value = "$url,$this->filename";
-            if (in_array($value, $url_list)) continue;
-            array_push($url_list, $value);
+        if (!isset($yasca->general_cache[self::$CACHE_ID])){ 
+        	$yasca->general_cache[self::$CACHE_ID] = array();
+        	$yasca->add_attachment(self::$CACHE_ID);
         }
-        sort($url_list);
         
-        $yasca->general_cache[self::$CACHE_ID] = $url_list;
-        $yasca->add_attachment(self::$CACHE_ID);
+        $cache =& $yasca->general_cache[self::$CACHE_ID];
         
-        $matches = null;
-        $url_list = null;
+        $matches = preg_grep('/([a-z0-9\-\_][a-z0-9\-\_\.]+\.(com|org|gov|biz|edu|eu|info|cn|us))[^a-z0-9]/i', $this->file_contents);
+        $matches = preg_grep('/(package |import )/', $matches, PREG_GREP_INVERT);
+        $matches = preg_grep('/^\s*\*/', $matches, PREG_GREP_INVERT);     // probably in a comment
+        foreach ($matches as $match) {
+            preg_match_all('/([a-z0-9\-\_][a-z0-9\-\_\.]+\.(com|org|gov|biz|edu|eu|info|cn|us))[^a-z0-9]/i', $match, $submatches);
+            $submatches = $submatches[1];	//The submatches[0] block have cruft around them
+            foreach ($submatches as $url){
+	            if (isset($cache[$url])) continue;
+	            $cache[$url] = str_replace($yasca->options['dir'], "", correct_slashes($this->filename));
+            }
+            
+        }
         
         static $already_added = false;
         if ($already_added) return;
@@ -56,14 +52,16 @@ class Plugin_URLFinder extends Plugin {
         $id = self::$CACHE_ID;
         $yasca->register_callback('post-scan', function () use ($id) {
         	$yasca =& Yasca::getInstance();
-        	$url_list = $yasca->general_cache[$id];
+        	asort($yasca->general_cache[$id]);
 	
-	        $html = '<table style="width:95%;">';
-	        $html .= '<th>URL</th><th>Filename</th>';
-	        foreach ($url_list as $url) {
-	            $url_array = explode(",", $url, 2);
-	            $html .= "<tr><td>{$url_array[0]}</td><td><a target=\"_blank\" ";
-	            $html .= "href=\"file://{$url_array[1]}\">{$url_array[1]}</a></td></tr>";
+	        $html = '<table style="width:99%;">';
+	        $html .= '<th>URLs to this host</th><th>Exist in at least this file</th>';
+	        foreach ($yasca->general_cache[$id] as $url => $file) {
+	            $html .= "<tr>";
+	    		$html .= "<td>$url</td>";
+	           	$html .= "<td><a target=\"_blank\" ";
+		        $html .= "href=\"file://$file\">$file</a></td>";
+		        $html .= "</tr>";
 	        }
 	        $html .= "</table>";
 	        $yasca->general_cache[$id] = $html; 
