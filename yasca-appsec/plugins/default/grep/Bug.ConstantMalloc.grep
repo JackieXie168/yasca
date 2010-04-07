@@ -1,7 +1,7 @@
 name = Constant Memory Allocation
 file_type = C
-grep = /(malloc|alloc|realloc)\(\s*\d+\s*\)/
-category = Bug: Memory Allocation
+grep = /^(?!\/\/)(?:.(?!\/\/))*?\b(malloc|alloc|realloc)\(\s*\d+\s*\)/
+category = Portability: Constant Memory Allocation
 severity = 2
 description =
 <p>
