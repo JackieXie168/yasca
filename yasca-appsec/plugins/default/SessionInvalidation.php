@@ -12,14 +12,25 @@
  */
 
 class Plugin_SessionInvalidation extends Plugin {
-    public $valid_file_types = array("JAVA");
+    public $valid_file_types = array("jsp", "java");
+    
+    public $is_multi_target = true;
 
     public $session_files = array();    
+    
+	protected static $already_executed = false;
+	
+	public function Plugin_SessionInvalidation($filename, &$file_contents){
+		if (self::$already_executed){
+			$this->initialized = true;
+			return;
+		}
+		parent::Plugin($filename, $file_contents);
+	}
 
     function execute() {
-        static $alreadyExecuted;
-        if ($alreadyExecuted == 1) return;
-        $alreadyExecuted = 1;
+        if (self::$already_executed) return;
+        self::$already_executed = true;
 
         $yasca =& Yasca::getInstance();
         $dir = $yasca->options['dir'];   
@@ -27,10 +38,10 @@ class Plugin_SessionInvalidation extends Plugin {
         $this->start_scan($this->dir_recursive($dir));
     }
 
-    function dir_recursive($start_dir) {
+    protected function dir_recursive($start_dir) {
         $file_types = array("\.jsp", "\.java");
         $files = array();
-        $start_dir = str_replace("\\", "/", $start_dir);    // canonicalize
+        $start_dir = correct_slashes($start_dir);    // canonicalize
         
         if (is_dir($start_dir)) {
             $fh = opendir($start_dir);
@@ -38,7 +49,7 @@ class Plugin_SessionInvalidation extends Plugin {
             while (($file = readdir($fh)) !== false) {
                 if (strcmp($file, '.')==0 || strcmp($file, '..')==0) continue;
 
-                $filepath = $start_dir . '/' . $file;
+                $filepath = $start_dir . DIRECTORY_SEPARATOR . $file;
                 if ( is_dir($filepath) ) {
                     $files = array_merge($files, $this->dir_recursive($filepath));
                 } else {
@@ -57,12 +68,13 @@ class Plugin_SessionInvalidation extends Plugin {
         return $files;
     }
 
-    function start_scan($file_values) {
+    protected function start_scan($file_values) {
         $session_invalidates = 0;
         $session_files = array();
         $f = 0;
 
-        for ($i = 0; $i < sizeof($file_values); $i++) {
+        $count = sizeof($file_values);
+        for ($i = 0; $i < $count; $i++) {
             $lines = file($file_values[$i], FILE_IGNORE_NEW_LINES);
 
             foreach ($lines as $line_num => $line) {
@@ -74,19 +86,21 @@ class Plugin_SessionInvalidation extends Plugin {
 
                 if (preg_match("/(Session\.Invalidate|HttpSession\.Invalidate|\.Invalidate\(\))/i", $line)) {
                     $session_invalidates = 1;
+                    return;
                 }
             }
         }
         
         if ($session_invalidates == 0) {
-            for ($m = 0; $m < sizeof($session_files); $m++) {
+        	$size = sizeof($session_files);
+            for ($m = 0; $m < $size; $m++) {
                 $file_results = split(":", $session_files[$m]);
                 $full_file = $file_results[0] . ":" . $file_results[1];
                 $file_line = isset($file_results[2]) ? $file_results[2] : "Not available";
 
                 $result = new Result();
                 $result->line_number = $file_line;
-                $result->filename = $full_file;
+                $result->filename = str_replace($dir, "", correct_slashes($full_file));
                 $result->plugin_name = "Session Fixation";
                 $result->severity = 2;
                 $result->category = "Session Fixation";
