@@ -19,7 +19,14 @@ class Plugin_PMD extends Plugin {
 
     public $installation_marker = "pmd";
 
+    protected static $already_executed = false;
+    
     public function Plugin_PMD($filename, &$file_contents) {
+    	if (self::$already_executed) {
+        	$this->initialized = true;
+        	return;
+        }
+    	
         parent::Plugin($filename, $file_contents);
         if (!class_exists("DOMDocument")) {
             Yasca::log_message("DOMDocument is not available. PMD results are not available. Please install php-xml.", E_USER_WARNING);
@@ -51,12 +58,11 @@ class Plugin_PMD extends Plugin {
      * process output comes back here.
      */
     function execute() {
+    	if (self::$already_executed) return;  
+        self::$already_executed = true;  
+        
         if (!$this->canExecute) return;
-
-        static $alreadyExecuted;
-        if ($alreadyExecuted == 1) return;
-        $alreadyExecuted = 1;
-
+        
         $yasca =& Yasca::getInstance();
         
         if (!$this->check_for_java(1.40)) {
@@ -73,7 +79,7 @@ class Plugin_PMD extends Plugin {
         foreach ($this->get_rulesets() as $ruleset) {
             $pmd_results = array();
             
-            $yasca->log_message("Forking external process (PMD) for $ruleset...", E_USER_WARNING);
+            $yasca->log_message("Forking external process (PMD)...", E_USER_WARNING);
             $yasca->log_message("Executing [" . $executable . " " . escapeshellarg($ruleset) . "]", E_ALL);
             exec( $executable . " " . escapeshellarg($ruleset), $pmd_results);
             $yasca->log_message("External process completed...", E_USER_WARNING);
@@ -95,7 +101,7 @@ class Plugin_PMD extends Plugin {
                  continue;
             }
             foreach ($dom->getElementsByTagName("file") as $file_node) {
-                $filename = $file_node->getAttribute("name");
+                $filename = correct_slashes($file_node->getAttribute("name"));
                 
                 foreach ($file_node->getElementsByTagName("violation") as $violation_node) {
                     $rule = $violation_node->getAttribute("rule");
@@ -122,15 +128,15 @@ class Plugin_PMD extends Plugin {
                     }                   
                     
                     // Do not include non-parsed files.
-                    if (startsWith(trim($message), "Error while processing") ||
-                        startsWith(trim($message), "Error while parsing")) {
+                    if (startsWith($message, "Error while processing") ||
+                        startsWith($message, "Error while parsing")) {
                         $yasca->log_message("PMD was unable to parse file [$filename]", E_USER_WARNING);
                         continue;
                     }
                     
                     $result = new Result();
                     $result->line_number = $beginline;
-                    $result->filename = $filename;
+                    $result->filename = str_replace($yasca->options['dir'], "", correct_slashes($filename));
                     $result->category = "PMD: $rule";
                     $result->category_link = $externalInfoUrl;
                     $result->is_source_code = false;
@@ -139,7 +145,7 @@ class Plugin_PMD extends Plugin {
                     
                     $result->source = $message;
                     $result->description = $yasca->get_adjusted_description("PMD", $rule, "<p>$description</p><h4>Example:</h4><pre class=\"fixedwidth\">$example</pre>");
-
+					//@todo Use mb encoding module to ensure it's read on properly
                     $result->source_context = array_slice( file($filename), max( $result->line_number-(($this->context_size+1)/2), 0), $this->context_size );
                     array_push($this->result_list, $result);
                 }

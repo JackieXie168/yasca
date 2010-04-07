@@ -23,7 +23,7 @@ class Plugin_Pixy extends Plugin {
      * Executes the Pixy function. This calls out to pixy.bat which then calls Java, but
      * process output comes back here.
      */
-    function execute() {
+    public function execute() {
     	// added because Pixy is a one-at-a-time plugin
         if (isset(self::$minimum_java_exists) && !self::$minimum_java_exists) return;
         
@@ -44,52 +44,55 @@ class Plugin_Pixy extends Plugin {
 
         exec( $executable . " " . escapeshellarg($this->filename) . " 2>&1", $pixy_results);
                
-        if ($yasca->options['debug']) 
+        if ($yasca->options['debug'])
             $yasca->log_message("Pixy returned: " . implode("\r\n", $pixy_results), E_ALL);
     
+        
         $rule = "";
         $category_link = "#";
-        
+                
         foreach($pixy_results as $line) {
             if (preg_match('/^XSS Analysis BEGIN/i', $line)) { 
             	$rule = "Cross-Site Scripting"; 
             	$category_link = "http://www.owasp.org/index.php/Cross_Site_Scripting"; 
+            	continue;
             } elseif (preg_match('/^SQL Analysis BEGIN/i', $line)) {
             	$rule = "SQL Injection";
-            	$category_link = "http://www.owasp.org/index.php/SQL_Injection"; 
+            	$category_link = "http://www.owasp.org/index.php/SQL_Injection";
+            	continue; 
             } elseif (preg_match('/^File Analysis BEGIN/i', $line)) {
             	$rule = "File-Related Vulnerability";
             	$category_link = "#";
+            	continue;
+            } elseif($rule == ""){
+            	continue;
             }
+            
 
-            if ($rule == "") continue;
             
             if (preg_match('/^\-\d*(.*?):(\d+)$/', $line, $results)) {
-                $vFilename = str_replace("\\", "/", trim($results[1]));
                 //if (!file_exists($vFilename)) continue;
-                $vFilename = trim($results[1]);
+                $vFilename = correct_slashes(trim($results[1]));
 
                 $vLine = $results[2];
                 $priority = 1;
 
                 $result = new Result();
                 $result->line_number = $vLine;
-                $result->filename = $vFilename;
-                $result->category = $rule;
+                $result->category = "PIXY ".$rule; //REMOVE THE PIXY PREPENDER BEFORE SENDING TO SOURCEFORGE
                 $result->category_link = $category_link;
                 $result->is_source_code = true;
                 $result->plugin_name = $yasca->get_adjusted_alternate_name("Pixy", $rule, $rule);
                 $result->severity = $yasca->get_adjusted_severity("Pixy", $rule, $priority);
 
-                $result->source = array_slice( file($vFilename), $result->line_number-1, 1 );
+                //@todo use mb encoding module to ensure correctness
+                $result->source = array_slice($this->file_contents, $result->line_number-1, 1 );
                 $result->source = $result->source[0];
                 $result->description = $yasca->get_adjusted_description("Pixy", $rule, "<p>description</p><h4>Example:</h4><pre class=\"fixedwidth\">example</pre>");
 
-				$result->source_context = array_slice( file($vFilename), max( $result->line_number-(($this->context_size+1)/2), 0), $this->context_size );
-	
-				if (!in_array($result, $this->result_list)) {
-				    array_push($this->result_list, $result);
-				}
+                //@todo use mb encoding module to ensure correctness
+				$result->source_context = array_slice($this->file_contents, max( $result->line_number-(($this->context_size+1)/2), 0), $this->context_size );
+				array_push($this->result_list, $result);
 		    }
 		}
     }
