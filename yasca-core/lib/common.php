@@ -23,18 +23,16 @@ function startsWith( $str, $sub ) {
  * @return boolean true iff $str ends with $sub.
  */
 function endsWith( $str, $sub ) {
+	//@todo Use negative value for substr position instead of reading the length of $str
    return ( substr( $str, strlen( $str ) - strlen( $sub ) ) === $sub );
 }
 
 /**
  * @return boolean true iff success
  */
-function flatten_array($value, $key, &$array) {
+function flatten_array(array $value, $key, &$array) {
 	return array_walk_recursive($value, 
-		function ($v, $k) use (&$array){
-		        array_push($array, $value);
-		        return true;
-		});
+		function ($v, $k) use (&$array){$array[] = $value;});
 }
 
 function ellipsize($string, $limit, $repl = "...", $strip_tags = true) {
@@ -111,7 +109,7 @@ function substr_in_array($needle, $haystack) {
  * If there are any naming conflicts, the conflicts' basename will
  * have a random (non-conflicting) 4-character string appended to it.
  */
-function collapse_dir($dest_dir, $file_type_list=array(), $start_dir=".", &$translation) {
+function collapse_dir($dest_dir, array $file_type_list=array(), $start_dir=".", &$translation) {
     if (!is_dir($dest_dir) || !is_dir($start_dir)) return;
     $file_list = Yasca::dir_recursive($start_dir);
     if ($file_list === false) return;
@@ -297,7 +295,7 @@ function is_valid_regex($regex) {
     return (preg_last_error() == PREG_NO_ERROR);
 }
 
-function any_within($haystack, $needle, $max_distance = 10) {
+function any_within(array $haystack, $needle, $max_distance = 10) {
     if (!is_numeric($needle)) return false;
 
     foreach ($haystack as $hay) {
@@ -305,7 +303,7 @@ function any_within($haystack, $needle, $max_distance = 10) {
         if ($hay < $needle &&
             $needle - $hay <= $max_distance) {
             return true;
-    }
+    	}
     }
     return false;
 }
@@ -316,7 +314,7 @@ function any_within($haystack, $needle, $max_distance = 10) {
  * @param closure $closure A closure accepting one parameter for an item in the array and that returns true/false. 
  * @return boolean true iff there is at least one item in the array where $closure($item) returns true.
  */
-function array_any($array, $closure){
+function array_any(array $array, $closure){
 	foreach($array as $item){
 		if ($closure($item)) return true;
 	}
@@ -329,11 +327,11 @@ function array_any($array, $closure){
  * @param closure $closure A closure accepting one parameter for an item in the array and that returns true/false. 
  * @return mixed The first &$item in the array that satisfies $closure($item), or null if none exist.
  */
-function &array_first($array, $closure){
+function &array_first(array $array, $closure){
 	foreach($array as &$item){
 		if ($closure($item)) return $item;
 	}
-	return null;
+	return $item = null;
 }
 
 /**
@@ -341,7 +339,7 @@ function &array_first($array, $closure){
  * If $endWithSlash is false and $path ends in a slash, the ending slash is preserved.
  */
 function correct_slashes($path, $endWithSlash = false) {
-    return preg_replace("/(\\+|\/+)/", DIRECTORY_SEPARATOR, 
+    return preg_replace("/(\\|\/)+/", DIRECTORY_SEPARATOR, 
     	trim($endWithSlash ? $path . DIRECTORY_SEPARATOR : $path));
 }
 

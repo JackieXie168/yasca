@@ -13,21 +13,28 @@ class Plugin_CppCheck extends Plugin {
 
     public $installation_marker = "cppcheck";
 
-    /**
-     * This class is multi-target.
-     */
     public $is_multi_target = true;
+    
+    protected static $already_executed = false;
+    
+	public function Plugin_CppCheck($filename, &$file_contents){
+		if (self::$already_executed){
+			$this->initialized = true;
+			return;
+		}
+		parent::Plugin($filename,$file_contents);
+	}
 
     /**
      * Executes the cppcheck function. This calls out to the actual executable, but
      * process output comes back here.
      */
     function execute() {
-        static $alreadyExecuted;
-        if ($alreadyExecuted == 1) return;
-        $alreadyExecuted = 1;
+        if (self::$already_executed) return;  
+        self::$already_executed = true;  
 
-        if (getSystemOS() !== "Windows") return;        // only supporting Windows right now
+        if (!isWindows()) return;        // only supporting Windows right now
+        //@todo Try using it with wine? Or perhaps create a yasca installer to compile cppcheck on the linux box it's using at the time?
 
         $yasca =& Yasca::getInstance();
         
@@ -57,43 +64,51 @@ class Plugin_CppCheck extends Plugin {
         }
 
         foreach ($dom->getElementsByTagName("error") as $error_node) {
-            $filename = $error_node->getAttribute("file");
-            $line_number = $error_node->getAttribute("line");
-            $category = $error_node->getAttribute("id");
-            $severity = $error_node->getAttribute("severity");
+            $result = new Result();
+            $result->line_number = $error_node->getAttribute("line");
+            $result->category = "cppcheck: " . $error_node->getAttribute("id");
+            $result->category_link = "http://sourceforge.net/projects/cppcheck/";
+            $result->is_source_code = false;
             $message = $error_node->getAttribute("msg");
-                    $description = <<<END
+            $filename = $error_node->getAttribute("file");
+            $source = $message;
+            
+            //CppCheck will output results differently if this is true. Compensate.
+            if ($result->category == "cppcheck: id"){
+            	$result->category = "cppcheck: General";
+            	$filename = ltrim(strstr($message, "]:", true), "[");
+            	$message = ltrim(strstr($message, "]:", false), "]: ");
+            }
+            
+
+            $result->source = $message;
+            $result->plugin_name = $yasca->get_adjusted_alternate_name("CppCheck", $message, "cppcheck");
+            $result->severity = $yasca->get_adjusted_severity("CppCheck", $message, $error_node->getAttribute("severity"));
+            $result->description = $yasca->get_adjusted_description("CppCheck", $message, "
 <p>
         This finding was discoverd by cppcheck and is titled:<br/>
-        <div style="margin-left:10px;"><strong>$message</strong></div>
+        <div style=\"margin-left:10px;\"><strong>$message</strong></div>
 </p>
 <p>
         <h4>References</h4>
         <ul>
-                <li><a href="http://sourceforge.net/projects/cppcheck/">cppcheck Home Page</a></li>
+                <li><a href=\"http://sourceforge.net/projects/cppcheck/\">cppcheck Home Page</a></li>
         </ul>
-</p>
-END;
-            $result = new Result();
-            $result->line_number = $line_number;
-            $result->filename = $filename;
-            $result->category = "cppcheck: $category";
-            $result->category_link = "http://sourceforge.net/projects/cppcheck/";
-            $result->is_source_code = false;
-            $result->plugin_name = $yasca->get_adjusted_alternate_name("CppCheck", $message, "cppcheck");
-            $result->severity = $yasca->get_adjusted_severity("CppCheck", $message, $severity);
-                
-            $result->source = $message;
-            $result->description = $yasca->get_adjusted_description("CppCheck", $message, $description);
+</p>");
+
 
             if (file_exists($filename) && is_readable($filename)) {
                 $t_file = @file($filename);
+                //@todo Use mb encoding module to ensure it's read on properly
                 if ($t_file != false && is_array($t_file)) {
-                        $result->source_context = array_slice( $t_file, max( $result->line_number-(($this->context_size+1)/2), 0), $this->context_size );
+                    $result->source_context = array_slice( $t_file, max( $result->line_number-(($this->context_size+1)/2), 0), $this->context_size );
                 }
             } else {
                 $result->source_context = "";
             }
+            
+            //Hide the full path, as yasca could be running on a server the user should not know the full path of.
+            $result->filename = str_replace($dir, "", correct_slashes($filename));
 
             array_push($this->result_list, $result);
         }

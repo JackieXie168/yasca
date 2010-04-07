@@ -94,7 +94,7 @@ class Yasca {
 	private $max_mem = 268435456; //256M
 	
 	//http://us3.php.net/manual/en/function.ini-get.php
-	private static function return_bytes($val) {
+	private static function calculate_bytes($val) {
 	    $val = trim($val);
 	    if ($val == "") return null;
 	    $last = strtolower($val[strlen($val)-1]);
@@ -117,7 +117,7 @@ class Yasca {
 	 * @param array $options command line options (parsed)
 	 */
 	private function Yasca($options = array()) {
-		$ini_mem = self::return_bytes(ini_get("memory_limit"));
+		$ini_mem = self::calculate_bytes(ini_get("memory_limit"));
 		if (isset($ini_mem)) $this->max_mem = $ini_mem;
 		
 		// Parse command line arguments if necessary
@@ -146,12 +146,12 @@ class Yasca {
 				if (isset($pinfo['extension']) && in_array($pinfo['extension'], $ignore_list))
 					return false;
 				
-				if (!is_readable($target)) {
+				if (!file_exists($target) || !is_readable($target)) {
 					Yasca::log_message("Unable to read [$target]. File will be ignored.", E_USER_WARNING);
 					return false;
 				}
 				if (filesize($target) >= $max_filesize){
-					Yasca::log_message("$target is too big to load into Yasca. Skipping...", E_USER_NOTICE);
+					Yasca::log_message("$target is too big to load into Yasca. Skipping...", E_USER_WARNING);
 					return false;
 				}
 				return true;
@@ -165,7 +165,7 @@ class Yasca {
 			$this->log_message("Invalid plugin directory specified.", E_USER_ERROR);
 		}
 		
-		//By default, remove ignored findings after a scan.
+		//By default, remove ignored findings after a scan, and then sort.
 		$this->register_callback('post-scan', function () {
 			$yasca =& Yasca::getInstance();
 	
@@ -174,14 +174,25 @@ class Yasca {
 				return;
 			}
 			
-			$yasca->results = array_filter($yasca->results, function ($result) use (&$yasca){
+			$yasca->results = array_filter($yasca->results, function ($result) use ($yasca){
 				foreach ($yasca->ignore_list as $ignore) {
 					if (	$ignore->line_number == $result->line_number &&
 							$ignore->category == $result->category &&
-							$ignore->filename == str_replace("\\", "/", $result->filename))
+							$ignore->filename == correct_slashes($result->filename))
 						return false;
 				}
 				return true;
+			});
+			
+			usort($yasca->results, function($a, $b){ 
+				if (!is_object($a) || !is_object($b)) return 0;
+	
+				if ($a->severity == $b->severity && $a->category == $b->category) 
+					return ($a->filename . $a->line_number < $b->filename . $b->line_number ? 1 : -1);
+				 elseif ($a->severity == $b->severity) 
+					return ($a->category < $b->category ? 1 : -1);
+				 else 
+					return ($a->severity < $b->severity ? -1 : 1);
 			});
 		});
 	}
@@ -216,11 +227,10 @@ class Yasca {
 
 		$total_executions = count($this->target_list) * count($this->plugin_list);
 		$num_executions = 0;
-
 		
 		foreach ($this->target_list as $target) {
 			$this->log_message("Attempting to scan [$target]", E_ALL);
-			$target_file_contents = null; //Lazy load, but pass a handle around.
+			$target_file_contents = null; //Lazy load, but keep a handle around.
 			
 			foreach ($this->plugin_list as $plugin) {
 				$this->log_message("Initializing plugin [$plugin] on [$target]", E_USER_NOTICE);
@@ -228,6 +238,7 @@ class Yasca {
 				$plugin_obj = new $plugin($target, $target_file_contents);
 				if (!$plugin_obj->initialized) {
 					$this->log_message("Unable to instantiate plugin object of [$plugin] class. Plugin will be ignored.", E_USER_WARNING);
+					$total_executions -= count($this->target_list);
 					unset($this->plugin_list[array_search($plugin, $this->plugin_list)]);
 					continue;
 				}
@@ -236,8 +247,11 @@ class Yasca {
 							&& $plugin_obj->is_valid_filetype){
 					// This is a slow process - is there a faster alternative?
 					$target_file_contents = file_get_contents($target);
-					/* Global unicode support requires compiling PHP with the mbstring module.
+					/* @todo Global unicode support requires compiling PHP with the mbstring module.
 					 * http://us2.php.net/manual/en/mbstring.installation.php
+					 * Note that enabling this line will render the
+					 * conversion calls in Grep.php and PotentialConcerns.php incorrect; they must be 
+					 * removed when this is enabled.
 					 * $target_file_contents = mb_convert_encoding($target_file_contents, 'ISO-8859-1', 
 						"ASCII,JIS,UTF-8,EUC-JP,SJIS,UTF-16"); */
 					$target_file_contents = explode("\n", $target_file_contents);
@@ -254,29 +268,18 @@ class Yasca {
 				
 				$this->results = array_merge($this->results, $plugin_obj->result_list);
 
+				
 				if ($this->options['debug']) {
 					$this->log_message("Memory Usage: [" . memory_get_usage(true) . "] after calling [$plugin] on [$target]", E_ALL);
 				}
 			}
 		}
-
-		usort($this->results, function($a, $b){ 
-			if (!is_object($a) || !is_object($b)) return 0;
-
-			if ($a->severity == $b->severity && $a->category == $b->category) 
-				return ($a->filename . $a->line_number < $b->filename . $b->line_number ? 1 : -1);
-			 elseif ($a->severity == $b->severity) 
-				return ($a->category < $b->category ? 1 : -1);
-			 else 
-				return ($a->severity < $b->severity ? -1 : 1);
-		});
-
 	}
 
 	/**
-	 * Finds and includes all plugins.
+	 * Finds and includes all plugins under the given directory.
 	 * Writes output to $this->plugin_list.
-	 * @param string $plugin_directory directory to look for plugins in (recursively).
+	 * @param string $plugin_directory directories (comma delimited) to look for plugins in (recursively).
 	 * @return nothing
 	 */
 	private function include_plugins($plugin_dir = "plugins") {
@@ -298,12 +301,12 @@ class Yasca {
 		// include() each of the plugins
 		foreach ($plugin_file_list as $plugin_file) {
 			$pinfo = pathinfo($plugin_file);
-			$ext = (isset($pinfo['extension']) ? $pinfo['extension'] : "");
 			$base = (isset($pinfo['basename']) ? $pinfo['basename'] : "");
 
 			// ignore all plugin files that start with a '_'
 			if (startsWith($base, "_")) continue;
-
+			
+			$ext = (isset($pinfo['extension']) ? $pinfo['extension'] : "");
 			if (strtolower($ext) === 'php') {
 				foreach ($this->options['plugin_exclude'] as $excluded_plugin) {
 					if ($excluded_plugin != '' &&
@@ -342,12 +345,12 @@ class Yasca {
 	 */
 	public static function dir_recursive($start_dir='.') {
 		$files = array();
-		$start_dir = str_replace("\\", "/", $start_dir);    // canonicalize
+		$start_dir = correct_slashes($start_dir);    // canonicalize
 		if (is_dir($start_dir)) {
 			$fh = opendir($start_dir);
 			while (($file = readdir($fh)) !== false) {
 				if (strcmp($file, '.')==0 || strcmp($file, '..')==0) continue;
-					$filepath = $start_dir . '/' . $file;
+					$filepath = $start_dir . DIRECTORY_SEPARATOR . $file;
 				if ( is_dir($filepath) )
 					$files = array_merge($files, Yasca::dir_recursive($filepath));
 				else
@@ -679,9 +682,9 @@ END;
 	 * @return boolean true iff target found.
 	 */
 	public function find_target_by_relative_name($rel_filename) {
-		$rel_filename = str_replace("\\", "/", $rel_filename);
+		$rel_filename = correct_slashes($rel_filename);
 		foreach ($this->target_list as $target) {
-			if (endsWith(str_replace("\\", "/", $target), $rel_filename)) {
+			if (endsWith(correct_slashes($target), $rel_filename)) {
 				return $target;
 			}
 		}
@@ -695,7 +698,7 @@ END;
 	 */
 	private function load_adjustments() {
 		$dom = new DOMDocument();
-		if (!@$dom->loadXML( file_get_contents("resources/adjustments.xml"))) {
+		if (!@$dom->loadXML( file_get_contents("resources".DIRECTORY_SEPARATOR."adjustments.xml"))) {
 			$this->log_message("Unable to load plugin adjustments. Defaults will be used.", E_USER_WARNING);
 			$this->adjustment_list = array();
 			return;
@@ -732,7 +735,6 @@ END;
 			if (isset($alternate_name)) $this->adjustment_list["$key.alternate_name.text"] = $alternate_name;
 			if (isset($description_method)) $this->adjustment_list["$key.description.method"] = $description_method;
 		}
-		unset($dom);
 	}
 
 	/**
@@ -831,7 +833,7 @@ END;
 	/**
 	 * Gets the attachment by $cache_id. If the id is not in the cache, return false.
 	 * @param $cache_id
-	 * @return mixed The item in the cache with the specified id.
+	 * @return mixed The item in the cache with the specified id or false if it does not exist.
 	 */
 	public function get_attachment($cache_id) {
 		if (!isset($this->general_cache[$cache_id])) {
@@ -895,10 +897,10 @@ END;
 		$ig_list = array();
 		foreach ($elts as $elt) {
 			$ig = new StdClass;
-			$ig->filename = $elt->getAttribute("filename");
+			$ig->filename = correct_slashes($elt->getAttribute("filename"));
 			$ig->line_number = $elt->getAttribute("line_number");
 			$ig->category = $elt->getAttribute("category");
-			array_push($ig_list, $ig);
+			$ig_list[] = $ig;
 		}
 		return $ig_list;
 	}
@@ -906,6 +908,7 @@ END;
 
 	/**
 	 * Place a small advertisement within Yasca.
+	 * @param string $type Returns a hyperlinked email address if =="HTML", ignored otherwise. Defaults to "HTML".
 	 * @return string The advertisement
 	 */
 	public static function getAdvertisementText($type="HTML") {
