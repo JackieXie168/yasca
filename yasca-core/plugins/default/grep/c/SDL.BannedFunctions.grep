@@ -2,54 +2,54 @@ name = Banned Function
 file_type = C
 
 ; Banned string copy functions
-grep = /strcpy|wcscpy|_tcscpy|_mbscpy|StrCpy|StrCpyA|StrCpyW|lstrcpy|lstrcpyA/
-grep = /lstrcpyW|strcpyA|strcpyW|_tccpy|_mbccpy/
-grep = /strncpy|wcsncpy|_tcsncpy|_mbsncpy|_mbsnbcpy|StrCpyN|StrCpyNA|StrCpyNW/
-grep = /StrNCpy|strcpynA|StrNCpyA|StrNCpyW|lstrcpyn|lstrcpynA|lstrcpynW|_fstrncpy/
+grep = /^(?!\/\/)(?:.(?!\/\/))*?\b($strcpy|wcscpy|_tcscpy|_mbscpy|StrCpy|StrCpyA|StrCpyW|lstrcpy|lstrcpyA)[\b\Z]/
+grep = /^(?!\/\/)(?:.(?!\/\/))*?\b(lstrcpyW|strcpyA|strcpyW|_tccpy|_mbccpy)[\b\Z]/
+grep = /^(?!\/\/)(?:.(?!\/\/))*?\b(strncpy|wcsncpy|_tcsncpy|_mbsncpy|_mbsnbcpy|StrCpyN|StrCpyNA|StrCpyNW)[\b\Z]/
+grep = /^(?!\/\/)(?:.(?!\/\/))*?\b(StrNCpy|strcpynA|StrNCpyA|StrNCpyW|lstrcpyn|lstrcpynA|lstrcpynW|_fstrncpy)[\b\Z]/
 
 
 ; Banned string concatenation functions
-grep = /strcat|wcscat|_tcscat|_mbscat|StrCat|StrCatA|StrCatW|lstrcat|lstrcatA/
-grep = /lstrcatW|StrCatBuffW|StrCatBuff|StrCatBuffA|StrCatChainW|strcatA|strcatW|_tccat|_mbccat/
-grep = /strncat|wcsncat|_tcsncat|_mbsncat|_mbsnbcat|StrCatN|StrCatNA|StrCatNW|StrNCat|StrNCatA/
-grep = /StrNCatW|lstrncat|lstrcatnA|lstrcatnW|lstrcatn|_fstrncat/
+grep = /^(?!\/\/)(?:.(?!\/\/))*?\b(strcat|wcscat|_tcscat|_mbscat|StrCat|StrCatA|StrCatW|lstrcat|lstrcatA)[\b\Z]/
+grep = /^(?!\/\/)(?:.(?!\/\/))*?\b(lstrcatW|StrCatBuffW|StrCatBuff|StrCatBuffA|StrCatChainW|strcatA|strcatW|_tccat|_mbccat)[\b\Z]/
+grep = /^(?!\/\/)(?:.(?!\/\/))*?\b(strncat|wcsncat|_tcsncat|_mbsncat|_mbsnbcat|StrCatN|StrCatNA|StrCatNW|StrNCat|StrNCatA)[\b\Z]/
+grep = /^(?!\/\/)(?:.(?!\/\/))*?\b(StrNCatW|lstrncat|lstrcatnA|lstrcatnW|lstrcatn|_fstrncat)[\b\Z]/
 
 ; Banned sprintf functions
-grep = /wnsprintf|wnsprintfA|wnsprintfW|sprintfW|sprintfA|wsprintf|wsprintfW|wsprintfA|sprintf|swprintf|_stprintf/
-grep = /_snwprintf|_snprintf|_sntprintf|nsprintf/
+grep = /^(?!\/\/)(?:.(?!\/\/))*?\b(wnsprintf|wnsprintfA|wnsprintfW|sprintfW|sprintfA|wsprintf|wsprintfW|wsprintfA|sprintf|swprintf|_stprintf)[\b\Z]/
+grep = /^(?!\/\/)(?:.(?!\/\/))*?\b(_snwprintf|_snprintf|_sntprintf|nsprintf)[\b\Z]/
 
 ; Banned vararg sprintf functions
-grep = /wvsprintf|wvsprintfA|wvsprintfW|vsprintf|_vstprintf|vswprintf/
-grep = /_vsnprintf|_vsnwprintf|_vsntprintf|wvnsprintf|wvnsprintfA|wvnsprintfW/
+grep = /^(?!\/\/)(?:.(?!\/\/))*?\b(wvsprintf|wvsprintfA|wvsprintfW|vsprintf|_vstprintf|vswprintf)[\b\Z]/
+grep = /^(?!\/\/)(?:.(?!\/\/))*?\b(_vsnprintf|_vsnwprintf|_vsntprintf|wvnsprintf|wvnsprintfA|wvnsprintfW)[\b\Z]/
 
 ; Banned string tokenizing functions
-grep = /strtok|_tcstok|wcstok|_mbstok/
+grep = /^(?!\/\/)(?:.(?!\/\/))*?\b(strtok|_tcstok|wcstok|_mbstok)[\b\Z]/
 
 ; Banned path functions
-grep = /Makepath|_tmakepath|_makepath|_wmakepath/
-grep = /_splitpath|_tsplitpath|_wsplitpath/
+grep = /^(?!\/\/)(?:.(?!\/\/))*?\b(Makepath|_tmakepath|_makepath|_wmakepath)[\b\Z]/
+grep = /^(?!\/\/)(?:.(?!\/\/))*?\b(_splitpath|_tsplitpath|_wsplitpath)[\b\Z]/
 
 ; Banned scanf functions
-grep = /scanf|wscanf|_tscanf|sscanf|swscanf|_stscanf/
-grep = /snscanf|snwscanf|_sntscanf/
+grep = /^(?!\/\/)(?:.(?!\/\/))*?\b(scanf|wscanf|_tscanf|sscanf|swscanf|_stscanf)[\b\Z]/
+grep = /^(?!\/\/)(?:.(?!\/\/))*?\b(snscanf|snwscanf|_sntscanf)[\b\Z]/
 
 ; Banned numeric conversion
-grep = /_itoa|_itow|_i64toa|_i64tow|_ui64toa|_ui64tot|_ui64tow|_ultoa|_ultot|_ultow/
+grep = /^(?!\/\/)(?:.(?!\/\/))*?\b(_itoa|_itow|_i64toa|_i64tow|_ui64toa|_ui64tot|_ui64tow|_ultoa|_ultot|_ultow)[\b\Z]/
 
 ; Banned gets functions
-grep = /gets|_getts|_gettws/
+grep = /^(?!\/\/)(?:.(?!\/\/))*?\b(gets|_getts|_gettws)[\b\Z]/
 
 ; Banned IsBad functions
-grep = /sBadWritePtr|IsBadHugeWritePtr|IsBadReadPtr|IsBadHugeReadPtr|IsBadCodePtr|IsBadStringPtr/
+grep = /^(?!\/\/)(?:.(?!\/\/))*?\b(sBadWritePtr|IsBadHugeWritePtr|IsBadReadPtr|IsBadHugeReadPtr|IsBadCodePtr|IsBadStringPtr)(\b|\Z)/
 
 ; Banned OEM functions
-grep = /CharToOem|CharToOemA|CharToOemW|OemToChar|OemToCharA|OemToCharW|CharToOemBuffA|CharToOemBuffW/
+grep = /^(?!\/\/)(?:.(?!\/\/))*?\b(CharToOem|CharToOemA|CharToOemW|OemToChar|OemToCharA|OemToCharW|CharToOemBuffA|CharToOemBuffW)(\b|\Z)/
 
 ; Banned stack dynamic memory alloc functions
-grep = /alloca|_alloca/
+grep = /^(?!\/\/)(?:.(?!\/\/))*?\b(alloca|_alloca)(\b|\Z)/
 
 ; Banned string length functions
-grep = /strlen|wcslen|_mbslen|_mbstrlen|StrLen|lstrlen/
+grep = /^(?!\/\/)(?:.(?!\/\/))*?\b(strlen|wcslen|_mbslen|_mbstrlen|StrLen|lstrlen)(\b|\Z)/
 
 category = Unsafe/Banned Function
 severity = 3
