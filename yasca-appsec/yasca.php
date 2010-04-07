@@ -56,7 +56,12 @@ function main() {
     if ($report->uses_file_output) 
         $yasca->log_message("Results have been written to " . correct_slashes($yasca->options["output"]), E_USER_WARNING);
     
-    if ($yasca->options['debug']) print_r(profile("get"));
+    if ($yasca->options['debug']){ 
+    	print("Class,Function,Seconds\n");
+	    foreach(profile("get") as $key => $value){
+			print("$key,$value\n");
+		}
+	}
 }
 
 
@@ -90,7 +95,7 @@ function profile($cmd = false) {
     $delta = $now - $last_time;
     $last_time = $now;
     $trace = debug_backtrace();
-    $caller = @$trace[1]['function'] . " at " . @$trace[1]['class'];
+    $caller = @$trace[1]['class'] . "," . @$trace[1]['function'];
     @$log[$caller] += $delta;
     $total += $delta;
 }
