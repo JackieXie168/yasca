@@ -1,6 +1,6 @@
 name = Displaying Error to Client
 file_type = aspx,asp,vb
-grep = /response\.write\s*\(.*error/i
+grep = /response\.write\s*\([^\)]*error/i
 category = Poor Error Handling
 severity = 3
 description =
