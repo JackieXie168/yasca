@@ -1,8 +1,6 @@
 <?php
-
-include_once("lib/Result.php");
-include_once("lib/common-analysis.php");
-include_once("lib/PreProcessors.php");
+require_once("lib/Result.php");
+require_once("lib/common-analysis.php");
 
 /**
  * Plugin Class
@@ -16,71 +14,84 @@ include_once("lib/PreProcessors.php");
 abstract class Plugin {
 	/**
 	 * Holds the filename that this Plugin happens to be working on.
+	 * @var string
 	 */
 	public $filename = "";
 
 	/**
-	 * Holds the file contents that this Plugin is working on. This can
-	 * be either an array of strings or just a \n-separated string, in which
-	 * case it will be exploded when the object is created.
+	 * Holds the file contents that this Plugin is working on.
+	 * @var array of strings
 	 */
 	public $file_contents = array();
+	
+	/**
+	 * Holds the results of the scan.
+	 * @var array of Result()s
+	 */
+	public $result_list = array();
 
 	/**
-	 * Valid file types that this Plugin can operate on.
+	 * Valid file types that this Plugin can operate on - ie, array("exe","bin")
+	 * @var array of strings
 	 */
 	public $valid_file_types = array();
 
 	/**
 	 * True iff this object was initialized (i.e. has a valid extension)
+	 * @var boolean
 	 */
 	public $is_valid_filetype = false;
 
 	/**
 	 * How many lines to include in the context returned.
+	 * @var integer
 	 */
 	public $context_size = 7;
 
-	/**
-	 * Holds the results of the scan.
-	 */
-	public $result_list = array();
 
 	/**
 	 * Description of this plugin (what it looks for, why it's important, how to
 	 * remediate.
+	 * @var string
 	 */
 	public $description = "default";
 
 	/**
 	 * True iff this object is to be only invoked once. The object itself should prevent
 	 * multiple executions.
+	 * @var boolean
 	 */
 	public $is_multi_target = false;
 
 	/**
 	 * Internal variable set to true at the end of the constructor.
+	 * @var boolean
 	 */
 	public $initialized = false;
 
 	/**
 	 * This file should exist to indicate that the underlying plugin is accessible, or should
 	 * be true to mean ignore it.
+	 * @var boolean
 	 */
 	public $installation_marker = true;
 
 	/**
-	 * This is a reference to the static anylzers plugin directory
+	 * This is a reference to the static analyzers plugin directory
+	 * @var string representing a filepath
 	 */
 	public $sa_home = "";
 
 	/**
 	 * This sometimes contains the executable to be called.
+	 * @var array
 	 */
 	public $executable = array();
 
 	/**
 	 * Interval marker used to prevent objects from being executed.
+	 * @var boolean
+	 * @todo Rename can_execute
 	 */
 	public $canExecute = true;
 
@@ -95,27 +106,39 @@ abstract class Plugin {
                                          "PYTHON"     => array("py"),
                                          "COLDFUSION" => array("cfm", "cfml")
 	);
-
+	
 	/**
 	 * Creates a new generic Plugin.
 	 * @param string $filename that is being examined.
 	 * @param mixed $file_contents array or string of the file contents.
 	 */
-	public function Plugin($filename, &$file_contents) {
+	public function __construct($filename, $file_contents){
 		$yasca =& Yasca::getInstance();
 		$this->sa_home = $yasca->options["sa_home"];
 
-		if (self::check_in_filetype($filename, $this->valid_file_types)) {
+		if (static::check_in_filetype($filename, $this->valid_file_types)) {
 			$this->is_valid_filetype = true;
-			$this->filename = $filename;
-			$this->file_contents =& $file_contents;
+			//Multitarget plugins use the directory rather than a specific filename or contents.
+			if (!$this->is_multi_target){
+				$this->filename = $filename;
+				$this->file_contents = $file_contents;
+			}
 		}
 
 		$this->initialized = true;
 	}
 
+
+	/**
+	 * @deprecated Use __construct instead
+	 */
+	public function Plugin($filename, $file_contents) {
+		$this->__construct($filename, $file_contents);
+	}
+
 	/**
 	 * This function is called to de-allocate as much of the object as possible.
+	 * @deprecated Wasteful of cpu time to use as of PHP 5.3.0 and it's new garbage collector.
 	 */
 	public function destructor() {
 		foreach ($this as $item) {
@@ -164,7 +187,7 @@ abstract class Plugin {
 		$this->execute();
 
 		if (!is_array($this->result_list)) {
-			$yasca->log_message("Unable to process results list.", E_USER_WARNING);
+			$yasca->log_message("Unable to process results list from ".get_class($this).".", E_USER_WARNING);
 			return;
 		}
 		foreach($this->result_list as &$result){
@@ -189,11 +212,11 @@ abstract class Plugin {
 	}
 
 	/**
-	 * Checks for the current version of Java. The version must be greater than or equal
-	 * to 1.4, or else the function will return true.
-	 * @return boolean If the version of java is at least the specified minimum version (1.4 if empty)
+	 * Checks for the current version of Java. 
+	 * @param float $minimum_version The minimum version of java to accept. Defaults to 1.4
+	 * @return boolean If the version of java is at least the specified minimum version
 	 */
-	protected static function check_for_java($minimum_version = 1.40) {
+	protected final static function check_for_java($minimum_version = 1.40) {
 		$result = array();
 		exec("java -version 2>&1", $result);
 		if (!isset($result[0])) return false;
@@ -211,38 +234,43 @@ abstract class Plugin {
 	 * $filename does not have to be an accessible file.
 	 * @param string $filename filename to check
 	 * @param mixed $ext string extension or array of extensions to check. Should not include a period. An empty array means accept all filenames.
-	 * @return boolean true iff filename matches one of the extensions, or if $ext was an empty array.
+	 * @return boolean true iff filename matches one of the extensions or if $ext was an empty array.
+	 * @todo This function is still too slow (sometimes slower than even all of grep.php)
 	 */
-	protected static function check_in_filetype($filename, $exts = array(), $equiv_classes = null) {
+	protected final static function check_in_filetype($filename, $exts = array(), array $equiv_classes = null) {
 		if (!is_array($exts)) $exts = explode(",", $exts);
 
 		if (count($exts) == 0) return true;      // $ext=() means all accepted
 		
+		$file_ext = strrchr($filename, ".");
+		if ($file_ext == false) return false;
+		$file_ext = substr($file_ext, 1);
+		
 		//Because this is a bottlenecking function, check the most common usage first and return early.
 		//Stage 1: the caller provided the exact list of extensions that they are interested in.
-		foreach ($exts as $ext) {
-			if (endsWith($filename, "." . $ext) || fnmatch($ext, $filename))
-				return true;
-		}
+		if (in_array($file_ext, $exts)) return true;
 		
 		//Stage 2: The caller provided an equivalent class token, ie "JAVA" or "COBOL".
 		if (!isset($equiv_classes)) $equiv_classes = self::$ext_classes;
+
 		foreach (array_intersect($exts, array_keys($equiv_classes)) as $ev) {
-			foreach ($equiv_classes[$ev] as $eqv) {
-				if (endsWith($filename, "." . $eqv)) return true;
-			}
+			if (in_array($file_ext,$equiv_classes[$ev])) return true;
 		}
-		
+
+		//@todo Which plugins only ask for specific files by their full name? This is very CPU time expensive.
+		foreach ($exts as $ext){
+			if (fnmatch($ext, $filename)) return true;
+		}
 		return false;
 	}
-
 
 	/**
 	 * Replaces standard variables from executable strings.
 	 * @param string $executable string to expand out
 	 * @return new string with special variables replaced
+	 * @todo rename to replace_executable_strings for consistency in naming convention
 	 */
-	public function replaceExecutableStrings($executable) {
+	public final function replaceExecutableStrings($executable) {
 		$executable = str_replace("%SA_HOME%", $this->sa_home, $executable);
 		foreach ($_ENV as $key => $value) {
 			$executable = str_replace("%$key%", $value, $executable);

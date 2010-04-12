@@ -1,7 +1,8 @@
 <?php
-
-include_once("lib/Report.php");
-
+require_once("lib/Common.php");
+require_once("lib/Report.php");
+require_once("lib/Result.php");
+require_once("lib/Yasca.php");
 /**
  * MySQLReport Class
  *
@@ -21,7 +22,7 @@ class MySQLReport extends Report {
      */
     private $dbh;
 
-    private $canExecute = true;
+    //private $canExecute = true;
 
     /**
      * Creates a new MySQLNativeReport object.
@@ -63,7 +64,7 @@ class MySQLReport extends Report {
     /**
      * Executes a MySQLNativeReport, to the output file $options['output'] or ./results.db
      */ 
-    function execute() {
+    public function execute() {
         if (!isset($this->dbh)) $this->openDatabase();
         if (!$this->dbh) {
             Yasca::log_message("Aborting creation of MySQLReport.", E_USER_WARNING);

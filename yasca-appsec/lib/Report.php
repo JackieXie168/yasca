@@ -1,4 +1,6 @@
 <?php
+require_once("lib/Yasca.php");
+
 /**
  * Report Class
  *
@@ -17,7 +19,7 @@ abstract class Report {
    	 * @param boolean $end_with_slashes Whether to end the directory string with a directory separator.
    	 * @return string The default directory path. May not necessarily be fully qualified.
    	 */
-    public static function default_dir($end_with_slash = true){
+    public final static function default_dir($end_with_slash = true){
     	$profile_dir = isset($_SERVER['USERPROFILE']) ? $_SERVER['USERPROFILE'] : $_SERVER['HOME'];
     	return $profile_dir . DIRECTORY_SEPARATOR .
     		"Desktop" . DIRECTORY_SEPARATOR . "Yasca" . 
@@ -26,9 +28,11 @@ abstract class Report {
 
 	 /**
 	 * Instantiates a new Report object of type passed in.
+	 * @todo More thorough checking for malicious input.
 	 * @param string $report_type The name of the type of report to load.
+	 * @return Report An instantiated report object of the type $report_type
 	 */
-	public static function instantiate_report($report_type){
+	public final static function instantiate_report($report_type){
 		$report_type = trim($report_type);
 		if (!isset($report_type) || $report_type == "") {
 			$report_type = self::default_type;
@@ -71,7 +75,7 @@ abstract class Report {
      * The default filename for a report of this type.
      * @return string The default filename with the proper extension. No path information is included.
      */
-    public function default_filename(){
+    public final function default_filename(){
     	return "Yasca-Report-" . date('YmdHis') . "." . $this->default_extension;
     }
     
@@ -83,17 +87,17 @@ abstract class Report {
     protected $options = array();
     
     /**
+     * The results of the scan.
+     * @var array
+     */
+    protected $results = array();
+    
+    /**
      * Include a digital signature in the report file?
      * @var boolean
      * @deprecated
      */
     protected $use_digital_signature = true;
-    
-    /**
-     * The results of the scan.
-     * @var array
-     */
-    protected $results = array();
 
     /**
      * Whether or not the reader of this report should expect a file to be
@@ -103,12 +107,20 @@ abstract class Report {
     public $uses_file_output = true;
     
     /**
+     * @todo Disallow reports from changing the original options and results.
      * @param array $options Array of command line switches
      * @param array $results Array of Result objects.
      */
-    public function Report(&$options, &$results) {
+    public function __construct(array &$options = null, array &$results = null) {
         $this->options =& $options;
         $this->results =& $results;
+    }
+    
+    /**
+     * @deprecated Use __construct instead
+     */
+    public function Report(array &$options = null, array &$results = null){
+    	$this->__construct($options, $results);
     }
     
     /**
@@ -122,7 +134,7 @@ abstract class Report {
      * @param integer $level level in the (1-5) range.
      * @return boolean true iff the severity is sufficient.
      */
-    protected function is_severity_sufficient($level) {
+    protected final function is_severity_sufficient($level) {
         return ($this->options['level'] >= $level);
     }
     
@@ -131,7 +143,7 @@ abstract class Report {
      * same filename will be attempted to be placed in the temporary directory.
      * @return resource A resource handle to the file
      */
-    protected function &create_output_handle() {
+    protected final function &create_output_handle() {
         $handle = 0;
         $output_file =& $this->options["output"];
         $output_file = correct_slashes($output_file, false);
@@ -170,8 +182,9 @@ abstract class Report {
      * @param integer $n severity number (1-5)
      * @return string Description, or 'Unknown' if not in the required range
      */ 
-    protected static function get_severity_description($n) {
+    protected final static function get_severity_description($n) {
         if (!is_numeric($n)) return "Unknown " . ($n == "" ? "" : "($n)");
+        
         
         if ($n == 5) { return "Informational"; }
         if ($n == 4) { return "Low"; }
@@ -186,6 +199,7 @@ abstract class Report {
      * @param array $a array of data from Yasca.
      * @param array $b array of data from Yasca.
      * @return 0, 1, or -1 as per comparator requirements.
+     * @todo Investigate where this is used; perhaps it can be discarded.
      */ 
     protected static function result_list_comparator($a, $b) {
         if (!is_array($a) || !is_array($b)) return 0;

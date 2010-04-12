@@ -1,6 +1,7 @@
 <?php
-
-include_once("lib/Report.php");
+require_once("lib/Common.php");
+require_once("lib/Report.php");
+require_once("lib/Result.php");
 
 /**
  * CSVReport Class
@@ -21,7 +22,7 @@ class CSVReport extends Report {
     /**
      * Executes a CSVReport, with output going to $options['output']
      */ 
-    function execute() {
+    public function execute() {
         if (!$handle = $this->create_output_handle()) return;
         
         fwrite($handle, $this->get_preamble());
@@ -37,7 +38,6 @@ class CSVReport extends Report {
                 $t = $result->custom['translation'];
                 $filename = $t[basename($filename, ".$ext")];
             }
-            $filename = str_replace("\\", "/", $filename);      // changed from $result->filename
 
             $row_id = sprintf("%03d", ++$num_results_written);
             $category_link = $result->category_link;

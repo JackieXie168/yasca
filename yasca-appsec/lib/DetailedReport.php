@@ -1,5 +1,8 @@
 <?php
-include_once("lib/Report.php");
+require_once("lib/Common.php");
+require_once("lib/Report.php");
+require_once("lib/Result.php");
+require_once("lib/Yasca.php");
 
 /**
  * DetailedReport Class
@@ -20,7 +23,7 @@ class DetailedReport extends Report {
      * Executes a DetailedReport, with output going to $options['output']
      * The report will have: [header] [issue found] [code snippet] [description] [rule info]
      */ 
-    function execute() {
+    public function execute() {
         if (!$handle = $this->create_output_handle()) return;
         
         $description_cache = array();
@@ -31,7 +34,7 @@ class DetailedReport extends Report {
         foreach ($this->results as $result) {
             if (!$this->is_severity_sufficient($result->severity))
                 continue;
-            $filename = correct_slashes($result->filename);
+            $filename = $result->filename;
             $pinfo = pathinfo($filename);
             $ext = $pinfo['extension'];
             if (isset($result->custom['translation'])) {

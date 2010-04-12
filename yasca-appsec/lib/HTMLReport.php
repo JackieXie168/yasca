@@ -1,7 +1,8 @@
 <?php
-
-include_once("lib/Report.php");
-
+require_once("lib/Common.php");
+require_once("lib/Report.php");
+require_once("lib/Result.php");
+require_once("lib/Yasca.php");
 /**
  * HTMLReport Class
  *
@@ -20,7 +21,7 @@ class HTMLReport extends Report {
     /**
      * Executes an HTMLReport, with output going to $options['output']
      */ 
-    function execute() {
+    public function execute() {
         if (!$handle = $this->create_output_handle()) return;
         
         fwrite($handle, $this->get_preamble());
@@ -36,7 +37,6 @@ class HTMLReport extends Report {
                 $t =& $result->custom['translation'];
                 $filename = $t[basename($filename, ".$ext")];
             }
-            $filename = correct_slashes($filename);
 
             $source_context = "";
             if (is_array($result->source_context)) {
