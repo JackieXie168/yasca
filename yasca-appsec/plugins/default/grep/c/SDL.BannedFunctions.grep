@@ -52,10 +52,11 @@ grep = /^(?!\/\/)(?:.(?!\/\/))*?\b(alloca|_alloca)(\b|\Z)/
 grep = /^(?!\/\/)(?:.(?!\/\/))*?\b(strlen|wcslen|_mbslen|_mbstrlen|StrLen|lstrlen)(\b|\Z)/
 
 category = Unsafe/Banned Function
+category_link = http://msdn.microsoft.com/en-us/library/bb288454.aspx
 severity = 3
 description =
 <p>
-    A function call was found that has been labeled as "unsafe" or "banned. Specifically, the function is now
+    A function call was found that has been labeled as "unsafe" or "banned". Specifically, the function is now
     considered banned by Microsoft. More information is available in <i>The Security Development Lifecycle</i> by
     Michael Howard and Steve Lipner, Microsoft Press, 2006.
 
