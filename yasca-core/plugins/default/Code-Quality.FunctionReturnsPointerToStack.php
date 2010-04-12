@@ -11,14 +11,16 @@
 class Plugin_codequality_function_returns_pointer_to_stack extends Plugin {
     public $valid_file_types = array("c", "cpp");
     
-    private $buffer = 25;       // Number of lines to look back from "return X"
+    protected $buffer = 25;       // Number of lines to look back from "return X"
     
     function execute() {
-        for ($i=0; $i<count($this->file_contents); $i++) {
-            if (preg_match('/return ([a-zA-Z\_][a-zA-Z0-9_]*)\s*;/', $this->file_contents[$i], $matches)) {
+    	$count = count($this->file_contents);
+        for ($i=0; $i<$count; $i++) {
+            if (preg_match('/^(?!\/\/)(?:.(?!\/\/))*?\breturn ([a-zA-Z\_][a-zA-Z0-9_]*)\s*;/', $this->file_contents[$i], $matches)) {
                 $variable_name = $matches[1];
-                for ($j=$i-1; $j>max(0, $i-$this->buffer); $j--) {
-                    if (!preg_match("/[a-zA-Z\_][a-zA-Z0-9_]*\s+$variable_name\s*\[/", $this->file_contents[$j]))
+                $inner_count = max(0, $i-$this->buffer);
+                for ($j=$i-1; $j>$inner_count; $j--) {
+                    if (!preg_match("/^(?!\/\/)(?:.(?!\/\/))*?\b[a-zA-Z\_][a-zA-Z0-9_]*\s+$variable_name\s*\[/", $this->file_contents[$j]))
                     continue;
                     $result = new Result();
                     $result->plugin_name = "Function Returns Pointer to Stack"; 

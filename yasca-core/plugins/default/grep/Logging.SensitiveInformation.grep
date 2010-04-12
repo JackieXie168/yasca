@@ -1,6 +1,6 @@
 name = Potentially Logging Sensitive Information  
 file_type = JAVA
-grep = /(log|logger)\..*\(.*(([^a-z]ssn[^a-z])|getssn|ssn\(|socialsecurity|taxid|email|e_mail|emailaddress|pass|amount|account|acct|address|phone|phonenumber|zip|postal)/i
+grep = /log(ger)?\..*?\(.*(([^a-z]ssn[^a-z])|getssn|ssn\(|socialsecurity|taxid|email|e_mail|emailaddress|pass|amount|account|acct|address|phone|phonenumber|zip|postal)/i
 category = Potentially Logging Sensitive Information
 severity = 3
 description =
