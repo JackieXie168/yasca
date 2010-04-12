@@ -1,5 +1,8 @@
 <?php
-
+require_once("lib/Common.php");
+require_once("lib/Plugin.php");
+require_once("lib/Result.php");
+require_once("lib/Yasca.php");
 /**
  * This class looks for weak authentication values, such as:
  *  foo-username = bar
@@ -17,10 +20,10 @@ class Plugin_authentication_weak extends Plugin {
 	public $valid_file_types = array();
 	protected $lookahead_length = 20;
 
-	public function Plugin_authentication_weak($filename, &$file_contents){
-		parent::Plugin($filename, $file_contents);
+	public function __construct($filename, $file_contents){
+		parent::__construct($filename, $file_contents);
 		// Handle this separately, since it's valid on all files EXCEPT those listed below
-		// TODO White-list checking instead of blacklist checking. An 80 meg media file in the directory will crash yasca.
+		// @TODO White-list checking instead of blacklist checking. An 80 meg media file in the directory will crash yasca.
 		if ($this->check_in_filetype($filename, array("jar", "zip", "dll", "war", "tar", "ear",
 													  "jpg", "png", "gif", "exe", "bin", "lib",
 													  "svn-base", "7z", "rar", "gz",
@@ -29,13 +32,16 @@ class Plugin_authentication_weak extends Plugin {
 		}
 	}
 
-	function execute() {
+	public function execute() {
 		//This plugin is slow based on measurements from the profiler. Caching the counting significantly helped.
+		//This plugin is still slow.
+		$userids = preg_grep('/^(.{0,20})(user|username|logon|logonid|userid|login|loginid)\s*=\s*([^\s]+)/i',
+							$this->file_contents);
 		$count = count($this->file_contents);
-		for ($i=0; $i<$count; $i++) {
+		foreach ($userids as $linenumber => $line){
 			$matches = array();
-			if (! preg_match('/^(.{0,20})(user|username|logon|logonid|userid|login|loginid)\s*=\s*([^\s]+)/i',
-						     $this->file_contents[$i], $matches) ) continue;
+			preg_match('/^(.{0,20})(user|username|logon|logonid|userid|login|loginid)\s*=\s*([^\s]+)/i',
+						     $line, $matches);
 			$prefix = $matches[1];
 			$username = $matches[3];
 
@@ -43,13 +49,14 @@ class Plugin_authentication_weak extends Plugin {
 				continue;
 			}
 
-			$inner_count = min($i+$this->lookahead_length, $count);
-			for ($j=$i+1; $j<$inner_count; $j++) {
+			$inner_count = min($linenumber+$this->lookahead_length, $count);
+			for ($j=$linenumber+1; $j<$inner_count; $j++) {
 				$quote = preg_quote($prefix) . "pass(word)?\s*=\s*" . preg_quote($username) . "(1|123)?";
 				$quote = str_replace("/", "\/", $quote);
 				if ( preg_match('/' . $quote . '/i', $this->file_contents[$j]) ) {
 					$result = new Result();
-					$result->line_number = $i+1;
+					$result->plugin_name = "Authentication: Weak Credentials";
+					$result->line_number = $linenumber+1;
 					$result->severity = 1;
 					$result->category = "Authentication: Weak Credentials";
 					$result->category_link = "http://www.owasp.org/index.php/Weak_credentials";
@@ -66,7 +73,7 @@ class Plugin_authentication_weak extends Plugin {
                             </ul>
                         </p>
 END;
-					array_push($this->result_list, $result);
+					$this->result_list[] = $result;
 					break;
 				}
 			}
