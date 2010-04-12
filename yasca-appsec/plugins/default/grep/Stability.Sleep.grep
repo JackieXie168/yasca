@@ -1,9 +1,10 @@
 name = Dangeous Function - Servlet.sleep()
 file_type = JAVA
-grep = /\.sleep\(/i
+grep = /^(?!\/\/)(?:.(?!\/\/))*?\.sleep\(/i
 category = J2EE: Bad Practice
 severity = 3
 tags = servlet
+category_link = http://www.fortify.com/vulncat/en/vulncat/java/j2ee_badpractices_threads.html
 description =
 <p>
     Sleeping within a Servlet is considered a bad practice, prohibited by the J2EE specification. 

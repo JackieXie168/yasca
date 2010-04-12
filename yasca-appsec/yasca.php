@@ -12,13 +12,11 @@
 
 chdir(dirname($_SERVER["argv"][0]));        // get back to the current directory
 
-// Use this to show ALL possible errors
-error_reporting(E_ALL | E_PARSE);
-set_error_handler("custom_error_handler");
+//Configure error reporting levels and sinks in the ini file instead of here.
 
-include_once("lib/Yasca.php");
-include_once("lib/common.php");
-include_once("lib/Report.php");
+require_once("lib/Yasca.php");
+require_once("lib/common.php");
+require_once("lib/Report.php");
 
 
 /**
@@ -76,6 +74,7 @@ function profile($cmd = false) {
     $now = (float) $usec + (float) $sec;
     if($cmd) {
         if($cmd == 'get') {
+        	//@todo Are these underscores an error?
             unregister_tick_function('__profile__');
             foreach($log as $function => $time) {
                 if($function != '__profile__') {
@@ -98,46 +97,6 @@ function profile($cmd = false) {
     $caller = @$trace[1]['class'] . "," . @$trace[1]['function'];
     @$log[$caller] += $delta;
     $total += $delta;
-}
-
-function custom_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
-    if (error_reporting() == 0) return;
-    print "[" . error2string($errno) . "] [ $errfile:$errline ] $errstr\n";
-}
-
-/**
- * Converts an error value to a string.
- * Thanks to Chris at http://us.php.net/error_reporting for this function.
- */
-function error2string($value) {
-    $level_names = array(
-        E_ERROR => 'E_ERROR', 
-        E_WARNING => 'E_WARNING',
-        E_PARSE => 'E_PARSE', 
-        E_NOTICE => 'E_NOTICE',
-        E_CORE_ERROR => 'E_CORE_ERROR', 
-        E_CORE_WARNING => 'E_CORE_WARNING',
-        E_COMPILE_ERROR => 'E_COMPILE_ERROR', 
-        E_COMPILE_WARNING => 'E_COMPILE_WARNING',
-        E_USER_ERROR => 'E_USER_ERROR', 
-        E_USER_WARNING => 'E_USER_WARNING',
-        E_USER_NOTICE => 'E_USER_NOTICE' 
-    );
-    
-    if(defined('E_STRICT')) 
-        $level_names[E_STRICT]='E_STRICT';
-
-    $levels=array();
-
-    if( ($value & E_ALL) == E_ALL) {
-        $levels[] = 'E_ALL';
-        $value &= ~E_ALL;
-    }
-    foreach ($level_names as $level => $name)
-        if ( ($value & $level) == $level)
-            $levels[] = $name;
-
-    return implode(' | ', $levels);
 }
 
 
