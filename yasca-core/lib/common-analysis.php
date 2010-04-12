@@ -9,10 +9,12 @@
 
 /**
  * Finds non-static member variables of a class.
+ * WARNING: Sending $file_contents as a string will cause the file to be allocated in memory again.
  * @param mixed $file_contents string of file contents or array of lines.
+ * @param array $line_matches Output only. The lines that contain the found variables. 
  * @return array of variable names.
  */
-function find_member_variables($file_contents, &$line_matches) {
+function find_member_variables($file_contents, array &$line_matches = null) {
     $b=0;
     $variables = array();
     
@@ -48,6 +50,9 @@ function find_member_variables($file_contents, &$line_matches) {
 
 /**
  * Gets method contents from a specific file.
+ * WARNING: Sending $file_contents as a string will cause the file to be allocated in memory again.
+ * @param array $file_contents 
+ * @param string $method_name
  */
 function get_method_contents($file_contents, $method_name) {
     $b=0;

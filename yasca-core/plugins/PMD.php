@@ -1,4 +1,8 @@
 <?php
+require_once("lib/Common.php");
+require_once("lib/Plugin.php");
+require_once("lib/Result.php");
+require_once("lib/Yasca.php");
 /**
  * The PMD Plugin uses PMD to discover potential vulnerabilities in .java files.
  * This class is a Singleton that runs only once, returning all of the results that
@@ -21,13 +25,13 @@ class Plugin_PMD extends Plugin {
 
     protected static $already_executed = false;
     
-    public function Plugin_PMD($filename, &$file_contents) {
-    	if (self::$already_executed) {
+    public function __construct($filename, $file_contents) {
+    	if (static::$already_executed) {
         	$this->initialized = true;
         	return;
         }
     	
-        parent::Plugin($filename, $file_contents);
+        parent::__construct($filename, $file_contents);
         if (!class_exists("DOMDocument")) {
             Yasca::log_message("DOMDocument is not available. PMD results are not available. Please install php-xml.", E_USER_WARNING);
             $this->canExecute = false;
@@ -47,7 +51,7 @@ class Plugin_PMD extends Plugin {
             if (isset($pinfo['extension']) &&
                 $pinfo['extension'] == 'xml' && 
                 !startsWith(basename($rulepath), "_")) {
-                array_push($rpatharray, "" . $rulepath);
+                $rpatharray[] = "" . $rulepath;
             }
         }
         return $rpatharray;
@@ -57,9 +61,9 @@ class Plugin_PMD extends Plugin {
      * Executes the PMD function. This calls out to pmd.bat which then calls Java, but
      * process output comes back here.
      */
-    function execute() {
-    	if (self::$already_executed) return;  
-        self::$already_executed = true;  
+    public function execute() {
+    	if (static::$already_executed) return;  
+        static::$already_executed = true;  
         
         if (!$this->canExecute) return;
         
@@ -136,7 +140,7 @@ class Plugin_PMD extends Plugin {
                     
                     $result = new Result();
                     $result->line_number = $beginline;
-                    $result->filename = str_replace($yasca->options['dir'], "", correct_slashes($filename));
+                    $result->filename = $filename;
                     $result->category = "PMD: $rule";
                     $result->category_link = $externalInfoUrl;
                     $result->is_source_code = false;
@@ -146,8 +150,8 @@ class Plugin_PMD extends Plugin {
                     $result->source = $message;
                     $result->description = $yasca->get_adjusted_description("PMD", $rule, "<p>$description</p><h4>Example:</h4><pre class=\"fixedwidth\">$example</pre>");
 					//@todo Use mb encoding module to ensure it's read on properly
-                    $result->source_context = array_slice( file($filename), max( $result->line_number-(($this->context_size+1)/2), 0), $this->context_size );
-                    array_push($this->result_list, $result);
+                    $result->source_context = array_slice( file($filename, FILE_TEXT+FILE_IGNORE_NEW_LINES), max( $result->line_number-(($this->context_size+1)/2), 0), $this->context_size );
+                    $this->result_list[] = $result;
                 }
             }
         }

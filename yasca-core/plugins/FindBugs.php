@@ -1,5 +1,8 @@
 <?php
-
+require_once("lib/Common.php");
+require_once("lib/Plugin.php");
+require_once("lib/Result.php");
+require_once("lib/Yasca.php");
 /**
  * The FindBugs Plugin uses the open source tool FindBugs to discover potential 
  * vulnerabilities in compiled Java code.
@@ -10,18 +13,26 @@
 class Plugin_FindBugs extends Plugin {
     public $valid_file_types = array(); 	// All singletons do not use valid file types
 
-    public $executable = array('Windows' => '%SA_HOME%resources\\utility\\findbugs\\findbugs.bat -home %SA_HOME%resources/utility/findbugs $PLUGIN -textui -xml:withMessages -xargs -quiet',
-                               'Linux'   => '%SA_HOME%resources/utility/findbugs/findbugs -home %SA_HOME%resources/utility/findbugs $PLUGIN -textui -xml:withMessages -xargs -quiet');
+    public $executable = array('Windows' => '%SA_HOME%resources\\utility\\findbugs\\findbugs.bat -home %SA_HOME%resources/utility/findbugs $PLUGIN -include resources\\utility\\FindBugs\\filter.xml -textui -xml:withMessages -xargs -quiet',
+                               'Linux'   => '%SA_HOME%resources/utility/findbugs/findbugs -home %SA_HOME%resources/utility/findbugs $PLUGIN -include resources/utility/FindBugs/filter.xml -textui -xml:withMessages -xargs -quiet');
 
     public $installation_marker = "findbugs";
+    
+    protected static $already_executed = false;
 
     /**
      * This class is multi-target.
      */
     public $is_multi_target = true;
 
-    public function Plugin_FindBugs($filename, &$file_contents) {
-        parent::Plugin($filename, $file_contents);
+    public function __construct($filename, $file_contents) {
+        if (static::$already_executed) {
+        	$this->initialized = true;
+        	return;
+        }
+        
+        parent::__construct($filename, $file_contents);
+        
         if (!class_exists("DOMDocument")) {
             Yasca::log_message("DOMDocument is not available. FindBugs results are not available. Please install php-xml.", E_USER_WARNING);
             $this->canExecute = false;
@@ -32,12 +43,11 @@ class Plugin_FindBugs extends Plugin {
      * Executes the scanning function. This calls out to findbugs.bat which then calls Java, but
      * process output comes back here.
      */
-    function execute() {
+    public function execute() {
+        if (static::$already_executed) return;
+        static::$already_executed = true;
+        
         if (!$this->canExecute) return;
-
-        static $alreadyExecuted;
-        if ($alreadyExecuted == 1) return;
-        $alreadyExecuted = 1;
 
         $yasca =& Yasca::getInstance();
         
@@ -48,18 +58,15 @@ class Plugin_FindBugs extends Plugin {
         
         $dir = $yasca->options['dir'];
 
-        $target_list = $yasca->target_list;
-        foreach ($target_list as $target) {
-            if (!endsWith($target, ".class") && !endsWith($target, ".jar")) {
-                unset($target_list[array_search($target, $target_list)]);
-            }
-        }   
+        $target_list = array_filter($yasca->target_list, function ($target){
+        	return endsWith($target, ".class") || endsWith($target, ".jar");
+        });
+        
         if (count($target_list) == 0) {
-            if ($yasca->options['debug']) {
-                $yasca->log_message("FindBugs target list was empty. Nothing to do.", E_ALL);
-            }
+            $yasca->log_message("FindBugs target list was empty. Nothing to do.", E_ALL);
             return;
         }
+        
         $descriptor_spec = array(
           0 => array("pipe", "r"),
           1 => array("pipe", "w"),
@@ -120,8 +127,8 @@ class Plugin_FindBugs extends Plugin {
         if ($yasca->options['debug']) 
             $yasca->log_message("FindBugs returned: " . $xml, E_ALL);
 
-        $dom = @new DOMDocument();
-        if (!$dom->loadXML($xml)) {
+        $dom = new DOMDocument();
+        if (!@$dom->loadXML($xml)) {
             $yasca->log_message("FindBugs did not return valid XML. Unable to parse.", E_USER_WARNING);
             return;
         }
@@ -149,16 +156,13 @@ class Plugin_FindBugs extends Plugin {
 
             $line_number = $source_line->item(0)->getAttribute("start");
             $rel_filename = $source_line->item(0)->getAttribute("sourcepath");
-            $filename = $yasca->find_target_by_relative_name($rel_filename);
-            if ($filename === false) {
-                $filename = $yasca->options['dir'] . '/' . $rel_filename;
-            }
+
             
             $description = $bugPatternList[$type];
             
             $result = new Result();
             $result->line_number = $line_number;
-            $result->filename = $filename;
+            $result->filename = $rel_filename;
             $result->plugin_name = $yasca->get_adjusted_alternate_name("FindBugs", $short_message, $short_message);
             $result->severity = $yasca->get_adjusted_severity("FindBugs", $short_message, $severity);
             $result->category = "FindBugs: " . ucwords(strtolower(str_replace("_", " ",$category)));
@@ -167,8 +171,13 @@ class Plugin_FindBugs extends Plugin {
             $result->source = $short_message;
             $result->description = $yasca->get_adjusted_description("FindBugs", $short_message, "<b>$long_message</b><br/>$description");
 
+            $filename = $yasca->find_target_by_relative_name($rel_filename);
+            if ($filename === false) {
+                $filename = $yasca->options['dir'] . DIRECTORY_SEPARATOR . $rel_filename;
+            }
             if (file_exists($filename) && is_readable($filename)) {
-                $t_file = @file($filename);
+            	//@todo Use mb encoding module to ensure it's read on properly OR upgrade to PHP 6.
+                $t_file = @file($filename, FILE_TEXT+FILE_IGNORE_NEW_LINES);
                 if ($t_file != false && is_array($t_file)) {
                     $result->source_context = array_slice( $t_file, max( $result->line_number-(($this->context_size+1)/2), 0), $this->context_size );
                 }
@@ -177,8 +186,6 @@ class Plugin_FindBugs extends Plugin {
             }
             array_push($this->result_list, $result);
         }
-        unset($dom);
-        unset($xml);
     }
 }
 ?>

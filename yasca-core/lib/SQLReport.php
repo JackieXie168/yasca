@@ -1,7 +1,8 @@
 <?php
-
-include_once("lib/Report.php");
-
+require_once("lib/Common.php");
+require_once("lib/Report.php");
+require_once("lib/Result.php");
+require_once("lib/Yasca.php");
 /**
  * SQLReport Class
  *
@@ -20,21 +21,21 @@ class SQLReport extends Report {
     /**
      * Holds a reference to the SQL Database
      */
-    private $dbh;
+    protected $dbh;
 
-    private $canExecute = true;
-
-    public function SQLReport(&$options, &$results) {
-        parent::Report($options, $results);
+    protected $canExecute = true;
+    
+    public function __construct(&$options, &$results) {
+        parent::__construct($options, $results);
 
         /* Verify that the required libraries are available */
         if (!extension_loaded("pdo")) {
-            if (getSystemOS() == "Windows") {
+            if (isWindows()) {
                 if (!dl("php_pdo.dll") && !dl("resources/include/php_pdo.dll")) {
                     Yasca::log_message("PDO is required for SQLReport, but cannot be found.", E_USER_WARNING);
                     $this->canExecute = false;
                 }
-            } elseif (getSystemOS() == "Linux") {
+            } elseif (isLinux()) {
                 if (!dl("pdo.so") && !dl("resources/include/pdo.so")) {
                     Yasca::log_message("PDO is required for SQLReport, but cannot be found.", E_USER_WARNING);
                     $this->canExecute = false;
@@ -42,12 +43,12 @@ class SQLReport extends Report {
             }
         }
         if (!extension_loaded("pdo_sqlite")) {
-            if (getSystemOS() == "Windows") {
+            if (isWindows()) {
                 if (!dl("php_pdo_sqlite.dll") && !dl("resources/include/php_pdo_sqlite.dll")) {
                     Yasca::log_message("PDO SQLite is required for SQLReport, but cannot be found.", E_USER_WARNING);
                     $this->canExecute = false;
                 }
-            } elseif (getSystemOS() == "Linux") {
+            } elseif (isLinux()) {
                 if (!dl("pdo_sqlite.so") && !dl("resources/include/pdo_sqlite.so")) {
                     Yasca::log_message("PDO SQLite is required for SQLReport, but cannot be found.", E_USER_WARNING);
                     $this->canExecute = false;
@@ -56,7 +57,7 @@ class SQLReport extends Report {
 		}
     }
 
-    private function openDatabase() {
+    protected function openDatabase() {
         $yasca =& Yasca::getInstance();     
         
         $yasca->options["output"] = dirname($yasca->options["output"]) . "/" . basename($yasca->options["output"], ".html") . ".db";
@@ -76,9 +77,9 @@ class SQLReport extends Report {
             $this->dbh = new PDO("sqlite:" . $output_file, '', '');
         
         } catch(PDOException $e) {
-        $yasca->log_message("Error creating database connection: " . $e->getMessage(), E_USER_WARNING);
-        $this->dbh = false;
-        return;
+	        $yasca->log_message("Error creating database connection: " . $e->getMessage(), E_USER_WARNING);
+	        $this->dbh = false;
+	        return;
         }
 
 /*
@@ -96,7 +97,7 @@ class SQLReport extends Report {
     /**
      * Executes a SQLiteReport, to the output file $options['output'] or ./results.db
      */ 
-    function execute() {
+    public function execute() {
         if (!isset($this->dbh)) $this->openDatabase();
         if (!$this->dbh || !$this->canExecute) {
             $yasca->log_message("Aborting creation of SQLReport.", E_USER_WARNING);

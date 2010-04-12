@@ -1,6 +1,7 @@
 <?php
-
-include_once("lib/Report.php");
+require_once("lib/Common.php");
+require_once("lib/Report.php");
+require_once("lib/Result.php");
 
 /**
  * ConsoleReport Class
@@ -23,7 +24,7 @@ class ConsoleReport extends Report {
     /**
      * Executes a ConsoleReport, with output going to stdout.
      */ 
-    function execute() {
+    public function execute() {
         
         print "Report Output:\n";
         
@@ -38,7 +39,6 @@ class ConsoleReport extends Report {
                 $t = $result->custom['translation'];
                 $filename = $t[basename($filename, ".$ext")];
             }
-            $filename = str_replace("\\", "/", $filename);      // changed from $result->filename
 
             $row_id = sprintf("%03d", ++$num_results_written);
             $category_link = $result->category_link;

@@ -1,6 +1,5 @@
 <?php
-
-include_once("lib/Report.php");
+require_once("lib/Report.php");
 
 /**
  * XMLReport Class
@@ -20,7 +19,7 @@ class XMLReport extends Report {
     /**
      * Executes an XMLReport, with output going to $options['output']
      */ 
-    function execute() {
+    public function execute() {
         if (!$handle = $this->create_output_handle()) return;
         
         fwrite($handle, $this->get_preamble());

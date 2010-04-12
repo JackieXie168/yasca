@@ -22,9 +22,7 @@ function trim_cfx_ingres_sql($file_contents) {
                 $line = trim($line);
             }
             if ($in_sql) {
-                $line = str_replace("\n", " ", $line);
-                $line = str_replace("\r", " ", $line);
-                $line = str_replace("\t", " ", $line);
+                $line = str_replace(array("\n", "\r", "\t"), " ", $line);
                 $line = trim($line);
             }
         $output .= $line;

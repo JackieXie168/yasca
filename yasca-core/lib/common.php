@@ -11,6 +11,7 @@
  * @param string $str string to search
  * @param string $sub substring to look for in $str
  * @return boolean true iff $str starts with $sub.
+ * @todo rename to starts_with for consistency
  */
 function startsWith( $str, $sub ) {
    return ( substr( $str, 0, strlen( $sub ) ) === $sub );
@@ -21,10 +22,10 @@ function startsWith( $str, $sub ) {
  * @param string $str string to search
  * @param string $sub substring to look for in $str
  * @return boolean true iff $str ends with $sub.
+ * @todo rename to ends_with for consistency
  */
 function endsWith( $str, $sub ) {
-	//@todo Use negative value for substr position instead of reading the length of $str
-   return ( substr( $str, strlen( $str ) - strlen( $sub ) ) === $sub );
+   return ( substr( $str, 0 - strlen( $sub ) ) === $sub );
 }
 
 /**
@@ -194,7 +195,7 @@ function get_owasp_vulnerability_content($url) {
         return "";
     }
     $baseurl = $matches[1];
-
+	//@todo Disable this function, as using an arbitrary url passed in is a security flaw.
     $html = file_get_contents($url . "&printable=yes");
     $html = str_replace(array("\n","\r","\r\n"), "", $html);
 
@@ -256,7 +257,9 @@ function get_class_from_file($filename) {
     return $matches[1];
 }
 
+//@todo Rename get_system_os
 function getSystemOS() {
+	//This is called many times and it's slow, so cache the result.
 	static $result = null;
 	if (!isset($result)){
 	    @ob_start();
@@ -273,15 +276,19 @@ function getSystemOS() {
 	return $result;
 }
 
+//@todo rename is_windows
 function isWindows() {
 	return getSystemOS() == 'Windows';
 }
 
+//@todo rename is_linux
 function isLinux() {
     return getSystemOS() == 'Linux';
 }
 
+//@todo rename wine_exists
 function wineExists(){
+	//This is called many times and it's slow, so cache the result.
 	static $result;
 	if (!isset($result))
 		$result = !preg_match("/no wine in/", `which wine`);
@@ -335,18 +342,36 @@ function &array_first(array $array, $closure){
 }
 
 /**
+ * 
+ * @param array $array The array to select unique values on
+ * @param closure $closure A closure accepting one parameter for an item in the array and that returns the values to consider items unique by.
+ * @param int $sort_flags The sort_flags constants used by array_unique. Optional.
+ * @return array The resulting unique array. Keys are preserved.
+ */
+function array_unique_with_selector(array $array, $closure, $sort_flags = SORT_STRING){
+	$selected_values;
+	foreach($array as $key => $item){
+		$selected_values[$key] = $closure($item);
+	}
+	$selected_values = array_unique($selected_values, $sort_flags);
+	return array_intersect_key($array,$selected_values);
+}
+
+/**
  * This function corrects slashes based on the platform.
- * If $endWithSlash is false and $path ends in a slash, the ending slash is preserved.
+ * @param string $path The absolute or relative filepath
+ * @param boolean $endWithSlash If true, the returned path will end in a slash. If is false and $path ends in a slash, the ending slash is preserved. Defaults to false.
+ * @return string The corrected path.
  */
 function correct_slashes($path, $endWithSlash = false) {
-    return preg_replace("/(\\|\/)+/", DIRECTORY_SEPARATOR, 
+    return preg_replace("/[\\/]+/", DIRECTORY_SEPARATOR, 
     	trim($endWithSlash ? $path . DIRECTORY_SEPARATOR : $path));
 }
 
 /** 
  * Converts UTF-16 to UTF-8 character sets.
  * Thanks to http://www.moddular.org/log/utf16-to-utf8
- * @todo Instead, use http://www.php.net/manual/en/book.mbstring.php
+ * @todo Deprecate when http://www.php.net/manual/en/book.mbstring.php or PHP 6 is available.
  * @var string
  */
 function utf16_to_utf8($str) {	
@@ -364,7 +389,7 @@ function utf16_to_utf8($str) {
     }
 
     $len = strlen($str);
-    //An odd number of bytes indicates that $str is not UTF-16.
+    //This function does not know how to interpret an odd number of bytes
     if ($len % 2 != 0) return $str;
     
     $str = substr($str, 2);

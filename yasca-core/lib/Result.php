@@ -9,7 +9,7 @@
  * @license see doc/LICENSE
  * @package Yasca
  */
-class Result {
+final class Result {
 	/**
 	 *  Name of the file
 	 *  @var string
@@ -18,6 +18,7 @@ class Result {
     
     /**
      * Informational. Default is 5.
+     * Must be in the range 1-5, 5 being the least severe.
      * @var int
      */
     public $severity = 5;

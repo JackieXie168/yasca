@@ -1,5 +1,9 @@
 <?php
-
+require_once("lib/Common.php");
+require_once("lib/Plugin.php");
+require_once("lib/Result.php");
+require_once("lib/Yasca.php");
+require_once("lib/PreProcessors.php");
 /**
  * The Grep Plugin is a special plugin that faciliates .grep psuedo-plugins, which
  * are just files in the PLUGINS directory that contain necessary information to scan
@@ -38,47 +42,54 @@ class Plugin_Grep extends Plugin {
 	//It is set after the plugin is instantiated and used in execute() to skip specific grep files.
 	public $valid_file_types; //see constructor
 
-	public function Plugin_Grep($filename, $file_contents){
-		if (!isset(self::$grep_files)){
-			self::$grep_files = array();
-			$yasca =& Yasca::getInstance();
-			foreach ($yasca->plugin_file_list as $plugin){
-				if (startsWith($plugin, "_") || !endsWith($plugin, ".grep"))
-					continue;
-				
-				$grep_content = explode("\n", file_get_contents($plugin));
-				if (!array_any($grep_content, function($line) {return preg_match('/^\s*grep\s*=\s*(.*)/i', $line);}))
-					continue;
-					
-				if (!array_any($grep_content, function($line) {return preg_match('/^\s*category\s*=\s*(.*)/i', $line);}))
-					continue;
-
-				//Code below this line means it's a keeper plugin.
-				array_walk($grep_content, function (&$line) {
-					$line = trim($line);
-				});
-				self::$grep_files[] = new Grep_File($plugin, $grep_content);
-			}
-			
+	public function __construct($filename, $file_contents){
+		if (!isset(static::$grep_files)){
+			static::load_grep_files();
 		}
 		 
 		// Capture all of the valid file types
-		if (!isset(self::$union_of_valid_file_types)) {
-			self::$union_of_valid_file_types = array();
-			$yasca =& Yasca::getInstance();
-			$yasca->log_message("Loading all scannable file types for the Grep plugin.", E_ALL);
-			
-			foreach (self::$grep_files as $grep_file) {
-				self::$union_of_valid_file_types = array_merge(self::$union_of_valid_file_types, 
-					$grep_file->valid_file_types);
-			}
-			self::$union_of_valid_file_types = array_unique(self::$union_of_valid_file_types);	
+		if (!isset(static::$union_of_valid_file_types)) {
+			static::set_union_of_filetypes();
 		}
 
-		$this->valid_file_types = self::$union_of_valid_file_types;
-		parent::Plugin($filename, $file_contents);
+		$this->valid_file_types = static::$union_of_valid_file_types;
+		parent::__construct($filename, $file_contents);
 	}
+	
+	
+	protected static function load_grep_files(){
+		static::$grep_files = array();
+		$yasca =& Yasca::getInstance();
+		foreach ($yasca->plugin_file_list as $plugin){
+			if (startsWith($plugin, "_") || !endsWith($plugin, ".grep"))
+				continue;
+			
+			$grep_content = file($plugin, FILE_TEXT+FILE_IGNORE_NEW_LINES);
+			if (!array_any($grep_content, function($line) {return preg_match('/^\s*grep\s*=\s*(.*)/i', $line);}))
+				continue;
+				
+			if (!array_any($grep_content, function($line) {return preg_match('/^\s*category\s*=\s*(.*)/i', $line);}))
+				continue;
 
+			//Code below this line means it's a keeper plugin.
+			array_walk($grep_content, function (&$line) {
+				$line = trim($line);
+			});
+			static::$grep_files[] = new Grep_File($plugin, $grep_content);
+		}
+	}
+	
+	protected static function set_union_of_filetypes(){
+		static::$union_of_valid_file_types = array();
+		$yasca =& Yasca::getInstance();
+		$yasca->log_message("Loading all scannable file types for the Grep plugin.", E_ALL);
+		
+		foreach (static::$grep_files as $grep_file) {
+			static::$union_of_valid_file_types = array_merge(static::$union_of_valid_file_types, 
+				$grep_file->valid_file_types);
+		}
+		static::$union_of_valid_file_types = array_unique(static::$union_of_valid_file_types);	
+	}
 
 
 	public function execute() {
@@ -87,7 +98,7 @@ class Plugin_Grep extends Plugin {
 		$this->test_and_convert_file_contents();
 		$filename = null;
 
-		foreach (self::$grep_files as $grep_file) {
+		foreach (static::$grep_files as $grep_file) {
 			//If the loaded grep doesn't apply to the current file, then move on to the next grep.
 			if (!$this->check_in_filetype($this->filename, $grep_file->valid_file_types)){
 				continue;
@@ -162,7 +173,7 @@ class Plugin_Grep extends Plugin {
 		}
 	}
 	
-	private function test_and_convert_file_contents(){
+	protected function test_and_convert_file_contents(){
 		  // Perform UTF Conversion, if necessary
           if (is_array($this->file_contents)) {
           	
@@ -190,11 +201,9 @@ class Plugin_Grep extends Plugin {
             $this->file_contents = utf16_to_utf8($this->file_contents);        
           }
 	}
-	
-
-
 }
-class Grep_File{
+
+final class Grep_File{
 	public $name;
 	public $file_type;
 	public $grep = array();

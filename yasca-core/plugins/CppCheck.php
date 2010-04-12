@@ -1,5 +1,8 @@
 <?php
-
+require_once("lib/Common.php");
+require_once("lib/Plugin.php");
+require_once("lib/Result.php");
+require_once("lib/Yasca.php");
 /**
  * The cppcheck Plugin uses cppcheck to discover potential vulnerabilities in C/C++ files.
  *
@@ -17,24 +20,25 @@ class Plugin_CppCheck extends Plugin {
     
     protected static $already_executed = false;
     
-	public function Plugin_CppCheck($filename, &$file_contents){
-		if (self::$already_executed){
+	public function __construct($filename, $file_contents){
+		if (static::$already_executed){
 			$this->initialized = true;
 			return;
 		}
-		parent::Plugin($filename,$file_contents);
+		parent::__construct($filename,$file_contents);
 	}
 
     /**
      * Executes the cppcheck function. This calls out to the actual executable, but
      * process output comes back here.
      */
-    function execute() {
-        if (self::$already_executed) return;  
-        self::$already_executed = true;  
+    public function execute() {
+        if (static::$already_executed) return;  
+        static::$already_executed = true;  
 
         if (!isWindows()) return;        // only supporting Windows right now
-        //@todo Try using it with wine? Or perhaps create a yasca installer to compile cppcheck on the linux box it's using at the time?
+        //@todo Try using cppcheck with wine?
+        //@todo Perhaps create a yasca installer to compile cppcheck on the linux box it's using at the time?
 
         $yasca =& Yasca::getInstance();
         
@@ -80,7 +84,7 @@ class Plugin_CppCheck extends Plugin {
             	$message = ltrim(strstr($message, "]:", false), "]: ");
             }
             
-
+			$result->filename = $filename;
             $result->source = $message;
             $result->plugin_name = $yasca->get_adjusted_alternate_name("CppCheck", $message, "cppcheck");
             $result->severity = $yasca->get_adjusted_severity("CppCheck", $message, $error_node->getAttribute("severity"));
@@ -98,17 +102,14 @@ class Plugin_CppCheck extends Plugin {
 
 
             if (file_exists($filename) && is_readable($filename)) {
-                $t_file = @file($filename);
-                //@todo Use mb encoding module to ensure it's read on properly
+                $t_file = @file($filename, FILE_TEXT+FILE_IGNORE_NEW_LINES);
+                //@todo Use mb encoding module to ensure it's read on properly OR upgrade to PHP 6.
                 if ($t_file != false && is_array($t_file)) {
                     $result->source_context = array_slice( $t_file, max( $result->line_number-(($this->context_size+1)/2), 0), $this->context_size );
                 }
             } else {
                 $result->source_context = "";
             }
-            
-            //Hide the full path, as yasca could be running on a server the user should not know the full path of.
-            $result->filename = str_replace($dir, "", correct_slashes($filename));
 
             array_push($this->result_list, $result);
         }

@@ -10,9 +10,11 @@
  * @license see doc/LICENSE
  * @package Yasca
  */
-include_once("lib/Plugin.php");
-include_once("lib/common.php");
-include_once("lib/cache.php");
+require_once("lib/Plugin.php");
+require_once("lib/common.php");
+require_once("lib/cache.php");
+require_once("lib/Report.php");
+require_once("lib/Result.php");
 
 define("VERSION", "2.1");
 
@@ -20,7 +22,7 @@ define("VERSION", "2.1");
  * This class implements a generic code scanner.
  * @package Yasca
  */
-class Yasca {
+final class Yasca {
 	/**
 	 * Options parsed from the command line.
 	 * @var array
@@ -75,11 +77,6 @@ class Yasca {
 	public $general_cache = array();
 
 	/**
-	 * @var Yasca
-	 */
-	private static $instance = null;
-
-	/**
 	 * Usage not yet implemented.
 	 * @var Cache
 	 */
@@ -110,26 +107,48 @@ class Yasca {
 	
 	    return $val;
 	}
+	
+	/**
+	 * @var Yasca
+	 */
+	private static $instance = null;
+	
+	/**
+	 * Gets the singleton instance of the Yasca object
+	 * @param array $options Command line options (parsed). Ignored if Yasca instance already exists.
+	 * @todo rename to get_instance for consistency in naming convention
+	 */
+	public static function &getInstance(array $options = null) {
+		if (!isset(static::$instance)) {
+			static::$instance = new Yasca($options);
+		}
+		return static::$instance;
+	}	
 
 	/**
 	 * Creates a new Yasca scanner object using the options passed in.
-	 * If nothing passed in, then it will parse the command line options.
+	 * If null is passed in, then it will parse the command line options.
 	 * @param array $options command line options (parsed)
 	 */
-	private function Yasca($options = array()) {
-		$ini_mem = self::calculate_bytes(ini_get("memory_limit"));
+	private function __construct(array $options = null) {
+		$ini_mem = static::calculate_bytes(ini_get("memory_limit"));
 		if (isset($ini_mem)) $this->max_mem = $ini_mem;
 		
 		// Parse command line arguments if necessary
-		//@todo Better validation of $options than just checking if it's zero length.
-		$this->options = (count($options) == 0 ? $this->parse_command_line_arguments() : $options);
+		if (isset($options) && static::options_have_all_required_keys($options)){
+			$this->options = $options;
+		}else{
+			$this->parse_command_line_arguments();
+		};
+		
+		
 
 		$this->ignore_list = $this->parse_ignore_file($this->options['ignore-file']);
 		
 		$this->cache = new Cache(33554432);     // 32 meg cache
 
 		
-		Yasca::$instance =& $this;
+		static::$instance =& $this;
 		// Scan for target files
 		$this->log_message("Scanning for files...", E_USER_NOTICE);
 		if (is_file($this->options['dir'])) {       // Allow user to specify a single file
@@ -165,8 +184,9 @@ class Yasca {
 			$this->log_message("Invalid plugin directory specified.", E_USER_ERROR);
 		}
 		
-		//By default, remove ignored findings after a scan, and then sort.
-		$this->register_callback('post-scan', function () {
+		//By default, remove ignored findings after a scan, 
+		//clense the full paths from filenames,and then sort.
+		$this->register_callback("post-scan", function () {
 			$yasca =& Yasca::getInstance();
 	
 			if (!isset($yasca->results) || !is_array($yasca->results)) {
@@ -174,39 +194,47 @@ class Yasca {
 				return;
 			}
 			
-			$yasca->results = array_filter($yasca->results, function ($result) use ($yasca){
+			//Filter out the full pathnames
+			foreach ($yasca->results as &$result){
+				$result->filename = str_replace($yasca->options['dir'], "", correct_slashes($result->filename));
+			}
+			
+			//Filter out unique results
+			$yasca->results = array_unique_with_selector($yasca->results, function ($result) {
+				return "$result->filename->$result->line_number->$result->category->$result->severity->$result->source";
+			});
+			
+			//Filter out the ignored files
+			$yasca->results = array_filter($yasca->results, function ($result) use (&$yasca){
 				foreach ($yasca->ignore_list as $ignore) {
 					if (	$ignore->line_number == $result->line_number &&
 							$ignore->category == $result->category &&
-							$ignore->filename == correct_slashes($result->filename))
+							$ignore->filename == $result->filename)
 						return false;
 				}
 				return true;
 			});
 			
+			//Sort the results
 			usort($yasca->results, function($a, $b){ 
 				if (!is_object($a) || !is_object($b)) return 0;
 	
-				if ($a->severity == $b->severity && $a->category == $b->category) 
-					return ($a->filename . $a->line_number < $b->filename . $b->line_number ? 1 : -1);
-				 elseif ($a->severity == $b->severity) 
-					return ($a->category < $b->category ? 1 : -1);
-				 else 
+				if ($a->severity != $b->severity)
 					return ($a->severity < $b->severity ? -1 : 1);
+					
+				if ($a->category != $b->category)
+					return ($a->category < $b->category ? 1 : -1);
+				
+				if ($a->filename != $b->filename)
+					return ($a->filename < $b->filename ? 1 : -1);
+					
+				return ($a->line_number < $b->line_number ? -1 : 1);
 			});
 		});
 	}
 
-	/**
-	 * Gets the singleton instance of the Yasca object
-	 * @param array $options Command line options (parsed). Ignored if Yasca instance already exists.
-	 */
-	public static function &getInstance($options = array()) {
-		if (Yasca::$instance == null) {
-			Yasca::$instance = new Yasca($options);
-		}
-		return Yasca::$instance;
-	}	
+	
+
 
 	/**
 	 * This function initiates the scan. After checking various things, it passes
@@ -232,21 +260,22 @@ class Yasca {
 			$this->log_message("Attempting to scan [$target]", E_ALL);
 			$target_file_contents = null; //Lazy load, but keep a handle around.
 			
-			foreach ($this->plugin_list as $plugin) {
+			foreach ($this->plugin_list as $key => $plugin) {
 				$this->log_message("Initializing plugin [$plugin] on [$target]", E_USER_NOTICE);
 				
 				$plugin_obj = new $plugin($target, $target_file_contents);
 				if (!$plugin_obj->initialized) {
 					$this->log_message("Unable to instantiate plugin object of [$plugin] class. Plugin will be ignored.", E_USER_WARNING);
 					$total_executions -= count($this->target_list);
-					unset($this->plugin_list[array_search($plugin, $this->plugin_list)]);
+					unset($this->plugin_list[$key]);
 					continue;
 				}
 				
 				if (!isset($target_file_contents) && !$plugin_obj->is_multi_target 
 							&& $plugin_obj->is_valid_filetype){
 					// This is a slow process - is there a faster alternative?
-					$target_file_contents = file_get_contents($target);
+					//FILE_TEXT switch requires PHP 6 to function.
+					$target_file_contents = file($target, FILE_TEXT+FILE_IGNORE_NEW_LINES);
 					/* @todo Global unicode support requires compiling PHP with the mbstring module.
 					 * http://us2.php.net/manual/en/mbstring.installation.php
 					 * Note that enabling this line will render the
@@ -254,7 +283,6 @@ class Yasca {
 					 * removed when this is enabled.
 					 * $target_file_contents = mb_convert_encoding($target_file_contents, 'ISO-8859-1', 
 						"ASCII,JIS,UTF-8,EUC-JP,SJIS,UTF-16"); */
-					$target_file_contents = explode("\n", $target_file_contents);
 					$plugin_obj->file_contents = $target_file_contents;
 				}
 				$plugin_obj->run();
@@ -290,10 +318,10 @@ class Yasca {
 		foreach ($plugin_dir_list as $plugin_item) {
 			$plugin_item = trim($plugin_item);
 			if (is_file($plugin_item)) {
-				array_push($plugin_file_list, $plugin_item);
+				$plugin_file_list[] = $plugin_item;
 			} elseif (is_dir($plugin_item)) {
 				foreach ($this->dir_recursive($plugin_item) as $plugin_item) {
-					array_push($plugin_file_list, $plugin_item);
+					$plugin_file_list[] = $plugin_item;
 				}
 			}
 		}
@@ -320,85 +348,21 @@ class Yasca {
 					$this->log_message("Unable to find class in plugin file [$plugin_file]. Ignoring.", E_USER_WARNING);
 				}  else {
 					$this->log_message("Including plugin file [$plugin_file].", E_USER_NOTICE);
-					include($plugin_file);
+					include_once($plugin_file);
 					if (!class_exists($class_name) || 
 						!is_subclass_of($class_name, "Plugin")){
 						$this->log_message("Found $class_name in plugin file [$plugin_file], but it is not a Plugin.", E_USER_WARNING);
 					}
 					else{
 						//It is a valid plugin, add it to the list.
-						array_push($this->plugin_list, $class_name);
+						$this->plugin_list[] = $class_name;
 					}
 				}
 			}
 
 			// This holds all files possible for plugins, not just .php files
-			array_push($this->plugin_file_list, $plugin_file);
+			$this->plugin_file_list[] = $plugin_file;
 		}
-	}
-
-	/**
-	 * Recursive directory listing. Returns all files starting
-	 * at $start_dir.
-	 * @param string $start_dir starting directory (default=.)
-	 * @return array of filenames
-	 */
-	public static function dir_recursive($start_dir='.') {
-		$files = array();
-		$start_dir = correct_slashes($start_dir);    // canonicalize
-		if (is_dir($start_dir)) {
-			$fh = opendir($start_dir);
-			while (($file = readdir($fh)) !== false) {
-				if (strcmp($file, '.')==0 || strcmp($file, '..')==0) continue;
-					$filepath = $start_dir . DIRECTORY_SEPARATOR . $file;
-				if ( is_dir($filepath) )
-					$files = array_merge($files, Yasca::dir_recursive($filepath));
-				else
-					array_push($files, $filepath);
-			}
-			closedir($fh);
-		} else {
-			$files = false;
-		}
-		return $files;
-	}
-
-	/**
-	 * Signs a piece of data using a hash. Uses SHA-1 to hash the data.
-	 * @param string $data string to hash.
-	 * @param string $password salt used in the calculation.
-	 * @return hash of the data.
-	 */
-	public static function calculate_signature($data, $password="3A4B3f39jf203jfALSFJAEFJ30fn2q3lf32cQF3FG") {
-		$data = str_replace(array(chr(10), chr(14)), "", $data);
-		return sha1($password . $data . $password);
-	}
-
-	/**
-	 * Validates if a signature has been tampered with. Uses calculate_signature() to
-	 * re-calculate the signature.
-	 * @param string $data string to hash
-	 * @param string $signature purported signature
-	 * @param string $password salt used in the calculation.
-	 * @return boolean true iff the signature matches the expected.
-	 */
-	public static function validate_signature($data, $signature, $password="3A4B3f39jf203jfALSFJAEFJ30fn2q3lf32cQF3FG") {
-		return ($signature == calculate_signature($data, $password));
-	}
-
-	/**
-	 * Validates whether a report content has a valid hash.
-	 * @param string $data data to check (the report content)
-	 * @return true iff the signature matches the expected.
-	 */
-	public static function validate_report($data) {
-		if (!$data || strlen($data) == 0) return false;
-		$signature = substr($data, strlen($data)-62);
-		$matches = array();
-		if (!preg_match("/<\!-- SIGNATURE: \[[a-z0-9]+\] -->/", $signature, $matches)) return false;
-		$signature = $matches[1];                       // just the hash
-		$data = substr($data, 0, strlen($data)-62);     // pull out the signature
-		return validate_signature($data, $signature);
 	}
 
 	/**
@@ -421,14 +385,14 @@ class Yasca {
 	//Shouldn't $just_print be deprecated if it's essentially replaced by --debug?
 	public static function log_message($message, $severity = E_USER_NOTICE, $include_timestamp = false, $just_print = false) {
 		if (!$message || trim($message) == '') return;
-		if (!endsWith($message, "\n")) $message .= "\n";
+		if (substr($message, -1) != "\n") $message .= "\n";
 
 		if ($include_timestamp) {
 			$message = date('Y-m-d h:i:s ') . $message;
 		}
 
-		if (isset(Yasca::$instance)) {
-			$yasca =& Yasca::$instance;
+		if (isset(static::$instance)) {
+			$yasca =& static::$instance;
 			if ($yasca->options['silent']){
 				if ($severity == E_USER_ERROR) exit(1);
 				return;
@@ -471,7 +435,7 @@ class Yasca {
 			//Ignore the message without printing anything.
 		}		
 	}
-
+	
 	/**
 	 * Parses the command line arguments (argc, argv).
 	 * Will call exit(1) if the --help or --version switches are encountered.
@@ -498,59 +462,96 @@ class Yasca {
 		$opt['fixes'] = false;
 		$opt['parameter'] = array();    // will be filled in by -d options
 
+		$args = $parse_arguments ? $_SERVER["argc"] : 0;
+		
+		if ($args == 1) {
+			print(static::help());
+			exit(1);
+		}
+		
 		//Assign the values for arguments passed in.
-		for ($i = 1; $i < $_SERVER["argc"]; $i++) {
+		for ($i = 1; $i < $args; $i++) {
 			switch($_SERVER["argv"][$i]) {
 				case "-v":
 				case "--version":
 					print("Yasca-Core version " . constant("VERSION") . "\n");
+					//@todo Update to 2010?
 					print("Copyright (c) 2009 Michael V. Scovetta. See docs/license.txt for license information.\n");
 					exit(1);
 					break;
 
 				case "-h":
 				case "--help":
-					print(self::help());
+					print(static::help());
 					exit(1);
 					break;
 
 				case "-d":      /* Pass this parameter to underlying components */
-					parse_str($_SERVER['argv'][++$i], $opt['parameter']);
+					if (!isset($_SERVER['argv'][++$i])){
+						print(static::help());
+						exit(1);
+					}
+					parse_str($_SERVER['argv'][$i], $opt['parameter']);
 					break;
 
 				case "--debug":
 					$opt['debug'] = true;
+					//Debug inherits verbose; the lack of break is intentional.
 					
 				case "--verbose":
 					$opt['verbose'] = true;
 					break;
 
 				case "--log":
-					$opt['log'] = $_SERVER['argv'][++$i];
+					if (!isset($_SERVER['argv'][++$i])){
+						print(static::help());
+						exit(1);
+					}
+					$opt['log'] = $_SERVER['argv'][$i];
 					break;
 
 				case "-i":
 				case "--ignore-ext":
-					$opt['ignore-ext'] = $_SERVER['argv'][++$i];
+					if (!isset($_SERVER['argv'][++$i])){
+						print(static::help());
+						exit(1);
+					}
+					$opt['ignore-ext'] = $_SERVER['argv'][$i];
 					break;
 
 				case "--ignore-file":
-					$opt['ignore-file'] = $_SERVER['argv'][++$i];
+					if (!isset($_SERVER['argv'][++$i])){
+						print(static::help());
+						exit(1);
+					}
+					$opt['ignore-file'] = $_SERVER['argv'][$i];
 					break;
 
 				case "-o":
 				case "--output":
-					$opt['output'] = $_SERVER['argv'][++$i];
+					if (!isset($_SERVER['argv'][++$i])){
+						print(static::help());
+						exit(1);
+					}
+					$opt['output'] = $_SERVER['argv'][$i];
 					break;
 
 				case "-f":
 				case "--fixes":
-					$opt['fixes'] = $_SERVER['argv'][++$i];
+					if (!isset($_SERVER['argv'][++$i])){
+						print(static::help());
+						exit(1);
+					}
+					$opt['fixes'] = $_SERVER['argv'][$i];
 					break;
 
 				case "-sa":
 				case "--sa_home":
-					$opt['sa_home'] = $_SERVER['argv'][++$i];
+					if (!isset($_SERVER['argv'][++$i])){
+						print(static::help());
+						exit(1);
+					}
+					$opt['sa_home'] = $_SERVER['argv'][$i];
 					break;
 
 				case "--source-required":
@@ -559,17 +560,29 @@ class Yasca {
 
 				case "-p":
 				case "--plugin":
-					$opt['plugin_dir'] = $_SERVER['argv'][++$i];
+					if (!isset($_SERVER['argv'][++$i])){
+						print(static::help());
+						exit(1);
+					}
+					$opt['plugin_dir'] = $_SERVER['argv'][$i];
 					break;
 
 				case "-px":
 				case "--plugin-exclude":
-					$opt['plugin_exclude'] = $_SERVER['argv'][++$i];
+					if (!isset($_SERVER['argv'][++$i])){
+						print(static::help());
+						exit(1);
+					}
+					$opt['plugin_exclude'] = $_SERVER['argv'][$i];
 					break;
 
 				case "-r":
 				case "--report":
-					$opt['report'] = $_SERVER['argv'][++$i];
+					if (!isset($_SERVER['argv'][++$i])){
+						print(static::help());
+						exit(1);
+					}
+					$opt['report'] = $_SERVER['argv'][$i];
 					break;
 
 				case "-s":
@@ -579,7 +592,11 @@ class Yasca {
 
 				case "-l":
 				case "--level";
-					$opt['level'] = $_SERVER['argv'][++$i];
+					if (!isset($_SERVER['argv'][++$i])){
+						print(static::help());
+						exit(1);
+					}
+					$opt['level'] = $_SERVER['argv'][$i];
 					break;
 
 				default:
@@ -610,12 +627,19 @@ class Yasca {
 
 		$opt['plugin_exclude'] = explode(",", $opt['plugin_exclude']);
 
-		if ($parse_arguments == true && $_SERVER['argc'] == 1) {
-			print(self::help());
-			exit(1);
-		}
-
 		return $opt;
+	}
+	
+	private static function options_have_all_required_keys(array $options){
+		$required_keys = array('dir', 'plugin_dir', 'plugin_exclude',
+								'level', 'verbose', 'source_required',
+								'output', 'ignore-ext', 'ignore-file',
+								'sa_home', 'report', 'silent', 'debug',
+								'log', 'fixes', 'parameter');
+		foreach($required_keys as $key){
+			if (!isset($options[$key])) return false;
+		}
+		return true;
 	}
 
 	/**
@@ -664,16 +688,29 @@ END;
 	}
 	
 	/**
-	 * Instantiates and executes a report of type $report_type, or if not set, the type specified by --report.
-	 * @param string $report_type The type of report to generate. Defaults to the type defined by the --report switch.
-	 * @returns Report An instantiated and executed report.
+	 * Recursive directory listing. Returns all files starting
+	 * at $start_dir.
+	 * @param string $start_dir starting directory (default=.)
+	 * @return array of filenames or false if the input is not a directory
 	 */
-	public function &instantiate_report($report_type = null){
-		if (!isset($report_type)){
-			$report_type = $this->options['report'];
+	public static function dir_recursive($start_dir='.') {
+		$files = array();
+		$start_dir = correct_slashes($start_dir);    // canonicalize
+		if (is_dir($start_dir)) {
+			$fh = opendir($start_dir);
+			while (($file = readdir($fh)) !== false) {
+				if (strcmp($file, '.')==0 || strcmp($file, '..')==0) continue;
+					$filepath = $start_dir . DIRECTORY_SEPARATOR . $file;
+				if ( is_dir($filepath) )
+					$files = array_merge($files, static::dir_recursive($filepath));
+				else
+					$files[] = $filepath;
+			}
+			closedir($fh);
+		} else {
+			$files = false;
 		}
-		$report = Report::instantiate_report($report_type);
-		return $report;
+		return $files;
 	}
 
 	/**
@@ -689,6 +726,40 @@ END;
 			}
 		}
 		return false;
+	}
+	
+	/**
+	 * Instantiates and executes a report of type $report_type, or if not set, the type specified by --report.
+	 * @param string $report_type The type of report to generate. Defaults to the type defined by the --report switch.
+	 * @returns Report An instantiated and executed report.
+	 * @todo Instead simply go straight to Report::instantiate_report();
+	 */
+	public function &instantiate_report($report_type = null){
+		if (!isset($report_type)){
+			$report_type = $this->options['report'];
+		}
+		$report = Report::instantiate_report($report_type);
+		return $report;
+	}
+
+	/**
+	 * @param string $filename
+	 * @return array of StdClass containing fields filename, line_number, and category. Can be empty array.
+	 */
+	private static function parse_ignore_file($filename) {
+		if (!file_exists($filename) || !is_readable($filename)) return array();
+		$dom = new DOMDocument();
+		if (!@$dom->load($filename)) return array();
+		$elts = $dom->getElementsByTagName("ignore");
+		$ig_list = array();
+		foreach ($elts as $elt) {
+			$ig = new StdClass;
+			$ig->filename = correct_slashes($elt->getAttribute("filename"));
+			$ig->line_number = $elt->getAttribute("line_number");
+			$ig->category = $elt->getAttribute("category");
+			$ig_list[] = $ig;
+		}
+		return $ig_list;
 	}
 
 	/**
@@ -881,35 +952,15 @@ END;
 		}
 
 		foreach ($callback_list as $callback) {
-			@call_user_func($callback);
+			call_user_func($callback);
 		}
 	}
-
-	/**
-	 * @param string $filename
-	 * @return array of StdClass containing fields filename, line_number, and category.
-	 */
-	private static function parse_ignore_file($filename) {
-		if (!file_exists($filename) || !is_readable($filename)) return array();
-		$dom = new DOMDocument();
-		if (!@$dom->load($filename)) return array();
-		$elts = $dom->getElementsByTagName("ignore");
-		$ig_list = array();
-		foreach ($elts as $elt) {
-			$ig = new StdClass;
-			$ig->filename = correct_slashes($elt->getAttribute("filename"));
-			$ig->line_number = $elt->getAttribute("line_number");
-			$ig->category = $elt->getAttribute("category");
-			$ig_list[] = $ig;
-		}
-		return $ig_list;
-	}
-
 
 	/**
 	 * Place a small advertisement within Yasca.
 	 * @param string $type Returns a hyperlinked email address if =="HTML", ignored otherwise. Defaults to "HTML".
 	 * @return string The advertisement
+	 * @todo rename to get_advertisement_text for consistency in naming convention
 	 */
 	public static function getAdvertisementText($type="HTML") {
 		if ($type == "HTML") {
@@ -918,6 +969,46 @@ END;
 			$ad = "Commercial support is now available for Yasca. Contact scovetta@users.sourceforge.net for more information.";
 		}
 		return $ad;
+	}
+	
+/**
+	 * Signs a piece of data using a hash. Uses SHA-1 to hash the data.
+	 * @param string $data string to hash.
+	 * @param string $password salt used in the calculation.
+	 * @return hash of the data.
+	 * @todo Do not allow use of hardcoded password.
+	 */
+	public static function calculate_signature($data, $password="3A4B3f39jf203jfALSFJAEFJ30fn2q3lf32cQF3FG") {
+		$data = str_replace(array(chr(10), chr(14)), "", $data);
+		return sha1($password . $data . $password);
+	}
+
+	/**
+	 * Validates if a signature has been tampered with. Uses calculate_signature() to
+	 * re-calculate the signature.
+	 * @param string $data string to hash
+	 * @param string $signature purported signature
+	 * @param string $password salt used in the calculation.
+	 * @return boolean true iff the signature matches the expected.
+	 * @todo Do not allow use of hardcoded password.
+	 */
+	public static function validate_signature($data, $signature, $password="3A4B3f39jf203jfALSFJAEFJ30fn2q3lf32cQF3FG") {
+		return ($signature == calculate_signature($data, $password));
+	}
+
+	/**
+	 * Validates whether a report content has a valid hash.
+	 * @param string $data data to check (the report content)
+	 * @return true iff the signature matches the expected.
+	 */
+	public static function validate_report($data) {
+		if (!$data || strlen($data) == 0) return false;
+		$signature = substr($data, strlen($data)-62);
+		$matches = array();
+		if (!preg_match("/<\!-- SIGNATURE: \[[a-z0-9]+\] -->/", $signature, $matches)) return false;
+		$signature = $matches[1];                       // just the hash
+		$data = substr($data, 0, strlen($data)-62);     // pull out the signature
+		return static::validate_signature($data, $signature);
 	}
 }
 ?>

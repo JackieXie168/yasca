@@ -2,9 +2,10 @@ name = Possible SQL Injection
 file_type = cs,aspx,vb,asp
 grep = /(update|insert|delete|select)[^\+\;]*\&\s*(Request(\.form\(\s*\"(.*)\"\s*\)|\.QueryString\(\s*\"(.*)\"\s*\)|\(\s*\"(.*)\"\s*\))|Session\(\s*\"(.*)\"\s*\))\s*\&*/i
 grep = /(update|insert|delete|select)[^\+\;]*.*(from|into|set).*\+[^\"]/i
-category = Possible SQL Injection
 preprocess = asp_remove_line_continuation
-severity = 2
+severity = 1
+category = SQL Injection
+category_link = http://www.owasp.org/index.php/SQL_Injection
 description = 
 <p>
 	<h4>Possible SQL Injection</h4>

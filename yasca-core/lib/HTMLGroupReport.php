@@ -1,7 +1,8 @@
 <?php
-
-include_once("lib/Report.php");
-
+require_once("lib/Common.php");
+require_once("lib/Report.php");
+require_once("lib/Result.php");
+require_once("lib/Yasca.php");
 /**
  * HTMLGroupReport Class
  *
