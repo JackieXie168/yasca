@@ -189,7 +189,7 @@ final class Yasca {
 		$this->register_callback("post-scan", function () {
 			$yasca =& Yasca::getInstance();
 	
-			if (!isset($yasca->results) || !is_array($yasca->results)) {
+			if (!isset($yasca->results) || !is_array($yasca->results) || $yasca->results == NULL) {
 				$yasca->log_message("No results were found.", E_ALL);
 				return;
 			}
@@ -203,7 +203,7 @@ final class Yasca {
 			$yasca->results = array_unique_with_selector($yasca->results, function ($result) {
 				return "$result->filename->$result->line_number->$result->category->$result->severity->$result->source";
 			});
-			
+
 			//Filter out the ignored files
 			$yasca->results = array_filter($yasca->results, function ($result) use (&$yasca){
 				foreach ($yasca->ignore_list as $ignore) {
