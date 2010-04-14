@@ -115,7 +115,7 @@ class Plugin_PotentialConcerns extends Plugin_Grep {
 	    		$acc = "$acc <a title=\"\" target=\"_blank\" ";
 	    		$acc .= "href=\"file://$result->filename\" source_code_link=\"true\">";
 	    		$acc .= basename($result->filename);
-	    		$acc .= ":$result->line_number</a> $result->source $result->description <br/><br/>\n";
+	    		$acc .= ":$result->line_number</a> " . htmlentities($result->source) . " $result->description <br/><br/>\n";
 	    		return $acc;
 	    	});
    	 	});
