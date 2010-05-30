@@ -1,5 +1,5 @@
 <?php
-require_once("lib/Common.php");
+require_once("lib/common.php");
 require_once("lib/Plugin.php");
 require_once("lib/Result.php");
 require_once("lib/Yasca.php");
@@ -13,8 +13,8 @@ require_once("lib/Yasca.php");
 class Plugin_FindBugs extends Plugin {
     public $valid_file_types = array(); 	// All singletons do not use valid file types
 
-    public $executable = array('Windows' => '%SA_HOME%resources\\utility\\findbugs\\findbugs.bat -home %SA_HOME%resources/utility/findbugs $PLUGIN -include resources\\utility\\FindBugs\\filter.xml -textui -xml:withMessages -xargs -quiet',
-                               'Linux'   => '%SA_HOME%resources/utility/findbugs/findbugs -home %SA_HOME%resources/utility/findbugs $PLUGIN -include resources/utility/FindBugs/filter.xml -textui -xml:withMessages -xargs -quiet');
+    public $executable = array('Windows' => '%SA_HOME%resources\\utility\\findbugs\\findbugs.bat -home %SA_HOME%resources/utility/findbugs $PLUGIN $FILTER -textui -xml:withMessages -xargs -quiet',
+                               'Linux'   => '%SA_HOME%resources/utility/findbugs/findbugs -home %SA_HOME%resources/utility/findbugs $PLUGIN -textui -xml:withMessages -xargs -quiet');
 
     public $installation_marker = "findbugs";
     
@@ -79,11 +79,20 @@ class Plugin_FindBugs extends Plugin {
         $executable = $this->executable[getSystemOS()];
         $executable = $this->replaceExecutableStrings($executable);
 
+	if (file_exists("{$this->sa_home}resources/utility/findbugs/filter.xml")) {
+	    $executable = str_replace('$FILTER', "-include {$this->sa_home}resources/utility/FindBugs/filter.xml", $executable);
+	} else {
+	    $executable = str_replace('$FILTER', "", $executable);
+	}
+
         if (file_exists("{$this->sa_home}resources/utility/findbugs/plugin/fb-contrib-3.8.1.jar")) {
             $executable = str_replace('$PLUGIN', "-pluginList {$this->sa_home}resources/utility/findbugs/plugin/fb-contrib-3.8.1.jar", $executable);
         } else {
             $executable = str_replace('$PLUGIN', "", $executable);
         }
+
+
+	print "***> $executable <***";
 
         $process = proc_open($executable, $descriptor_spec, $pipes);
         $xml = "";

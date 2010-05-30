@@ -3,7 +3,7 @@
 //and remove the next line.
 require_once("plugins/Grep.php");
 
-require_once("lib/Common.php");
+require_once("lib/common.php");
 require_once("lib/Plugin.php");
 require_once("lib/Result.php");
 require_once("lib/Yasca.php");

@@ -1,11 +1,11 @@
 <?php
-require_once("lib/Common.php");
+require_once("lib/common.php");
 require_once("lib/Plugin.php");
 require_once("lib/Result.php");
 require_once("lib/Yasca.php");
 require_once("lib/PreProcessors.php");
 /**
- * The Grep Plugin is a special plugin that faciliates .grep psuedo-plugins, which
+ * The Grep Plugin is a special plugin that facilitates .grep psuedo-plugins, which
  * are just files in the PLUGINS directory that contain necessary information to scan
  * the target files.
  * 
