@@ -21,7 +21,7 @@ class Plugin_Rats extends Plugin {
     public $executable = array('Windows' => "%SA_HOME%resources\\utility\\rats\\rats.exe",
                                'Linux' => "%SA_HOME%/resources/utility/rats/rats");  
 
-    protected static $alreadyExecuted = false;
+    protected static $already_executed = false;
     
     private $USE_WINE = false;        // set this to 'true' in order to use wine and the Windows .exe on Linux
     
@@ -48,8 +48,8 @@ class Plugin_Rats extends Plugin {
     * Executes the Rats executable. This calls out to rats.exe, with output being processed.
     */  
     function execute() {  
-        if (static::$alreadyExecuted == 1) return;  
-        static::$alreadyExecuted = 1;
+        if (static::$already_executed == 1) return;  
+        static::$already_executed = 1;
           
         if (!$this->canExecute) return;
              
