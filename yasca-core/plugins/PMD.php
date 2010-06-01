@@ -47,6 +47,7 @@ class Plugin_PMD extends Plugin {
         $rulepaths = $yasca->plugin_file_list;
         $rpatharray = array();
         foreach ($rulepaths as $rulepath) {
+            print "[$rulepath]\n";
             $pinfo = pathinfo($rulepath);
             if (isset($pinfo['extension']) &&
                 $pinfo['extension'] == 'xml' && 
@@ -54,6 +55,7 @@ class Plugin_PMD extends Plugin {
                 $rpatharray[] = "" . $rulepath;
             }
         }
+        print_r($rpatharray);
         return $rpatharray;
     }   
 

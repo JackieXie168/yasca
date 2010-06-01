@@ -34,7 +34,7 @@ class ConsoleReport extends Report {
                 continue;
             $filename = $result->filename;
             $pinfo = pathinfo($filename);
-            $ext = $pinfo['extension'];
+            $ext = isset($pinfo['extension']) ? $pinfo['extension'] : "";
             if (isset($result->custom['translation'])) {
                 $t = $result->custom['translation'];
                 $filename = $t[basename($filename, ".$ext")];

@@ -964,9 +964,9 @@ END;
 	 */
 	public static function getAdvertisementText($type="HTML") {
 		if ($type == "HTML") {
-			$ad = "Commercial support is now available for Yasca. Contact <a href=\"mailto:scovetta@users.sourceforge.net\">scovetta@users.sourceforge.net</a> for more information.";
+			$ad = "Commercial support is now available for Yasca through <a href=\"http://www.tasecuritygroup.com/\" target=\"blank\">Trusted Advisor Security</a>. Contact <a href=\"mailto:support@tasecuritygroup.com\">support@tasecuritygroup.com</a> for more information.";
 		} else {
-			$ad = "Commercial support is now available for Yasca. Contact scovetta@users.sourceforge.net for more information.";
+			$ad = "Commercial support is now available for Yasca Trusted Advisor Security. Contact support@tasecuritygroup.com for more information.";
 		}
 		return $ad;
 	}

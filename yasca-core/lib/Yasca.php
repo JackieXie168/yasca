@@ -16,7 +16,7 @@ require_once("lib/cache.php");
 require_once("lib/Report.php");
 require_once("lib/Result.php");
 
-define("VERSION", "2.1");
+define("VERSION", "2.2");
 
 /**
  * This class implements a generic code scanner.
@@ -387,6 +387,19 @@ final class Yasca {
 		if (!$message || trim($message) == '') return;
 		if (substr($message, -1) != "\n") $message .= "\n";
 
+		switch($severity) {
+		    case E_USER_NOTICE:
+		        $msgPrefix = "INFO  "; break;
+		    case E_USER_WARNING:
+		        $msgPrefix = "WARN  "; break;
+		    case E_USER_ERROR:
+		        $msgPrefix = "ERROR "; break;
+		    case E_ALL:
+		        $msgPrefix = "INFO  "; break;
+		    default:
+		        $msgPrefix = "INFO  "; break;
+		}
+		
 		if ($include_timestamp) {
 			$message = date('Y-m-d h:i:s ') . $message;
 		}
@@ -398,12 +411,12 @@ final class Yasca {
 				return;
 			}
 		} else {
-			print $message;
+			print $msgPrefix . $message;
 			return;
 		}
 
 		if ($just_print) {
-			print $message;
+			print $msgPrefix . $message;
 			return;
 		}
 
@@ -417,13 +430,13 @@ final class Yasca {
 			if (isset($yasca->progress_callback) && is_callable($yasca->progress_callback)) {
 				call_user_func($yasca->progress_callback, array("log_message", $message));
 			} else {
-				print $message;
+				print $msgPrefix . $message;
 			}
 				
 			// Log to a file as well?
 			if ($yasca->options['log'] !== false && is_file($yasca->options['log'])) {
 				$d = date('Y-m-d h:i:s ');
-				file_put_contents($yobj->options['log'], $d . $message, 'FILE_APPEND');
+				file_put_contents($yobj->options['log'], $msgPrefix . $d . $message, 'FILE_APPEND');
 			}
 			
 			if ($severity == E_USER_ERROR) {

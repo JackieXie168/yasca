@@ -9,35 +9,62 @@
  * @package Yasca
  */ 
 class Plugin_JavaScriptLint extends Plugin {
-    public $valid_file_types = array("js");
+    public $valid_file_types = array("JAVASCRIPT");
 
     public $is_multi_target = true;
 
+    public $executable = array('Windows' => "%SA_HOME%resources\\utility\\javascriptlint\\jsl.exe",
+                               'Linux'   => "%SA_HOME%resources/utility/javascriptlint/jsl");  
+    
     public $installation_marker = "javascriptlint";
     
+    /** Attempt to use wine to run the Windows version of the executable? */
+    private $USE_WINE = false;
+    
+    protected static $already_executed = false;
+    
+	public function __construct($filename, $file_contents){
+		if (static::$already_executed){
+			$this->initialized = true;
+			return;
+		}
+		parent::__construct($filename,$file_contents);
+	}
+	
     function execute() {
-        static $alreadyExecuted;
-        if ($alreadyExecuted == 1) return;
-        $alreadyExecuted = 1;
+        if (static::$already_executed) return;  
+        static::$already_executed = true;  
         
         $yasca =& Yasca::getInstance();
         $dir = $yasca->options['dir'];
         $jslint_results = array();
+
+        $executable = $this->executable[getSystemOS()];
+        $executable = $this->replaceExecutableStrings($executable);
+        $star_suffix = is_dir($dir) ? (getSystemOS() == "Windows" ? "\\*" : "/*") : "";
         
-        // Try to execute using native binary of via wine, if possible
+        // Try to execute using native binary or via wine, if possible
         if (getSystemOS() == "Windows") {
-            $star_suffix = is_dir($dir) ? "\\*" : "";
             $yasca->log_message("Forking external process (JavaScriptLint)...", E_USER_WARNING);
-            exec( "{$this->sa_home}resources\\utility\\javascriptlint\\jsl.exe +recurse -process \"" . addslashes($dir) . $star_suffix . "\" 2>&1", $jslint_results);
+            exec( $executable . " +recurse -process \"" . addslashes($dir) . $star_suffix . "\" 2>&1", $jslint_results);
             $yasca->log_message("External process completed...", E_USER_WARNING);
         } else if (getSystemOS() == "Linux") {
-            if (preg_match("/no wine in/", `which wine`)) {
-                $yasca->log_message("No JavaScript Lint executable and wine not found.", E_ALL);
-                return;
+            if ($this->USE_WINE) {
+                $wine_arr = array();
+                $wine_errorlevel = 0;
+                exec("which wine", $wine_arr, $wine_errorlevel);
+            
+                if (preg_match("/no wine in/", implode(" ", $wine_arr)) || $wine_errorlevel == 1) {
+                    $yasca->log_message("No Linux \"JavaScript Lint\" executable and wine not found.", E_ALL);
+                    return;
+                } else {
+                    $yasca->log_message("Forking external process (JavaScriptLint)...", E_USER_WARNING);
+                    exec( "wine " . $executable . " +recurse -process \"" . addslashes($dir) . $star_suffix . "\" 2>&1", $jslint_results);
+                    $yasca->log_message("External process completed...", E_USER_WARNING);
+                }
             } else {
-                $star_suffix = is_dir($dir) ? "/*" : "";
                 $yasca->log_message("Forking external process (JavaScriptLint)...", E_USER_WARNING);
-                exec( "wine {$this->sa_home}resources/utility/javascriptlint/jsl.exe +recurse -process \"" . addslashes($dir) . $star_suffix . "\" 2>&1", $jslint_results);
+                exec( $executable . " +recurse -process \"" . addslashes($dir) . $star_suffix . "\" 2>&1", $jslint_results);
                 $yasca->log_message("External process completed...", E_USER_WARNING);
             }
         }
@@ -96,6 +123,7 @@ END;
             }
         }   
     }
+    
     function convert_to_severity($str, $filename) {
         $yasca =& Yasca::getInstance();
         if ($str == "" || $str === false) {

@@ -96,7 +96,8 @@ abstract class Plugin {
 	public $canExecute = true;
 
 	private static $ext_classes = array( "JAVA"       => array("java", "jsp", "jsw"),
-                                         "C"          => array("c", "cpp", "h"),
+	                                     "JAVASCRIPT" => array("js", "html", "css", "js", "htm", "hta"),
+                                         "C"          => array("c", "cpp", "h", "cxx", "cc", "c++"),
                                          "HTML"       => array("html", "css", "js", "htm", "hta"),
                                          "BINARY"     => array("dll", "zip", "jar", "ear", "war", "exe"),
                                          "PHP"        => array("php", "php5", "php4"),
@@ -104,7 +105,8 @@ abstract class Plugin {
                                          "COBOL"      => array("cobol", "cbl", "cob"),
                                          "PERL"       => array("pl", "cgi"),
                                          "PYTHON"     => array("py"),
-                                         "COLDFUSION" => array("cfm", "cfml")
+                                         "COLDFUSION" => array("cfm", "cfml"),
+	                                     "RUBY"       => array("rb")
 	);
 	
 	/**

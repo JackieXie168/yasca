@@ -208,5 +208,9 @@ abstract class Report {
         else
             return ($a['severity'] < $b['severity']) ? -1 : 1;
     }
+    
+    public final function num_records() {
+	return isset($this->results) ? count($this->results) : 0;
+    }
 }
 ?>

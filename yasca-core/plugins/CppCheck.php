@@ -12,7 +12,8 @@ require_once("lib/Yasca.php");
 class Plugin_CppCheck extends Plugin {
     public $valid_file_types = array();
 
-    public $executable = array('Windows' => "%SA_HOME%resources\\utility\\cppcheck.exe" );
+    public $executable = array('Windows' => "%SA_HOME%resources\\utility\\cppcheck\\cppcheck.exe",
+                               'Linux'   => "%SA_HOME%resources/utility/cppcheck/cppcheck" );
 
     public $installation_marker = "cppcheck";
 
@@ -35,10 +36,6 @@ class Plugin_CppCheck extends Plugin {
     public function execute() {
         if (static::$already_executed) return;  
         static::$already_executed = true;  
-
-        if (!isWindows()) return;        // only supporting Windows right now
-        //@todo Try using cppcheck with wine?
-        //@todo Perhaps create a yasca installer to compile cppcheck on the linux box it's using at the time?
 
         $yasca =& Yasca::getInstance();
         
@@ -63,18 +60,19 @@ class Plugin_CppCheck extends Plugin {
             
         $dom = new DOMDocument();
         if (!@$dom->loadXML($cpp_result)) {
-            $yasca->log_message("cppcheck did not return valid XML", E_USER_WARNING);
+            $yasca->log_message("Cppcheck did not return valid XML", E_USER_WARNING);
             return;
         }
 
         foreach ($dom->getElementsByTagName("error") as $error_node) {
             $result = new Result();
             $result->line_number = $error_node->getAttribute("line");
-            $result->category = "cppcheck: " . $error_node->getAttribute("id");
+            $result->category = "Cppcheck: " . $error_node->getAttribute("id");
             $result->category_link = "http://sourceforge.net/projects/cppcheck/";
             $result->is_source_code = false;
             $message = $error_node->getAttribute("msg");
             $filename = $error_node->getAttribute("file");
+            if ($filename == "") $filename = "(Unknown)";
             $source = $message;
             
             //CppCheck will output results differently if this is true. Compensate.
