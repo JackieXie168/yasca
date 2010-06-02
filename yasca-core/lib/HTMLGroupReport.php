@@ -80,7 +80,7 @@ class HTMLGroupReport extends Report {
                     "<tr>" .
                     " <td colspan=\"3\" style=\"padding: 4px;font-weight: bold;\">" .
                                         "<a name=\"" . md5($category) . "\"></a>" .
-                    "$category_link_field</td></tr>");
+                    "$category_link_field &nbsp;&nbsp;&nbsp;<i><a style=\"color:#888888;font-weight:normal;\" href=\"javascript:void(0);\" onclick=\"toggle_category(event)\">hide</a></i></td></tr>");
                 $current_category = $category;
             } 
             
@@ -724,6 +724,37 @@ class HTMLGroupReport extends Report {
                         }
                         cancel_event(evt);
                     }
+
+                    // Toggles an entire category (show/hide)
+					function toggle_category(evt) {
+						try {
+							evt = (window.event) ? window.event : evt;
+							var elt = (evt.srcElement) ? evt.srcElement : evt.target;
+
+							var hide = true;
+							
+							if (elt.innerHTML == "hide") {
+								elt.innerHTML = "show";
+							} else {
+								elt.innerHTML = "hide";
+								hide = false;
+							}
+
+							while (elt != null && elt.nodeName != "TR") elt = elt.parentNode;
+							while(elt != null) {
+								elt = elt.nextElementSibling || elt.nextSibling;
+								if (elt.nodeName == "TR" && elt.id != "") {
+									elt.style.display = hide ? 'none' : '';
+									continue;
+								} else {
+									break;
+								}
+							}
+						} catch(e) {
+							// error
+						}
+					}
+
                 </script>
                 
             </head>
@@ -753,7 +784,7 @@ class HTMLGroupReport extends Report {
                     <div id="attachment_list" style="float:right;$attachment_list_style">Attachments: $attachment_list_select_box</div>
                     <div>
                     <table style="border:0;">
-                        <tr><td class="header_left" nowrap>Yasca Version:</td><td class="header_right">$version [ <a target="_blank" href="http://yasca.sourceforge.net/check_version.php?current_version=$version">check for updates</a> ]</td></tr>
+                        <tr><td class="header_left" nowrap>Yasca Version:</td><td class="header_right">$version [ <a target="_blank" href="http://sourceforge.net/projects/yasca/files/">check for updates</a> ]</td></tr>
                         <tr><td class="header_left" nowrap>Report Generated:</td><td class="header_right">$generation_date</td></tr>
                         <tr><td class="header_left" nowrap>Options:</td><td class="header_right">
                         [ <a href="javascript:void(0);" onclick="show_change_base(event);">change links</a> | <a href="javascript:void(0);" onclick="save_ignore_list(event);">save ignore list</a> | <a href="http://yasca.sourceforge.net/userguide.php" target="_blank">user guide</a> | <a href="http://yasca.sourceforge.net/feedback.php">send feedback</a> ]</td></tr>

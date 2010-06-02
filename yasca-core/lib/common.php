@@ -411,4 +411,37 @@ function utf16_to_utf8($str) {
     }
     return $dec;
 }
+
+function dir_recursive($start_dir, $file_types = array()) {
+    $files = array();
+    $start_dir = str_replace("\\", "/", $start_dir);    // canonicalize
+
+    if (is_dir($start_dir)) {
+        $fh = opendir($start_dir);
+
+        while (($file = readdir($fh)) !== false) {
+            if (strcmp($file, '.')==0 || strcmp($file, '..')==0) continue;
+
+            $filepath = $start_dir . '/' . $file;
+            if ( is_dir($filepath) ) {
+                $files = array_merge($files, dir_recursive($filepath, $file_types));
+            } else {
+				if (count($file_types) == 0) {
+					array_push($files, $filepath);
+				} else {
+                	foreach ($file_types as $file_type) {
+                    	if (endsWith($file, $file_type)) {
+                        	array_push($files, $filepath);
+                    	}
+                	}
+				}
+
+            }
+        }
+        closedir($fh);
+    } else {
+        $files = false;
+    }
+    return $files;
+}
 ?>
