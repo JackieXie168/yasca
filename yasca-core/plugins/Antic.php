@@ -71,23 +71,24 @@ class Plugin_Antic extends Plugin {
             $yasca->log_message("antiC returned: " . implode("\r\n", $antic_results), E_ALL);
         
         foreach ($antic_results as $antic_result) {
-            $matches = explode(":", $antic_result, 4);
-            if (count($matches) !== 4) continue;
-            $filename = $matches[0];
-            $line_number = $matches[1];
-            $message = $matches[3];
+			print $antic_result . "\n";
+		    if (preg_match("/^(.*):(\\d+):(\\d+): (.*)$/", $antic_result, $matches)) {
+			    $filename = $matches[1];
+			    $line_number = $matches[2];
+			    $message = $matches[4];
             
-            $result = new Result();
-            $result->line_number = $line_number;
-            $result->filename = $filename;
-            $result->plugin_name = $yasca->get_adjusted_alternate_name("Antic", $message, $message);
-            $result->severity = $yasca->get_adjusted_severity($result->plugin_name, $message, 4);
-            $result->category = "Antic Finding";
-            $result->category_link = "http://artho.com/jlint/";
-            $result->source = $yasca->get_adjusted_description($result->plugin_name, $message, $message);
-            $result->is_source_code = false;
-            $result->source_context = array_slice( file($filename), max( $result->line_number-(($this->context_size+1)/2), 0), $this->context_size );
-            array_push($this->result_list, $result);
+                $result = new Result();
+                $result->line_number = $line_number;
+                $result->filename = $filename;
+                $result->plugin_name = $yasca->get_adjusted_alternate_name("Antic", $message, $message);
+                $result->severity = $yasca->get_adjusted_severity($result->plugin_name, $message, 4);
+                $result->category = "Antic Finding";
+                $result->category_link = "http://artho.com/jlint/";
+                $result->source = $yasca->get_adjusted_description($result->plugin_name, $message, $message);
+                $result->is_source_code = false;
+                $result->source_context = array_slice( file($filename), max( $result->line_number-(($this->context_size+1)/2), 0), $this->context_size );
+                array_push($this->result_list, $result);
+            }
         }   
         print_r($this->result_list);
     }   
