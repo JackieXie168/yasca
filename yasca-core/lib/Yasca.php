@@ -465,7 +465,7 @@ final class Yasca {
 		$opt['verbose'] = false;
 		$opt['source_required'] = false;
 		$opt['output'] = Report::default_dir();
-		$opt['ignore-ext'] = "exe,zip,jpg,gif,png,pdf,class";
+		$opt['ignore-ext'] = "exe,zip,jpg,gif,png,pdf";
 		$opt['ignore-file'] = false;
 		$opt['sa_home'] = isset($_ENV['SA_HOME']) ? $_ENV['SA_HOME'] : ".";
 		$opt['report'] = Report::default_type;
