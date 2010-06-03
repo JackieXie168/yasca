@@ -79,20 +79,17 @@ class Plugin_FindBugs extends Plugin {
         $executable = $this->executable[getSystemOS()];
         $executable = $this->replaceExecutableStrings($executable);
 
-	if (file_exists("{$this->sa_home}resources/utility/findbugs/filter.xml")) {
-	    $executable = str_replace('$FILTER', "-include {$this->sa_home}resources/utility/FindBugs/filter.xml", $executable);
-	} else {
-	    $executable = str_replace('$FILTER', "", $executable);
-	}
+        if (file_exists("{$this->sa_home}resources/utility/findbugs/filter.xml")) {
+            $executable = str_replace('$FILTER', "-include {$this->sa_home}resources/utility/FindBugs/filter.xml", $executable);
+        } else {
+            $executable = str_replace('$FILTER', "", $executable);
+        }
 
         if (file_exists("{$this->sa_home}resources/utility/findbugs/plugin/fb-contrib-3.8.1.jar")) {
             $executable = str_replace('$PLUGIN', "-pluginList {$this->sa_home}resources/utility/findbugs/plugin/fb-contrib-3.8.1.jar", $executable);
         } else {
             $executable = str_replace('$PLUGIN', "", $executable);
         }
-
-
-	print "***> $executable <***";
 
         $process = proc_open($executable, $descriptor_spec, $pipes);
         $xml = "";

@@ -67,7 +67,7 @@ class Plugin_Rats extends Plugin {
             if (getSystemOS() == "Windows") {
                 if (file_exists($this->replaceExecutableStrings($executable))) {
                     $yasca->log_message("Forking external process (RATS) ($rats_plugin)...", E_USER_WARNING);
-                    exec( $executable . " --db \"$rats_plugin\" --quiet --xml " . escapeshellarg($dir) . " 2>&1", $raw_results);	                
+                    exec( $executable . " --db \"$rats_plugin\" --quiet --xml " . escapeshellarg($dir) . " 2>NUL", $raw_results);	                
                     $yasca->log_message("External process completed...", E_USER_WARNING);
                 } else {
                     $yasca->log_message("Plugin \"RATS\" not installed. Download it at yasca.org.", E_USER_WARNING);
@@ -84,11 +84,11 @@ class Plugin_Rats extends Plugin {
                     } else {
                         $yasca->log_message("Forking external process (RATS) ($rats_plugin)...", E_USER_WARNING);
                         $executable = "wine " . $this->executable['Windows'];
-                        exec( $executable . " --db \"$rats_plugin\" --quiet --xml " . escapeshellarg($dir) . " 2>&1", $raw_results);
+                        exec( $executable . " --db \"$rats_plugin\" --quiet --xml " . escapeshellarg($dir) . " 2>/dev/null", $raw_results);
                     }
                 } else {
                     $yasca->log_message("Forking external process (RATS) ($rats_plugin)...", E_USER_WARNING);
-                    exec( $executable . " --db \"$rats_plugin\" --quiet --xml " . escapeshellarg($dir) . " 2>&1", $raw_results);
+                    exec( $executable . " --db \"$rats_plugin\" --quiet --xml " . escapeshellarg($dir) . " 2>/dev/null", $raw_results);
                     $yasca->log_message("External process completed...", E_USER_WARNING);
                 }
             }
