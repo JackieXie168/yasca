@@ -96,8 +96,7 @@ class Plugin_JLint extends Plugin {
             $result->is_source_code = false;
             $result->source_context = "";
             array_push($this->result_list, $result);
-        }
-        print_r($this->result_list);   
+        }   
     }   
 }
 ?>

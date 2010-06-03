@@ -71,7 +71,6 @@ class Plugin_Antic extends Plugin {
             $yasca->log_message("antiC returned: " . implode("\r\n", $antic_results), E_ALL);
         
         foreach ($antic_results as $antic_result) {
-			print $antic_result . "\n";
 		    if (preg_match("/^(.*):(\\d+):(\\d+): (.*)$/", $antic_result, $matches)) {
 			    $filename = $matches[1];
 			    $line_number = $matches[2];
@@ -90,7 +89,6 @@ class Plugin_Antic extends Plugin {
                 array_push($this->result_list, $result);
             }
         }   
-        print_r($this->result_list);
     }   
 }
 ?>

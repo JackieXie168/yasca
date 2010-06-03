@@ -14,19 +14,33 @@ class Plugin_IntegrityCheck extends Plugin {
 
     public $installation_marker = true;
     
-    function execute() {
-        if (getSystemOS() !== 'Windows') return;        // Only execute on Windows
-        
-        static $alreadyExecuted;
-        if ($alreadyExecuted == 1) return;
-        $alreadyExecuted = 1;
+    protected static $already_executed = false;
+    
+    private static $DEFAULT_IC_DATABASE = "./IntegrityCheck_Reference.ser";
+    
+	public function __construct($filename, $file_contents){
+		if (static::$already_executed){
+			$this->initialized = true;
+			return;
+		}
+		parent::__construct($filename,$file_contents);
+	}
+
+    /**
+     * Executes the cppcheck function. This calls out to the actual executable, but
+     * process output comes back here.
+     */
+    public function execute() {
+        if (static::$already_executed) return;  
+        static::$already_executed = true;  
         
         $yasca =& Yasca::getInstance();
         $dir = $yasca->options['dir'];
 
-		$referenceFile = (isset($yasca->options['parameter']['IntegrityCheck_ReferenceFile']) ?
-						  $yasca->options['parameter']['IntegrityCheck_ReferenceFile'] :
-						  "./IntegrityCheck_Reference.ser");
+        $referenceFile = static::$DEFAULT_IC_DATABASE;
+		if (isset($yasca->options['parameter']['IntegrityCheck_ReferenceFile'])) {
+            $referenceFile = $yasca->options['parameter']['IntegrityCheck_ReferenceFile']; 
+		}
 
 		if (file_exists($referenceFile)) {
 			$file_list = unserialize(file_get_contents($referenceFile));
@@ -39,6 +53,7 @@ class Plugin_IntegrityCheck extends Plugin {
 			}
 			file_put_contents($referenceFile, serialize($file_list));
 		}
+		
 		if (isset($file_list)) {
 			foreach (dir_recursive($dir) as $file) {
 				if ($file_list[$file] !== sha1_file($file, false)) {
