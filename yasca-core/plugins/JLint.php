@@ -45,7 +45,7 @@ class Plugin_JLint extends Plugin {
         // Try to execute using native binary of via wine, if possible
         if (getSystemOS() == "Windows") {
             $yasca->log_message("Forking external process (JLint)...", E_USER_WARNING);
-            exec( $executable . " -source " . escapeshellarg($dir) . " " . escapeshellarg($dir) . "", $jlint_results);
+            exec( $executable . " -source " . escapeshellarg($dir) . " " . escapeshellarg($dir) . " 2>NUL", $jlint_results);
             $yasca->log_message("External process completed...", E_USER_WARNING);
         } else if (getSystemOS() == "Linux") {
             if ($this->USE_WINE) {
@@ -58,12 +58,12 @@ class Plugin_JLint extends Plugin {
                     return;
                 } else {
                     $yasca->log_message("Forking external process (JLint)...", E_USER_WARNING);
-                    exec( "wine " . $executable . " -source " . escapeshellarg($dir) . " " . escapeshellarg($dir) . "", $jlint_results);
+                    exec( "wine " . $executable . " -source " . escapeshellarg($dir) . " " . escapeshellarg($dir) . " 2>/dev/null", $jlint_results);
                     $yasca->log_message("External process completed...", E_USER_WARNING);
                 }
             } else {
                 $yasca->log_message("Forking external process (JLint)...", E_USER_WARNING);
-                exec( $executable . " -source " . escapeshellarg($dir) . " " . escapeshellarg($dir) . "", $jlint_results);
+                exec( $executable . " -source " . escapeshellarg($dir) . " " . escapeshellarg($dir) . " 2>/dev/null", $jlint_results);
                 $yasca->log_message("External process completed...", E_USER_WARNING);
             }
         }
