@@ -122,4 +122,3 @@ class Plugin_PotentialConcerns extends Plugin_Grep {
     }
 }
 ?>
-

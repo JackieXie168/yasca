@@ -91,4 +91,3 @@ class Plugin_ClamAV extends Plugin {
     }
 }
 ?>
-
