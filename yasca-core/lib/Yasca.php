@@ -6,7 +6,7 @@
  * files and plugins, and executing those plugins. The output of this all is a list of
  * Result objects that can be passed to a renderer.
  * @author Michael V. Scovetta <scovetta@users.sourceforge.net>
- * @version 2.1
+ * @version 2.2
  * @license see doc/LICENSE
  * @package Yasca
  */
@@ -135,20 +135,18 @@ final class Yasca {
 		if (isset($ini_mem)) $this->max_mem = $ini_mem;
 		
 		// Parse command line arguments if necessary
-		if (isset($options) && static::options_have_all_required_keys($options)){
+		if (isset($options) && static::options_have_all_required_keys($options)) {
 			$this->options = $options;
-		}else{
+		} else {
 			$this->parse_command_line_arguments();
-		};
+		}
 		
-		
-
 		$this->ignore_list = $this->parse_ignore_file($this->options['ignore-file']);
 		
 		$this->cache = new Cache(33554432);     // 32 meg cache
-
 		
 		static::$instance =& $this;
+
 		// Scan for target files
 		$this->log_message("Scanning for files...", E_USER_NOTICE);
 		if (is_file($this->options['dir'])) {       // Allow user to specify a single file
@@ -478,6 +476,8 @@ final class Yasca {
 		$args = $parse_arguments ? $_SERVER["argc"] : 0;
 		
 		if ($args == 1) {
+            print("Yasca-Core version " . constant("VERSION") . "\n");
+            print("Copyright (c) 2010 Michael V. Scovetta. See docs/LICENSE for license information.\n\n");
 			print(static::help());
 			exit(1);
 		}
@@ -488,8 +488,7 @@ final class Yasca {
 				case "-v":
 				case "--version":
 					print("Yasca-Core version " . constant("VERSION") . "\n");
-					//@todo Update to 2010?
-					print("Copyright (c) 2009 Michael V. Scovetta. See docs/license.txt for license information.\n");
+					print("Copyright (c) 2010 Michael V. Scovetta. See docs/LICENSE for license information.\n");
 					exit(1);
 					break;
 
@@ -890,7 +889,7 @@ END;
 	 */
 	public function get_adjusted_alternate_name($plugin_name, $finding_name = "", $default_text = "") {
 		if ($plugin_name == "") {
-			$this->log_message("No plugin name passed to get_adjusted_alternate_name (finding_name=$finding_name)", E_USER_ERROR);
+			$this->log_message("No plugin name passed to get_adjusted_alternate_name (finding_name=$finding_name)", E_USER_WARNING);
 		}
 		if (!isset($this->adjustment_list)) {
 			$this->load_adjustments();

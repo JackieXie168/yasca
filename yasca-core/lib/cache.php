@@ -55,7 +55,6 @@ class Cache {
         $p = pathinfo($filename);
         $c_filename = $p['dirname'] . '/' . $p['basename'];
         $c = $this->get($c_filename);
-        print $this->max_size - $this->size . " ";
         if ($c == false) {
             if (is_file($filename) && is_readable($filename)) {
                 $this->put($c_filename, file_get_contents($filename));
