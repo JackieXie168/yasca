@@ -6,7 +6,7 @@
  * files and plugins, and executing those plugins. The output of this all is a list of
  * Result objects that can be passed to a renderer.
  * @author Michael V. Scovetta <scovetta@users.sourceforge.net>
- * @version 2.1
+ * @version 2.2
  * @license see doc/LICENSE
  * @package Yasca
  */
@@ -16,7 +16,7 @@ require_once("lib/cache.php");
 require_once("lib/Report.php");
 require_once("lib/Result.php");
 
-define("VERSION", "2.1");
+define("VERSION", "2.2");
 
 /**
  * This class implements a generic code scanner.
@@ -135,20 +135,18 @@ final class Yasca {
 		if (isset($ini_mem)) $this->max_mem = $ini_mem;
 		
 		// Parse command line arguments if necessary
-		if (isset($options) && static::options_have_all_required_keys($options)){
+		if (isset($options) && static::options_have_all_required_keys($options)) {
 			$this->options = $options;
-		}else{
+		} else {
 			$this->parse_command_line_arguments();
-		};
+		}
 		
-		
-
 		$this->ignore_list = $this->parse_ignore_file($this->options['ignore-file']);
 		
 		$this->cache = new Cache(33554432);     // 32 meg cache
-
 		
 		static::$instance =& $this;
+
 		// Scan for target files
 		$this->log_message("Scanning for files...", E_USER_NOTICE);
 		if (is_file($this->options['dir'])) {       // Allow user to specify a single file
@@ -387,6 +385,19 @@ final class Yasca {
 		if (!$message || trim($message) == '') return;
 		if (substr($message, -1) != "\n") $message .= "\n";
 
+		switch($severity) {
+		    case E_USER_NOTICE:
+		        $msgPrefix = "INFO  "; break;
+		    case E_USER_WARNING:
+		        $msgPrefix = "WARN  "; break;
+		    case E_USER_ERROR:
+		        $msgPrefix = "ERROR "; break;
+		    case E_ALL:
+		        $msgPrefix = "INFO  "; break;
+		    default:
+		        $msgPrefix = "INFO  "; break;
+		}
+		
 		if ($include_timestamp) {
 			$message = date('Y-m-d h:i:s ') . $message;
 		}
@@ -398,12 +409,12 @@ final class Yasca {
 				return;
 			}
 		} else {
-			print $message;
+			print $msgPrefix . $message;
 			return;
 		}
 
 		if ($just_print) {
-			print $message;
+			print $msgPrefix . $message;
 			return;
 		}
 
@@ -417,13 +428,13 @@ final class Yasca {
 			if (isset($yasca->progress_callback) && is_callable($yasca->progress_callback)) {
 				call_user_func($yasca->progress_callback, array("log_message", $message));
 			} else {
-				print $message;
+				print $msgPrefix . $message;
 			}
 				
 			// Log to a file as well?
 			if ($yasca->options['log'] !== false && is_file($yasca->options['log'])) {
 				$d = date('Y-m-d h:i:s ');
-				file_put_contents($yobj->options['log'], $d . $message, 'FILE_APPEND');
+				file_put_contents($yobj->options['log'], $msgPrefix . $d . $message, 'FILE_APPEND');
 			}
 			
 			if ($severity == E_USER_ERROR) {
@@ -452,7 +463,7 @@ final class Yasca {
 		$opt['verbose'] = false;
 		$opt['source_required'] = false;
 		$opt['output'] = Report::default_dir();
-		$opt['ignore-ext'] = "exe,zip,jpg,gif,png,pdf,class";
+		$opt['ignore-ext'] = "exe,zip,jpg,gif,png,pdf";
 		$opt['ignore-file'] = false;
 		$opt['sa_home'] = isset($_ENV['SA_HOME']) ? $_ENV['SA_HOME'] : ".";
 		$opt['report'] = Report::default_type;
@@ -465,6 +476,8 @@ final class Yasca {
 		$args = $parse_arguments ? $_SERVER["argc"] : 0;
 		
 		if ($args == 1) {
+            print("Yasca-Core version " . constant("VERSION") . "\n");
+            print("Copyright (c) 2010 Michael V. Scovetta. See docs/LICENSE for license information.\n\n");
 			print(static::help());
 			exit(1);
 		}
@@ -475,8 +488,7 @@ final class Yasca {
 				case "-v":
 				case "--version":
 					print("Yasca-Core version " . constant("VERSION") . "\n");
-					//@todo Update to 2010?
-					print("Copyright (c) 2009 Michael V. Scovetta. See docs/license.txt for license information.\n");
+					print("Copyright (c) 2010 Michael V. Scovetta. See docs/LICENSE for license information.\n");
 					exit(1);
 					break;
 
@@ -877,7 +889,7 @@ END;
 	 */
 	public function get_adjusted_alternate_name($plugin_name, $finding_name = "", $default_text = "") {
 		if ($plugin_name == "") {
-			$this->log_message("No plugin name passed to get_adjusted_alternate_name (finding_name=$finding_name)", E_USER_ERROR);
+			$this->log_message("No plugin name passed to get_adjusted_alternate_name (finding_name=$finding_name)", E_USER_WARNING);
 		}
 		if (!isset($this->adjustment_list)) {
 			$this->load_adjustments();
@@ -964,9 +976,9 @@ END;
 	 */
 	public static function getAdvertisementText($type="HTML") {
 		if ($type == "HTML") {
-			$ad = "Commercial support is now available for Yasca through <a href=\"http://www.tasecuritygroup.com/\" target=\"blank\">Trusted Advisor Security</a>. Contact <a href=\"mailto:support@tasecuritygroup.com\">support@tasecuritygroup.com</a> for more information.";
+			$ad = "Commercial support is now available for Yasca. Contact <a href=\"mailto:scovetta@users.sourceforge.net\">scovetta@users.sourceforge.net</a> for more information.";
 		} else {
-			$ad = "Commercial support is now available for Yasca Trusted Advisor Security. Contact support@tasecuritygroup.com for more information.";
+			$ad = "Commercial support is now available for Yasca. Contact scovetta@users.sourceforge.net for more information.";
 		}
 		return $ad;
 	}
