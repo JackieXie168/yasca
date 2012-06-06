@@ -1,1 +1,0 @@
-@for /R %%i in (*.php) do @resources\php -l "%%i" | grep -v "No syntax errors detected"
