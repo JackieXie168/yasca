@@ -1,3 +1,0 @@
-#!/bin/sh
-export PATH=.:$PATH
-php -c ./resources/php_linux.ini -q yasca.php $@
