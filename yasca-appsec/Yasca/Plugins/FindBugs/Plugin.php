@@ -5,6 +5,7 @@ use \Yasca\Core\Async;
 use \Yasca\Core\Environment;
 use \Yasca\Core\Process;
 use \Yasca\Core\ProcessStartException;
+use \Yasca\Core\Operators;
 
 final class Plugin extends \Yasca\Plugin {
 	use \Yasca\MulticastPlugin;
@@ -30,8 +31,10 @@ final class Plugin extends \Yasca\Plugin {
     	}
 	    $this->log(['FindBugs launched', \Yasca\Logs\Level::INFO]);
 
-        (new \Yasca\Core\IteratorBuilder)
-        ->from(new \RecursiveDirectoryIterator($path))
+        (new \Yasca\Core\FunctionPipe)
+        ->wrap($path)
+        ->pipe([Operators::_class, '_new'], '\RecursiveDirectoryIterator')
+        ->toIteratorBuilder()
         ->where(function($fileinfo){
         	return $this->supportsExtension($fileinfo->getExtension());
 		})
@@ -42,11 +45,9 @@ final class Plugin extends \Yasca\Plugin {
 
         $process->closeStdin();
 
-        return $process->whenCompleted(function($stdout) use ($path){
+        return $process->continueWith(function($async) use ($path){
+        	list($stdout, $stderr) = $async->result();
         	$this->log(['FindBugs completed', \Yasca\Logs\Level::INFO]);
-        	if ($stdout === ''){
-        		return new \EmptyIterator();
-        	}
         	$dom = new \DOMDocument();
         	try {
         		$success = $dom->loadXML($stdout);
@@ -54,9 +55,13 @@ final class Plugin extends \Yasca\Plugin {
         		$success = false;
         	}
         	if ($success !== true){
-        		$this->log(['FindBugs did not return valid XML', \Yasca\Logs\Level::ERROR]);
-        		$this->log(["FindBugs returned $stdout", \Yasca\Logs\Level::INFO]);
-		        return new \EmptyIterator();
+        		if ($stdout === ''){
+        			$this->log(['FindBugs did not return any data', \Yasca\Logs\Level::ERROR]);
+        		} else {
+        			$this->log(['FindBugs did not return valid XML', \Yasca\Logs\Level::ERROR]);
+        			$this->log(["FindBugs returned $stdout", \Yasca\Logs\Level::ERROR]);
+        		}
+		        return Async::fromResult(new \EmptyIterator());
         	}
 
         	$bugPatterns =
@@ -80,7 +85,12 @@ final class Plugin extends \Yasca\Plugin {
 					'pluginName' => 'FindBugs',
 	        		'severity' => "{$bugInstance->getAttribute('priority')}",
 	        		'category' =>
-	        			\ucwords(\strtolower(\str_replace('_', ' ', $bugInstance->getAttribute('category')))),
+	        			(new \Yasca\Core\FunctionPipe)
+	        			->wrap($bugInstance->getAttribute('category'))
+	        			->pipeLast('\str_replace', '_', ' ')
+	        			->pipe('\strtolower')
+	        			->pipe('\ucwords')
+	        			->unwrap(),
 	        		'lineNumber' => "{$sourceLine->getAttribute('start')}",
 	        		'filename' => "$path/{$sourceLine->getAttribute('sourcepath')}",
 	        		'references' => [
@@ -94,8 +104,10 @@ $shortMessage
 $bugPatterns[$type]
 EOT
 ,
-	        	]);
-	        });
+        		]);
+        	})
+        	->toFunctionPipe()
+        	->pipe([Async::_class,'fromResult']);
         });
     }
 }

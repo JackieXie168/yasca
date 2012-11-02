@@ -1,23 +1,20 @@
-.ellipsis {
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	-o-text-overflow: ellipsis;
-	-ms-text-overflow: ellipsis;
-}
 body {
-	background-color: LightCyan;
-    font-family: Candara, Calibri, Verdana, Serif;
+	background-color: white;
+    font-family: Calibri, Verdana, Serif;
+    margin: 0;
+    padding: 0;
 }
 #resultsTable {
 	width: 100%;
 	empty-cells: show;
+	border-collapse: collapse;
 }
 #resultsTable th {
 	background-color: lightyellow;
 	color: black;
 	font-weight: bold;
 	border: 1px solid black;
+	border-top: 0px;
 	padding-left: 2px;
 	padding-right: 2px;
 	padding-top: 2px;
@@ -52,11 +49,24 @@ body {
 #resultsTable tr[severity="5"] {
 	background-color: #BDFFAE;
 }
+.ellipsis {
+	font-family: Monospace;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	-o-text-overflow: ellipsis;
+	-ms-text-overflow: ellipsis;
+}
+
+#loading {
+	width: 100%;
+	text-align: center;	
+}
 
 table.header {
 	width: 100%;
 	background-color: white;
-	border: 1px ridge darkgray;
+	border-bottom: 1px ridge darkgray;
 }
 table.header td { 
 	border: 0; 
@@ -81,9 +91,39 @@ table.header td.title {
 	width: 100%;
 	white-space: nowrap;
 }
+.saveB {
+	padding-right: 4px;
+}
 
 div.detailsPanel {
 	background-color: white;
+	padding: 12px;
+}
+
+div.detailsPanel[severity="1"] {
+	box-shadow: inset 0 0 1em red;
+	-moz-box-shadow: inset 0 0 1em red;
+	-webkit-box-shadow: inset 0 0 1em red;
+}
+div.detailsPanel[severity="2"] {
+	box-shadow: inset 0 0 1em orange;
+	-moz-box-shadow: inset 0 0 1em orange;
+	-webkit-box-shadow: inset 0 0 1em orange;
+}
+div.detailsPanel[severity="3"] {
+	box-shadow: inset 0 0 1em yellow;
+	-moz-box-shadow: inset 0 0 1em yellow;
+	-webkit-box-shadow: inset 0 0 1em yellow;
+}
+div.detailsPanel[severity="4"] {
+	box-shadow: inset 0 0 1em lightskyblue;
+	-moz-box-shadow: inset 0 0 1em lightskyblue;
+	-webkit-box-shadow: inset 0 0 1em lightskyblue;
+}
+div.detailsPanel[severity="5"] {
+	box-shadow: inset 0 0 1em #BDFFAE;
+	-moz-box-shadow: inset 0 0 1em #BDFFAE;
+	-webkit-box-shadow: inset 0 0 1em #BDFFAE;
 }
 
 .unsafeData {

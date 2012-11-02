@@ -36,7 +36,7 @@ EOT
 				'http://msdn.microsoft.com/en-us/library/system.web.caching.cache.insert.aspx' =>
 					'MSDN: ASP.NET Web Cache Insert',
 				'http://php.net/manual/en/function.date-default-timezone-set.php' =>
-					'PHP: Set Timezone'
+					'PHP: Set Timezone',
 			],
 		]);
 	}

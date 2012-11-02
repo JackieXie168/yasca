@@ -1,4 +1,5 @@
-Michael V. Scovetta <scovetta@users.sourceforge.net>
+Michael V. Scovetta <support@tasecuritygroup.com>
+Cory Carson <cory.carson@boeing.com> (Version 3.0+)
 
 Thank you to everyone who has submitted fixes, feedback, questions,
 compliments, and complaints!
@@ -7,5 +8,4 @@ Special thanks to:
 	Josh Berry - contribution of the ClamAV plugin
 	Jochen Paul - contribution of the PHPLint plugin
 	Laurent Cremmer - contribution of RATS plugin
-     Michael Maass - contribution of FxCop plugin and many bug fixes!
-	Cory Carson - contribution of Yasca-appsec version 3
+    Michael Maass and Edmund Jones - contribution of FxCop plugin and many bug fixes!

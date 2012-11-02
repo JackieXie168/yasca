@@ -1,9 +1,10 @@
 <?
 declare(encoding='UTF-8');
 namespace Yasca\Reports;
+use \Yasca\Core\Closeable;
 use \Yasca\Core\Iterators;
 use \Yasca\Core\JSON;
-use \Yasca\Core\Closeable;
+use \Yasca\Core\Operators;
 
 final class JsonFileReport extends \Yasca\Report {
 	use Closeable;
@@ -20,12 +21,21 @@ EOT;
 	private $fileObject;
 
 	public function __construct($args){
-		$filename = Iterators::elementAtOrNull($args, 0);
-		$flags = Iterators::elementAtOrNull($args, 1) ?: JSON_UNESCAPED_UNICODE;
+		$this->fileObject =
+			(new \Yasca\Core\FunctionPipe)
+			->wrap($args)
+			->pipe([Iterators::_class, 'elementAt'], 0)
+			->pipe([Operators::_class, '_new'], 'w', '\SplFileObject')
+			->unwrap();
 
-		$this->fileObject = new \SplFileObject($filename, 'w');
+		$this->flags =
+			(new \Yasca\Core\FunctionPipe)
+			->wrap($args)
+			->pipe([Iterators::_class, 'elementAt'], 1)
+			->pipe([Operators::_class, 'nullCoalesce'], JSON_UNESCAPED_UNICODE)
+			->unwrap();
+
 		$this->fileObject->fwrite('[');
-		$this->flags = $flags;
 	}
 
 	protected function innerClose(){
@@ -40,6 +50,9 @@ EOT;
 		} else {
 			$this->fileObject->fwrite(',');
 		}
-		$this->fileObject->fwrite(JSON::encode($result, $this->flags));
+		(new \Yasca\Core\FunctionPipe)
+		->wrap($result)
+		->pipe([JSON::_class,'encode'], $this->flags)
+		->pipe([$this->fileObject, 'fwrite']);
 	}
 }

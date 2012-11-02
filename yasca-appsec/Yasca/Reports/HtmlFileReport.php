@@ -1,9 +1,10 @@
 <?
 declare(encoding='UTF-8');
 namespace Yasca\Reports;
+use \Yasca\Core\Closeable;
 use \Yasca\Core\Iterators;
 use \Yasca\Core\JSON;
-use \Yasca\Core\Closeable;
+use \Yasca\Core\Operators;
 
 final class HtmlFileReport extends \Yasca\Report {
 	use Closeable;
@@ -17,9 +18,12 @@ EOT;
 	private $firstResult = true;
 
 	public function __construct($args){
-		$filename = Iterators::elementAtOrNull($args, 0);
-
-		$this->fileObject = new \SplFileObject($filename, 'w');
+		$this->fileObject =
+			(new \Yasca\Core\FunctionPipe)
+			->wrap($args)
+			->pipe([Iterators::_class, 'elementAt'], 0)
+			->pipe([Operators::_class, '_new'], 'w', '\SplFileObject')
+			->unwrap();
 
 		$c = static function(callable $c){return $c();};
 		$this->fileObject->fwrite(<<<"EOT"
@@ -28,15 +32,15 @@ EOT;
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-<title>Yasca v3 - Report</title>
+<title>Yasca v{$c(static function(){return \Yasca\Scanner::VERSION;})} - Report</title>
 <style type="text/css">
-{$c(static function(){return \file_get_contents(__DIR__ . '/HtmlFileReport.css');})}
+{$c(Operators::curry('\file_get_contents', __DIR__ . '/HtmlFileReport.css'))}
 </style>
 <script type="text/javascript">
-{$c(static function(){return \file_get_contents(__DIR__ . '/jquery-1.7.1.min.js');})}
+{$c(Operators::curry('\file_get_contents', __DIR__ . '/jquery-1.8.2.min.js'))}
 </script>
 <script type="text/javascript">
-{$c(static function(){return \file_get_contents(__DIR__ . '/HtmlFileReport.js');})}
+{$c(Operators::curry('\file_get_contents', __DIR__ . '/HtmlFileReport.js'))}
 </script>
 </head>
 <body>
@@ -45,19 +49,24 @@ EOT;
 		<td class="title">Yasca</td>
         <td style="width: 100%;">
         	<table style="border:0;">
-            <tr><td class="header_left">Yasca Version:</td><td class="header_right">3 [ <a target="_blank" href="http://sourceforge.net/projects/yasca/files/">check for updates</a> ]</td></tr>
-            <tr><td class="header_left">Report Generated:</td><td class="header_right">
+            <tr>
+            <td class="header_left">Yasca Version:</td>
+            <td class="header_right">{$c(static function(){return \Yasca\Scanner::VERSION;})} [ <a target="_blank" href="http://sourceforge.net/projects/yasca/files/">check for updates</a> ]</td>
+            </tr>
+            <tr><td class="header_left">Report Generated:</td>
+            <td class="header_right">
 {$c(static function(){return \htmlspecialchars(\date(\DateTime::RFC850),ENT_NOQUOTES);})}
             </td></tr>
             </table>
     	</td>
+    	<td class="saveB">
+    		<input id="saveJson" type="button" value="Save JSON Report"/>
+    	</td>
     </tr>
 </table>
 
-<h1 id="loading">Loading...</h1>
-<script type="text/javascript">
-"use strict";
-Yasca.results = [
+<h1 id="loading">Loading result <span id="loadingNum">0</span> of <span id="loadingOf">0</span></h1>
+<div id="resultsJson" style="display:none;">[
 EOT
 	);
 }
@@ -68,13 +77,16 @@ EOT
 		} else {
 			$this->fileObject->fwrite(',');
 		}
-		$this->fileObject->fwrite(JSON::encode($result, JSON_UNESCAPED_UNICODE));
+		(new \Yasca\Core\FunctionPipe)
+		->wrap($result)
+		->pipe([JSON::_class,'encode'], JSON_UNESCAPED_UNICODE)
+		->pipe('\htmlspecialchars', ENT_NOQUOTES)
+		->pipe([$this->fileObject,'fwrite']);
 	}
 
 	protected function innerClose(){
 		$this->fileObject->fwrite(<<<'EOT'
-];
-</script>
+]</div>
 </body>
 </html>
 EOT

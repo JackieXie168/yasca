@@ -1,9 +1,10 @@
 <?
 declare(encoding='UTF-8');
 namespace Yasca\Reports;
+use \Yasca\Core\Closeable;
 use \Yasca\Core\Iterators;
 use \Yasca\Core\JSON;
-use \Yasca\Core\Closeable;
+use \Yasca\Core\Operators;
 
 final class JsonStderrReport extends \Yasca\Report {
 	use Closeable;
@@ -22,10 +23,14 @@ EOT;
 	}
 
 	public function __construct($args){
-		$flags = Iterators::elementAtOrNull($args, 0) ?: JSON_UNESCAPED_UNICODE;
+		$this->flags =
+			(new \Yasca\Core\FunctionPipe)
+			->wrap($args)
+			->pipe([Iterators::_class, 'elementAt'], 0)
+			->pipe([Operators::_class,'nullCoalesce'], JSON_UNESCAPED_UNICODE)
+			->unwrap();
 
 		\fwrite(STDERR, '[');
-		$this->flags = $flags;
 	}
 
 	public function update(\SplSubject $subject){
@@ -35,6 +40,9 @@ EOT;
 		} else {
 			\fwrite(STDERR,',');
 		}
-		\fwrite(STDERR, JSON::encode($result, $this->flags));
+		(new \Yasca\Core\FunctionPipe)
+		->wrap($result)
+		->pipe([JSON::_class,'encode'], $this->flags)
+		->pipeLast('\fwrite', STDERR);
 	}
 }

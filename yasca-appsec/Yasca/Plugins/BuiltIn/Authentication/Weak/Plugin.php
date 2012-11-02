@@ -34,7 +34,7 @@ final class Plugin extends \Yasca\Plugin {
 EOT
     		, \RegexIterator::GET_MATCH
     	)
-    	->from(function($current, $key) use ($fileContents){
+    	->selectMany(function($current, $key) use ($fileContents){
     		$asRegexLiteral = static function($literal){
     			$quoted = \preg_quote($literal, '`');
     			return "((?-ix)$quoted)";

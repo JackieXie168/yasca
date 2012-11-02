@@ -8,6 +8,9 @@ declare(encoding='UTF-8');
 \spl_autoload_extensions('.php');
 \spl_autoload_register();
 
+use \Yasca\Core\Iterators;
+use \Yasca\Core\Operators;
+
 //Wrap the following code to not leave variables in local scope
 \call_user_func(static function(){
 
@@ -18,7 +21,6 @@ declare(encoding='UTF-8');
  * of source code files.
  * @author Michael V. Scovetta <scovetta@sourceforge.net>
  * @author Cory Carson <cory.carson@boeing.com>
- * @version 3
  * @license see doc/LICENSE
  * @package Yasca
  */
@@ -31,10 +33,9 @@ $logs = new \SplQueue();
 $addDefaultReport = true;
 $reports = new \SplQueue();
 
-$version = <<<'EOT'
-Yasca version 3
-Copyright (c) 2010 Michael V. Scovetta. See docs/LICENSE for license information.
-EOT;
+$version =
+	'Yasca version ' . \Yasca\Scanner::VERSION . "\n" +
+	'Copyright (c) 2010 Michael V. Scovetta. See docs/LICENSE for license information.';
 
 $help = <<<"EOT"
 $version
@@ -44,28 +45,33 @@ Perform analysis of program source code.
   -h, --help                show this help
   -v, --version				show only the version info
 
-  --extensionsOnly,EXT[,EXT]+    only scan these file extensions
-  --extensionsIgnore,EXT[,EXT]+  ignore these file extensions
+  --extensionsOnly(,EXT)+    only scan these file extensions
+  --extensionsIgnore(,EXT)+  ignore these file extensions
 
-  --pluginsIgnore,NAMEPART[,NAMEPART]+  ignore plugins containing these
-  --pluginsOnly,NAMEPART[,NAMEPART]+    only use plugins containing these
-  --pluginsInstalled				    Do not perform scan. Print names of installed plugins
+  --pluginsIgnore(,NAMEPART)+  ignore plugins containing these
+  --pluginsOnly(,NAMEPART)+    only use plugins containing these
+  --installedPlugins				    Do not perform scan. Print names of installed plugins
 
-  -l,TYPE[,OPTIONS]+
-  --log,TYPE[,OPTIONS]+
+  -l,TYPE(,OPTIONS)*
+  --log,TYPE(,OPTIONS)*
   		Uses the TYPE of log plugin, and provides OPTIONS to that type.
   		Multiple log switches can be used.
   		If no switch specified, behaves as --log:ConsoleLog,STDOUT
-  --logOptions,TYPE						Do not perform scan. Print help for options of log TYPE
-  --logInstalled						Do not perform scan. Print names of installed logs
-  --logSilent							Do not add default console log.
+  --logOptions							Do not perform scan. Print help for all installed log types
+  --logOptions,TYPE						Do not perform scan. Print help for log TYPE
+  --installedLogs						Do not perform scan. Print names of installed logs
+  --logSilent, --silent					Do not add default console log.
 
-  -r,TYPE[,OPTIONS]+
-  --report,TYPE[,OPTIONS]+
-  --reportInstalled						Do not perform scan. Print names of installed reports
+  -r,TYPE(,OPTIONS)*
+  --report,TYPE(,OPTIONS)*
+  		Use the TYPE of report, and provides OPTIONS to that type
+  		Multiple report switches can be used.
+  		If no switch specified, behaves as --report,HtmlFileReport
+  --installedReports					Do not perform scan. Print names of installed reports
+  --reportOptions						Do not perform scan. Print help for all installed report types
+  --reportOptions,TYPE					Do not perform scan. Print help for report TYPE
 
-  --batch[,DIR]+						Create a report for each folder in DIR, for each DIR
-  										Ignores other options
+  --batch(,DIR)+						Create a report for each folder in DIR, for each DIR
   --debug								Throw exceptions instead of logging them
 
 Examples:
@@ -89,19 +95,19 @@ foreach (
 	->selectKeys(static function($arg){
 		$options = \str_getcsv($arg);
 		$switch = \array_shift($options);
-		if ($options === null){
-			return [ [], $switch];
-		} else {
-			return [$options, $switch];
-		}
+		return [
+			Operators::nullCoalesce($options,[]),
+			$switch,
+		];
 	})
 
 	as $switch => $options
 ){
-	//As of PHP 5.4.3, switch() uses loose comparision instead of strict.
+	//As of PHP 5.4.8, switch() uses loose comparision instead of strict.
 	//Use if/elseif instead.
 	if 		 ($switch === '-h' 		||
-			  $switch === '--help'
+			  $switch === '--help'  ||
+			  $switch === '/?'
   	){
 		print($help);
 		exit(0);
@@ -114,18 +120,21 @@ foreach (
 
 	} elseif ($switch === '--pluginInstalled' ||
 			  $switch === '--pluginsInstalled'||
-			  $switch === '--installedPlugins'
+			  $switch === '--installedPlugins'||
+			  $switch === '--installedPlugin'
 	){
 		(new \Yasca\Core\IteratorBuilder)
 		->from(\Yasca\Plugin::$installedPlugins)
-		->from(static function($plugins){return $plugins;})
+		->selectMany(static function($plugins){return $plugins;})
 		->forAll(static function($plugin){
 			print("$plugin\n");
 		});
 		exit(0);
 
-	} elseif ($switch === '--logInstalled' ||
-			  $switch === '--logsInstalled'
+	} elseif ($switch === '--logInstalled'  ||
+			  $switch === '--logsInstalled' ||
+			  $switch === '--installedLogs' ||
+			  $switch === '--installedLog'
   	){
 		foreach(\Yasca\Log::getInstalledLogs() as $log){
 			print("$log\n");
@@ -142,41 +151,8 @@ foreach (
 
 
 	} elseif ($switch === '--batch'){
-		foreach(
-			(new \Yasca\Core\IteratorBuilder)
-			->from($options)
-			->from(static function($scanDir){
-				return (new \Yasca\Core\IteratorBuilder)
-				->from(new \DirectoryIterator($scanDir))
-				->selectKeys(static function($dir) use ($scanDir){
-					return [$dir, $scanDir];
-				});
-			})
-			->where(static function($fileinfo){
-				return !$fileinfo->isDot() && $fileinfo->isDir();
-			})
-			->select(static function($fileinfo, $scanDir) use ($scannerOptions){
-				static $count = 0;
-				$scannerOptions['targetDirectory'] = $fileinfo->getRealpath();
-				return (new \Yasca\Scanner($scannerOptions))
-				->attachLogObserver(
-					new \Yasca\Logs\ConsoleLog([
-						null,
-						'#' . \str_pad('' . $count++, 3) . '  ',
-					])
-				)
-				->attachResultObserver(
-					new \Yasca\Reports\HtmlFileReport(["{$scanDir}\\{$fileinfo->getBasename()}.html"])
-				)
-				->executeAsync();
-			})
-			->toList()
-
-			as $async
-		){
-			$async->getResult();
-		}
-		exit(0);
+		$scannerOptions['batch'] = $options;
+		$addDefaultReport = false;
 
 	} elseif ($switch === '--debug'){
 		$scannerOptions['debug'] = true;
@@ -203,21 +179,37 @@ foreach (
 	} elseif ($switch === '--logOption' ||
 			  $switch === '--logOptions'
   	){
-		$type = '\Yasca\Logs\\' . \array_shift($options);
-		print($type::OPTIONS);
+  		if (Iterators::any($options)){
+			$type = '\Yasca\Logs\\' . \array_shift($options);
+			print($type::OPTIONS);
+  		} else {
+  			foreach(\Yasca\Log::getInstalledLogs() as $log){
+				print("$log\n");
+				$type = '\Yasca\Logs\\' . $log;
+				print("    " . $type::OPTIONS . "\n\n");
+			}
+  		}
 		exit(0);
 
 	} elseif ($switch === '--reportOption' ||
 			  $switch === '--reportOptions'
   	){
-		$type = '\Yasca\Reports\\' . \array_shift($options);
-		print($type::OPTIONS);
+  		if (Iterators::any($options)){
+			$type = '\Yasca\Reports\\' . \array_shift($options);
+			print($type::OPTIONS);
+  		} else {
+  			foreach(\Yasca\Report::getInstalledReports() as $report){
+  				print("$report\n");
+  				$type = '\Yasca\Reports\\' . $report;
+				print("    " . $type::OPTIONS . "\n\n");
+  			}
+  		}
 		exit(0);
 
 	} elseif ($switch === '--ignoredPlugin'  ||
 			  $switch === '--ignoredPlugins' ||
 		 	  $switch === '--ignorePlugin'	 ||
-			  $switch === '--ingorePlugins'	 ||
+			  $switch === '--ignorePlugins'	 ||
 			  $switch === '--pluginIgnored'	 ||
 			  $switch === '--pluginsIgnored' ||
 			  $switch === '--pluginIgnore'	 ||
@@ -251,16 +243,113 @@ foreach (
 	}
 }
 
+$debug =
+	(new \Yasca\Core\FunctionPipe)
+	->wrap($scannerOptions)
+	->pipe([Iterators::_class,'elementAtOrNull'], 'debug')
+	->pipe([Operators::_class,'equals'], true)
+	->unwrap();
+
 if ($addDefaultLog === true){
-	$logs->enqueue(new \Yasca\Logs\ConsoleLog);
+	$logs->enqueue(
+		new \Yasca\Logs\ConsoleLog([
+			\Yasca\Logs\Level::ERROR |
+			\Yasca\Logs\Level::INFO  |
+			(
+			 $debug
+			 ? \Yasca\Logs\Level::DEBUG
+			 : 0
+			)
+		])
+	);
 }
 if ($addDefaultReport === true){
 	$reports->enqueue(new \Yasca\Reports\HtmlFileReport(['report.html']));
 }
 
+$batch = Iterators::elementAtOrNull($scannerOptions, 'batch');
+if ($batch !== null){
+	$logsAdapter = new \Yasca\Core\SplSubjectAdapter();
+	Iterators::forAll($logs, [$logsAdapter, 'attach']);
+	$batchStart = new \DateTime();
+
+	$iter =
+		(new \Yasca\Core\IteratorBuilder)
+		->from($batch)
+		->selectMany(static function($scanDir){
+			return (new \Yasca\Core\FunctionPipe)
+			->wrap($scanDir)
+			->pipe([Operators::_class,'_new'], '\DirectoryIterator')
+			->toIteratorBuilder()
+			->selectKeys(static function($dir) use ($scanDir){
+				return [$dir, $scanDir];
+			});
+		})
+		->where(static function($fileinfo){
+			return !$fileinfo->isDot() && $fileinfo->isDir();
+		})
+		->selectKeys(static function($fileinfo, $scanDir) use ($scannerOptions, $debug, $logsAdapter){
+			static $count = 0;
+			$count += 1;
+			$key = $count;
+			$targetDirectory = $fileinfo->getRealpath();
+			$scannerOptions['targetDirectory'] = $targetDirectory;
+			$reportFileName = "{$scanDir}\\{$fileinfo->getBasename()}.html";
+			$launchTime = new \DateTime();
+			$logPrefix = '#' . \str_pad('' . $key, 3) . '  ';
+			return [
+				(new \Yasca\Scanner($scannerOptions))
+				->attachLogObserver(
+					new \Yasca\Core\SplObserverAdapter(
+						static function($value) use ($logsAdapter, $logPrefix){
+							list($message, $severity) = $value;
+							$logsAdapter->raise([$logPrefix . $message, $severity]);
+						}
+					)
+				)
+				->attachResultObserver(
+					new \Yasca\Reports\HtmlFileReport([$reportFileName])
+				)
+				->executeAsync()
+				->whenDone(static function($async) use ($key, $targetDirectory, $launchTime, $logPrefix, $logsAdapter){
+					if ($async->isErrored() === true){
+						$logsAdapter->raise(["{$logPrefix}Errored for $targetDirectory", \Yasca\Logs\Level::ERROR]);
+					} else {
+						$logsAdapter->raise(["{$logPrefix}Completed for $targetDirectory", \Yasca\Logs\Level::INFO]);
+					}
+					$logsAdapter->raise(["{$logPrefix}Took {$launchTime->diff(new \DateTime())->format('%h:%i:%s')}", \Yasca\Logs\Level::INFO]);
+				}),
+				"#$key $targetDirectory",
+			];
+		})
+		->toFunctionPipe()
+		->pipe([Iterators::_class,'toArray'], true)
+		->toIteratorBuilder()
+		->where(static function($async) {
+			return $async->isDone() === false;
+		})
+		->toArray(true);
+
+	if (Iterators::any($iter)){
+		$logsAdapter->raise(["All scans launched", \Yasca\Logs\Level::INFO]);
+		$logsAdapter->raise([Iterators::count($iter) . " scans waiting on external plugins:", \Yasca\Logs\Level::INFO]);
+		foreach($iter as $dir => $async){
+			$logsAdapter->raise(["$dir", \Yasca\Logs\Level::INFO]);
+		}
+		foreach($iter as $dir => $async){
+			if ($async->isDone() === false){
+				$logsAdapter->raise(["Waiting on $dir...", \Yasca\Logs\Level::INFO]);
+			}
+			$async->result();
+		}
+	}
+	$logsAdapter->raise(["Batch took {$batchStart->diff(new \DateTime())->format('%h:%i:%s')}", \Yasca\Logs\Level::INFO]);
+	exit(0);
+}
+
 $scanner = new \Yasca\Scanner($scannerOptions);
-foreach($logs as $log){ $scanner->attachLogObserver($log);}
-foreach($reports as $report){ $scanner->attachResultObserver($report);}
+Iterators::forAll($logs, [$scanner, 'attachLogObserver']);
+Iterators::forAll($reports, [$scanner, 'attachResultObserver']);
 //Allow everything but the scanner (and things the scanner holds) to drop out of scope
 return $scanner;
 })->execute();

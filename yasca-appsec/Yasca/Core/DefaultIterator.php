@@ -14,14 +14,16 @@ final class DefaultIterator implements \Iterator {
 	private $innerHasItems = false;
 	private $isFirstValidCall = true;
 
+	/**
+	 * https://wiki.php.net/rfc/class_name_scalars
+	 */
+	const _class = __CLASS__;
+
 	public function __construct(\Iterator $iter, $defaultValue, $defaultKey = 0){
 		if ($iter instanceof DefaultIterator){
-			list($this->innerIterator, $this->defaultValue, $this->defaultKey) =
-				\Closure::bind(
-					function(){return [$this->innerIterator, $this->defaultValue, $this->defaultKey,];},
-					$iter,
-					$iter
-				)->__invoke();
+			$this->innerIterator = $iter->innerIterator;
+			$this->defaultValue = $iter->defaultValue;
+			$this->defaultKey = $iter->defaultKey;
 		} else {
 			$this->innerIterator = $iter;
 			$this->defaultValue = $defaultValue;
@@ -30,21 +32,21 @@ final class DefaultIterator implements \Iterator {
 	}
 
 	public function current(){
-		if ($this->innerHasItems){
+		if ($this->innerHasItems === true){
 			return $this->innerIterator->current();
 		} else {
 			return $this->defaultValue;
 		}
 	}
 	public function key(){
-		if ($this->innerHasItems){
+		if ($this->innerHasItems === true){
 			return $this->innerIterator->key();
 		} else {
 			return $this->defaultKey;
 		}
 	}
 	public function next(){
-		if ($this->innerHasItems){
+		if ($this->innerHasItems === true){
 			$this->innerIterator->next();
 		}
 	}
@@ -53,7 +55,7 @@ final class DefaultIterator implements \Iterator {
 		$this->innerIterator->rewind();
 	}
 	public function valid(){
-		if ($this->isFirstValidCall){
+		if ($this->isFirstValidCall === true){
 			$this->innerHasItems = $this->innerIterator->valid();
 			$this->isFirstValidCall = false;
 			return true;

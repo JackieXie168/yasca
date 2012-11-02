@@ -1,8 +1,44 @@
-Version 3.0 released 6/5/2012
-	PHP updated to 5.4.3
+Version 3.0.2 released 10/31/2012
+	PHP updated to 5.4.8
+	Updated FindBugs from 2.0 to 2.0.1
+	CppCheck upgraded from 1.53 to 1.56
+	Updated HTML report UI
+	--No longer appears to hang the browser when loading large reports.
+	--Provides status while loading
+	--jQuery upgraded from 1.7.1 to 1.8.2
+	IteratorBuilder and Iterators synced
+	--Several methods previously only available on IteratorBuilder are now on Iterators
+	--IteratorBuilder no longer uses reflection and self-closures for invoking functions.
+	----Gives significant relief to garbage collector pressure.
+	----Allows IDE’s to provide autocomplete
+	----More friendly to a hypothetical future PHP runtime that optimizes known function calls
+	\Yasca\Core\Encoding::detect now correctly returns the detected encoding.
+	Errors from external plugins are now logged consistently as ERROR.
+	FunctionPipe, Operators introduced to support functional programming
+	Batch mode improved
+	--No longer ignores other command line arguments (such as --debug)
+	--Now prints the scan duration time when a scan completes
+	--When only waiting on external plugins to finish a batch, now prints which
+	----scans are waiting on external plugins, and prints which scan it's waiting on.
+	Updated command line help
+	--Fixed typos in command line arguments
+	_class constant added to all Yasca Core classes, emulating use of class name scalars before PHP 5.5 
+	--See https://wiki.php.net/rfc/class_name_scalars
+	Async improved
+	--\Yasca\Core\Process now inherits from Async
+	--Continuations are now supported
+	--Allows subscribing events, for when the async completes
+	--Constructor now optionally accepts an exception handler
+	jQuery license text now correctly included.
+	Yasca Core Iterator classes no longer use \Closure::bind to retrieve private properties from instances of their own class.
+	Iterators::concat now uses \AppendIterator with workaround.
+	UniqueIterator removed. Iterators::unique implemented with a \CallbackFilterIterator instead.
+
+Version 3.0 released 4/31/2012
+	PHP updated to 5.4.1
 	Updated for multibyte support, SPL, Namespaces, and Autoloading
 	Now finds problems with source code in Unicode (eg Java/C# unicode variable names)
-	--Previously, non-ASCII encodings were not handled or had spotty support.
+	--Previously, non-ASCII encodings were blindly not handled or had spotty support.
 	External plugins are now executed asynchronously
 	--Multiple plugins launched while continuing built-in plugins
 	--Previously, internal scanning and other scanners were halted while waiting on an external plugin.
@@ -17,8 +53,6 @@ Version 3.0 released 6/5/2012
 	FindBugs updated to 2.0
 	CppCheck updated to 1.53
 	FxCop updated to 10.0
-	--When FxCop is not packaged inside Yasca, Yasca will look for it in Windows default install locations.
-	FXCop integration improved. Severity is now tempered by certainty.
 	Plugin results are made available as they are found, instead of buffered to the end
 	--Reports may buffer them for sorting, etc.
 	Built-In Plugin Overhaul

@@ -51,9 +51,13 @@ final class Plugin extends \Yasca\Plugin {
     	}
 	    $this->log(['Pixy launched', \Yasca\Logs\Level::DEBUG]);
 
-    	return $process->whenCompleted(function($stdout){
+    	return $process->continueWith(function($async){
+    		list($stdout, $stderr) = $async->result();
         	$this->log(['Pixy completed', \Yasca\Logs\Level::DEBUG]);
-        	$regex = <<<'EOT'
+
+    		$matches = [];
+    		\preg_match_all(
+    			<<<'EOT'
 `(*ANY)(?xim)
 	^ (?<analysis>
 		XSS		|
@@ -68,20 +72,22 @@ final class Plugin extends \Yasca\Plugin {
 		(^ 	-	\d*	.* \: \d+ $ \R?)+
 	)
 `u
-EOT;
-				$resultsRegex = <<<'EOT'
-`(*ANY)(?xim)
-	^ - \d* (?<filename> .* ) : (?<lineNumber> \d+ ) $.
-`u
-EOT;
-    		$matches = [];
-    		\preg_match_all($regex, $stdout, $matches, PREG_SET_ORDER);
+EOT
+, 				$stdout, $matches, PREG_SET_ORDER
+			);
     		return (new \Yasca\Core\IteratorBuilder)
     		->from($matches)
     		->selectKeys(static function($analysisMatch){
     			return [$analysisMatch['results'], $analysisMatch['analysis']];
         	})
-        	->whereRegex($resultsRegex, \RegexIterator::ALL_MATCHES, 0, PREG_SET_ORDER)
+        	->whereRegex(
+        		<<<'EOT'
+`(*ANY)(?xim)
+	^ - \d* (?<filename> .* ) : (?<lineNumber> \d+ ) $.
+`u
+EOT
+, 				\RegexIterator::ALL_MATCHES, 0, PREG_SET_ORDER
+			)
         	->selectMany(function($results, $analysis){
         		if ($analysis === 'XSS'){
         			$result = $this->newXssResult();
@@ -103,7 +109,9 @@ EOT;
         				'message' => "{$match['filename']}",
         			]);
         		});
-        	});
+        	})
+        	->toFunctionPipe()
+        	->pipe([Async::_class,'fromResult']);
     	});
     }
 }

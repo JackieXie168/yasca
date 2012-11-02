@@ -8,6 +8,11 @@ namespace Yasca\Core;
  */
 final class SplSubjectAdapter implements \SplSubject {
 
+	/**
+	 * https://wiki.php.net/rfc/class_name_scalars
+	 */
+	const _class = __CLASS__;
+
 	/** @var \SplObjectStorage */ private $observers;
 	public function __construct(){
 		$this->observers = new \SplObjectStorage();

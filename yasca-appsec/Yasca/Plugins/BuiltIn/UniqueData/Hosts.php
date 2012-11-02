@@ -33,8 +33,8 @@ EOT
 EOT
 , 			\RegexIterator::GET_MATCH
 		)
-		->select(static function($match){
-			$url = $match[0];
+		->select(static function($match){ return $match[0]; })
+		->select(static function($url){
 			return \parse_url($url, PHP_URL_HOST);
 		});
     }

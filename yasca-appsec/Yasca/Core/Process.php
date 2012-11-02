@@ -6,19 +6,24 @@ namespace Yasca\Core;
  * Wraps \proc_open and \proc_close to ensure that a process
  * is closed when no longer used.
  *
- * In addition, allows attaching a callback for when the process completes.
+ * In addition, provides Async methods, such as attaching a callback for
+ * when the process completes.
  *
- * (PNCTL libraries are not available on Windows as of PHP 5.4.3)
+ * (PNCTL libraries are not available on Windows as of PHP 5.4.8)
  *
  * @author Cory Carson <cory.carson@boeing.com> (version 3)
  */
-final class Process {
+class Process extends Async {
 	use Closeable;
+	/**
+	 * https://wiki.php.net/rfc/class_name_scalars
+	 */
+	const _class = __CLASS__;
 
 	private static $maxStreamMemory = '';
 
 	private $process;
-	private $pipes;
+	private $pipes = [];
 
 	/**
 	 * @param string $command
@@ -29,7 +34,16 @@ final class Process {
 		//allowing the launched process to run to completion without waiting for
 		//PHP to empty it's buffers.
 		$stdoutTempStream = \fopen('php://temp' . self::$maxStreamMemory, 'rw');
+		if ($stdoutTempStream === false){
+			throw new ProcessStartException('Unable to open temporary stream for process standard in');
+		}
+		$this->pipes[] = $stdoutTempStream;
 		$stderrTempStream = \fopen('php://temp' . self::$maxStreamMemory, 'rw');
+		if ($stdoutTempStream === false){
+			throw new ProcessStartException('Unable to open temporary stream for process standard out');
+		}
+		$this->pipes[] = $stderrTempStream;
+
         $pipes = [];
         try {
 			$this->process = \proc_open(
@@ -43,15 +57,14 @@ final class Process {
 		        null,
 		        null,
 		        [
-		        	//This switch only applies on Windows machines
+		        	//This switch only takes effect on Windows machines
 		        	'bypass_shell' => true,
 		        ]
 		    );
+		    if ($this->process === false || \is_resource($this->process) !== true){
+		    	throw new ProcessStartException('Unable to start process');
+		    }
         } catch (\ErrorException $e){
-        	$pipes[1] = $stdoutTempStream;
-		    $pipes[2] = $stderrTempStream;
-		    $this->pipes = $pipes;
-
         	$matches = [];
         	$match = \preg_match('`(?<=CreateProcess failed, error code - )\d+`u', $e->getMessage(), $matches);
         	if ($match === 1){
@@ -64,65 +77,81 @@ final class Process {
         	}
         }
 
+        //$pipes[0] is the standard input stream created by \proc_open
         $pipes[1] = $stdoutTempStream;
 		$pipes[2] = $stderrTempStream;
 		$this->pipes = $pipes;
 
-	    if (\is_resource($this->process) !== true){
-	    	//This will trigger the destructor, which will ensure the streams are closed
-	    	throw new ProcessStartException('Unable to start process');
-	    }
+	    parent::__construct(
+			//Instance anonymous function keeps this instance alive,
+			//preventing PHP from closing the process.
+			function(){
+				return \proc_get_status($this->process)['running'] !== true;
+			},
+        	function(){
+        		$this->closeStdIn();
+        		return (new \Yasca\Core\IteratorBuilder)
+        		->from($this->pipes)
+        		->select(static function($pipe, $index){
+        			$success = \rewind($pipe);
+        			if ($success === false){
+        				throw new \Exception("Unable to rewind process pipe $index");
+        			}
+        			return $pipe;
+        		})
+        		->select(static function($pipe, $index){
+        			$contents = \stream_get_contents($pipe);
+        			if ($contents === false){
+        				throw new \Exception("Unable to get process data from process pipe $index");
+        			}
+        			return $contents;
+        		})
+        		->toArray();
+        	}
+        );
+
+        $this->whenDone([$this,'close']);
 	}
 
 	public function writeToStdin($content){
+		if (isset($this->pipes[0]) === false){
+			throw new \Exception('Standard in already closed');
+		}
 		\fwrite($this->pipes[0], $content);
 		return $this;
 	}
 
 	public function closeStdin(){
-		\fclose($this->pipes[0]);
+		if (isset($this->pipes[0]) === false){
+			return;
+		}
+		$success = \fclose($this->pipes[0]);
+		if ($success === false){
+			throw new \Exception('Unable to close process pipe');
+		}
 		unset($this->pipes[0]);
 		return $this;
 	}
 
-	private $alreadyBound = false;
-	/**
-	 * Creates an Async object that uses the provided callback when the process completes.
-	 * @param callable $handler Params (string $stdout, string $stderr). Return value passed to Async.
-	 * @throws \BadMethodCallException Multiple continuations are not supported by this version
-	 * @return Async
-	 */
-	public function whenCompleted(callable $handler){
-		if ($this->alreadyBound === true){
-			throw new \BadMethodCallException('This version does not implement multiple continuations');
-		}
-		$this->alreadyBound = true;
-		$stdout = '';
-		$stderr = '';
-		return new Async(
-			//Instance anonymous function keeps this instance alive,
-			//preventing PHP from closing the process.
-			function() use (&$stdout, &$stderr){
-				if (\proc_get_status($this->process)['running'] === true){
-					return false;
-        		}
-        		\rewind($this->pipes[1]);
-        		$stdout = \stream_get_contents($this->pipes[1]);
-				\rewind($this->pipes[2]);
-				$stderr = \stream_get_contents($this->pipes[2]);
-				$this->close();
-				return true;
-        	},
-        	static function() use (&$stdout, &$stderr, $handler){
-        		return $handler($stdout, $stderr);
-        	}
-        );
-	}
-
 	protected function innerClose(){
-		foreach($this->pipes as $pipe){
-			\fclose($pipe);
-		}
+		(new \Yasca\Core\IteratorBuilder)
+		->from($this->pipes)
+		->select(Operators::paramLimit('\fclose', 1))
+		->where(Operators::curry([Operators::_class,'equals'], false))
+		->toFunctionPipe()
+		->pipe([Iterators::_class,'count'])
+		->pipe([Operators::_class,'match'],
+			[
+				Operators::curry([Operators::_class,'equals'], 0),
+				Operators::identity(null)
+			],
+			[
+				Operators::identity(true),
+				static function($failureCount){
+					throw new \Exception("Unable to close $failuteCount process pipes");
+				}
+			]
+		);
 
 		if (\is_resource($this->process) === true){
 			\proc_close($this->process);

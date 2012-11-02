@@ -54,6 +54,7 @@ final class Plugin extends \Yasca\Plugin {
 					'ProgramFiles(x86)',
 					'ProgramW6432',
 				])
+
 				//Windows PHP 5.4.3 segfaults on:
 				//Iterators::elementAtOrNull($_ENV, 'ProgramFiles');
 				//Pull these out the old fashioned way: test then get.
@@ -63,6 +64,7 @@ final class Plugin extends \Yasca\Plugin {
 				->select(static function($specialDir){
 					return $_ENV[$specialDir];
 				})
+
 				->selectMany(static function($dir) use ($compatibleVersions){
 					return (new \Yasca\Core\IteratorBuilder)
 					->from($compatibleVersions)
@@ -119,11 +121,9 @@ final class Plugin extends \Yasca\Plugin {
     	}
 	    $this->log(['FxCop launched', \Yasca\Logs\Level::INFO]);
 
-	    return $process->whenCompleted(function($stdout){
+	    return $process->continueWith(function($async){
+	    	list($stdout, $stderr) = $async->result();
         	$this->log(['FxCop completed', \Yasca\Logs\Level::INFO]);
-        	if ($stdout === ''){
-        		return new \EmptyIterator();
-        	}
 			$dom = new \DOMDocument();
         	try {
 	        	$success = $dom->loadXML($stdout);
@@ -131,9 +131,13 @@ final class Plugin extends \Yasca\Plugin {
 	        	$success = false;
 	        }
 	        if ($success !== true){
-	        	$this->log(['FxCop did not return valid XML', \Yasca\Logs\Level::ERROR]);
-	        	$this->log(["FxCop returned $stdout", \Yasca\Logs\Level::ERROR]);
-			    return new \EmptyIterator();
+	        	if ($stdout === ''){
+	        		$this->log(['FxCop did not return any data', \Yasca\Logs\Level::ERROR]);
+	        	} else {
+	        		$this->log(['FxCop did not return valid XML', \Yasca\Logs\Level::ERROR]);
+	        		$this->log(["FxCop returned $stdout", \Yasca\Logs\Level::ERROR]);
+	        	}
+			    return Async::fromResult(new \EmptyIterator());
 	        }
 	        return (new \Yasca\Core\IteratorBuilder)
 	        ->from($dom->getElementsByTagName('result'))
@@ -149,7 +153,9 @@ final class Plugin extends \Yasca\Plugin {
 	        		'message' => "{$result->getAttribute('message')}",
 	        		'description' => "{$result->getAttribute('description')}",
 	        	]);
-	        });
+	        })
+	        ->toFunctionPipe()
+	        ->pipe([Async::_class, 'fromResult']);
 	    });
 	}
 }

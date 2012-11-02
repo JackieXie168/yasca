@@ -15,21 +15,22 @@ final class ProjectionIterator implements \Iterator {
 	/** @var bool */ private $projectionNeeded = true;
 
 	/**
+	 * https://wiki.php.net/rfc/class_name_scalars
+	 */
+	const _class = __CLASS__;
+
+	/**
 	 * Project the given iterator to new values.
 	 * @param \Iterator $iter
 	 * @param callable $projection Params: (value, key, iterator). Returns new value.
 	 */
 	public function __construct(\Iterator $iter, callable $projection){
-		//When stacking, curry the projection instead.
 		if ($iter instanceof ProjectionIterator){
-			list($innerProjection, $this->innerIterator) =
-				\Closure::bind(
-					function(){return [$this->projection, $this->innerIterator,];},
-					$iter,
-					$iter
-				)->__invoke();
+			$this->innerIterator = $iter->innerIterator;
+			$innerProjection = $iter->projection;
 			$this->projection = static function($current, $key, $iterator) use ($projection, $innerProjection){
-				return $projection($innerProjection($current, $key, $iterator), $key, $iterator);
+				$current = $innerProjection($current, $key, $iterator);
+				return $projection($current, $key, $iterator);
 			};
 		} else {
 			$this->innerIterator = $iter;
@@ -40,25 +41,34 @@ final class ProjectionIterator implements \Iterator {
 	public function current(){
 		if ($this->projectionNeeded){
 			$projection = $this->projection;
-			$this->current = $projection(
-				$this->innerIterator->current(),
-				$this->innerIterator->key(),
-				$this->innerIterator);
+			$this->current =
+				$projection(
+					$this->innerIterator->current(),
+					$this->innerIterator->key(),
+					$this->innerIterator
+				);
 			$this->projectionNeeded = false;
 		}
 		return $this->current;
 	}
-	public function key(){return $this->innerIterator->key();}
+
+	public function key(){
+		return $this->innerIterator->key();
+	}
+
 	public function next(){
 		$this->projectionNeeded = true;
 		unset($this->current);
 		return $this->innerIterator->next();
 	}
+
 	public function rewind(){
 		$this->projectionNeeded = true;
 		unset($this->current);
 		$this->innerIterator->rewind();
 	}
-	public function valid(){return $this->innerIterator->valid();
+
+	public function valid(){
+		return $this->innerIterator->valid();
 	}
 }

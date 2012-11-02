@@ -2,6 +2,7 @@
 declare(encoding='UTF-8');
 namespace Yasca\Logs;
 use \Yasca\Core\Iterators;
+use \Yasca\Core\Operators;
 
 /**
  * @author Cory Carson <cory.carson@boeing.com> (version 3)
@@ -16,21 +17,27 @@ final class FileLog extends \Yasca\Log {
 	const OPTIONS = <<<'EOT'
 --log,FileLog[,filename,levels]
 filename: The name of the file to write, relative to the current working directory
-levels: The numerical value of the level flags (DEBUG: 1, INFO: 2, ERROR: 4)
+levels: The numerical value of the level flags (DEBUG: 1, INFO: 2, ERROR: 4, ALL: 7)
 EOT;
 
 	private $fileObject;
 	private $levels;
 	public function __construct($args){
-		$this->fileObject = new \SplFileObject(
-			Iterators::elementAtOrNull($args, 0),
-			'w'
-		);
+		$this->fileObject =
+			(new \Yasca\Core\FunctionPipe)
+			->wrap($args)
+			->pipe([Iterators::_class, 'elementAt'], 0)
+			->pipe([Operators::_class, '_new'], 'w', '\SplFileObject')
+			->unwrap();
 
-		$this->levels = Iterators::elementAtOrNull($args, 1);
-		if ($this->levels === null){
-			$this->levels = (Level::DEBUG | Level::INFO | Level::ERROR);
-		}
+		$this->levels =
+			(new \Yasca\Core\FunctionPipe)
+			->wrap($args)
+			->pipe([Iterators::_class,'elementAtOrNull'], 1)
+			->pipe([Operators::_class, 'nullCoalesce'],
+				(Level::DEBUG | Level::INFO | Level::ERROR)
+			)
+			->unwrap();
 	}
 
 	public function update(\SplSubject $subject){

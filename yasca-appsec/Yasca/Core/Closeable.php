@@ -10,7 +10,7 @@ namespace Yasca\Core;
  * and destructors can find themselves waiting
  * in the 5.3+ garbage collection queue.
  * Using this trait lets the resources go
- * sooner than the process ending or a manual
+ * sooner than the PHP process ending or a manual
  * call to \gc_collect_cycles();
  * @author Cory Carson <cory.carson@boeing.com> (version 3)
  */
@@ -21,7 +21,7 @@ trait Closeable {
 	 * Can be called multiple times.
 	 */
 	public function close(){
-		if ($this->closed === true){return;}
+		if ($this->closed === true){ return; }
 		$this->innerClose();
 		$this->closed = true;
 	}

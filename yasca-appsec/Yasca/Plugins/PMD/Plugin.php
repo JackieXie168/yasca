@@ -4,6 +4,7 @@ namespace Yasca\Plugins\PMD;
 use \Yasca\Core\Async;
 use \Yasca\Core\Environment;
 use \Yasca\Core\Iterators;
+use \Yasca\Core\Operators;
 use \Yasca\Core\Process;
 use \Yasca\Core\ProcessStartException;
 
@@ -28,9 +29,11 @@ final class Plugin extends \Yasca\Plugin {
         try {
     		$process = new Process(
     			'java -cp "' .
-    			(new \Yasca\Core\IteratorBuilder)
-    			->from(new \FilesystemIterator(__DIR__))
-    			->select(static function($u, $key){return $key;})
+    			(new \Yasca\Core\FunctionPipe)
+    			->wrap(__DIR__)
+    			->pipe([Operators::_class,'_new'], '\FilesystemIterator')
+    			->toIteratorBuilder()
+    			->select(static function($u, $key){ return $key; })
     			->whereRegex('`\.jar$`ui')
     			->join(';') .
     			'" net.sourceforge.pmd.PMD "' . $path . '"' .
@@ -43,7 +46,8 @@ final class Plugin extends \Yasca\Plugin {
     	}
 	    $this->log(['PMD launched', \Yasca\Logs\Level::INFO]);
 
-	    return $process->whenCompleted(function($stdout){
+	    return $process->continueWith(function($async){
+	    	list($stdout, $stderr) = $async->result();
         	$this->log(['PMD completed', \Yasca\Logs\Level::INFO]);
 	        $dom = new \DOMDocument();
 	        try {
@@ -52,9 +56,13 @@ final class Plugin extends \Yasca\Plugin {
 	        	$success = false;
 	        }
 	        if ($success !== true){
-	        	$this->log(['PMD did not return valid XML', \Yasca\Logs\Level::INFO]);
-	        	$this->log(["PMD returned $stdout", \Yasca\Logs\Level::DEBUG]);
-			    return new \EmptyIterator();
+	        	if ($stdout === ''){
+	        		$this->log(['PMD did not return any data', \Yasca\Logs\Level::ERROR]);
+	        	} else {
+	        		$this->log(['PMD did not return valid XML', \Yasca\Logs\Level::ERROR]);
+	        		$this->log(["PMD returned $stdout", \Yasca\Logs\Level::ERROR]);
+	        	}
+			    return Async::fromResult(new \EmptyIterator());
 	        }
 
 	        return (new \Yasca\Core\IteratorBuilder)
@@ -69,14 +77,16 @@ final class Plugin extends \Yasca\Plugin {
         				'lineNumber' => "{$violationNode->getAttribute('beginline')}",
         				'category' => "{$violationNode->getAttribute('rule')}",
         				'severity' => "{$violationNode->getAttribute('priority')}",
-        				'description' => Iterators::firstOrNull($violationNode->getElementsByTagName('description'))->nodeValue,
-        				'message' => Iterators::firstOrNull($violationNode->getElementsByTagName('message'))->nodeValue,
+        				'description' => Iterators::first($violationNode->getElementsByTagName('description'))->nodeValue,
+        				'message' => Iterators::first($violationNode->getElementsByTagName('message'))->nodeValue,
         				'references' => [
         					"{$violationNode->getAttribute('externalInfoUrl')}" => 'PMD Reference',
         				],
         			]);
 	        	});
-	        });
+	        })
+	        ->toFunctionPipe()
+	        ->pipe([Async::_class, 'fromResult']);
         });
     }
 }

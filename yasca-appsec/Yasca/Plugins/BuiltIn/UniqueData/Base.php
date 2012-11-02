@@ -2,6 +2,7 @@
 declare(encoding='UTF-8');
 namespace Yasca\Plugins\BuiltIn\UniqueData;
 use \Yasca\Core\Iterators;
+use \Yasca\Core\Operators;
 
 trait Base {
 	use \Yasca\AggregateFileContentsPlugin, \Yasca\Plugins\BuiltIn\Base;
@@ -18,13 +19,19 @@ trait Base {
 	private $uniqueData = [];
 
 	public function getResultIterator(){
-		if (Iterators::any($this->uniqueData) !== true){
-			return new \EmptyIterator();
-		} else {
-			return $this->newResult()->setOptions([
-				'unsafeData' => \array_keys($this->uniqueData),
-			]);
-		}
+		return Operators::match($this->uniqueData,
+			[
+				[Iterators::_class,'any'],
+				function($uniqueData){
+					return $this->newResult()->setOptions([
+						'unsafeData' => \array_keys($uniqueData),
+					]);
+				}
+			],
+			[
+				Operators::identity(true), Operators::identity(new \EmptyIterator())
+			]
+		);
 	}
 
     public function apply($fileContents){

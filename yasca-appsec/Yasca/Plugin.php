@@ -3,7 +3,7 @@ declare(encoding='UTF-8');
 namespace Yasca;
 use \Yasca\Core\Iterators;
 use \Yasca\Core\JSON;
-use \Yasca\Core\RecursiveTraitIterator;
+use \Yasca\Core\Operators;
 
 /**
  * Plugin Class
@@ -11,7 +11,6 @@ use \Yasca\Core\RecursiveTraitIterator;
  * This (abstract) class is the parent of all plugin classes.
  * @author Michael V. Scovetta <scovetta@users.sourceforge.net>
  * @author Cory Carson <cory.carson@boeing.com> (version 3)
- * @version 3
  * @license see doc/LICENSE
  */
 abstract class Plugin {
@@ -36,22 +35,27 @@ abstract class Plugin {
 	 * by the below function.
 	 */
 	protected function getSupportedFileClasses(){
-		$class = \get_called_class();
-		$namespaces = \explode('\\', $class);
-		$lastClassName = \array_pop($namespaces);
-		return [$lastClassName];
+		return
+			(new \Yasca\Core\FunctionPipe)
+			->wrap(\get_called_class())
+			->pipeLast('\explode', '\\')
+			->pipe('\array_pop')
+			->pipe(static function($fileClass){ return [$fileClass]; })
+			->unwrap();
 	}
 
 	private static $fileClasses;
 	private $types = null;
 	public function getSupportedFileTypes(){
-		if (isset($this->types) !== true){
+		if (isset($this->types) === false){
 			$this->types =
 				(new \Yasca\Core\IteratorBuilder)
 				->from($this->getSupportedFileClasses())
-				->from(static function($ext){
-					return (new \Yasca\Core\IteratorBuilder)
-					->from(Iterators::elementAtOrNull(self::$fileClasses, $ext))
+				->selectMany(static function($ext){
+					return (new \Yasca\Core\FunctionPipe)
+					->wrap(self::$fileClasses)
+					->pipe([Iterators::_class,'elementAtOrNull'], $ext)
+					->toIteratorBuilder()
 					->defaultIfEmpty($ext);
 				})
 				->toArray();
@@ -60,14 +64,14 @@ abstract class Plugin {
 	}
 
 	public function supportsExtension($ext){
-		return Iterators::any(
-			$this->getSupportedFileTypes(),
-			static function($supportedExt) use ($ext){
-				//PHP 5.4.1 does not have a multibyte-safe case insensitive compare
-				return (\mb_strlen($supportedExt) === \mb_strlen($ext) &&
-						\mb_stripos($supportedExt, $ext) === 0);
-			}
-		);
+		return (new \Yasca\Core\IteratorBuilder)
+		->from($this->getSupportedFileTypes())
+		->where(static function($supportedExt) use ($ext){
+			//PHP 5.4.8 does not have a multibyte-safe case insensitive compare
+			return \mb_strlen($supportedExt) === \mb_strlen($ext) &&
+				   \mb_stripos($supportedExt, $ext) === 0;
+		})
+		->any();
 	}
 
 	protected final function log($val){
@@ -83,10 +87,13 @@ abstract class Plugin {
 }
 \Closure::bind(
 	static function(){
-		static::$fileClasses = JSON::decode(
-			\file_get_contents(__FILE__ . '.FileClasses.json'),
-			true
-		);
+		static::$fileClasses =
+			(new \Yasca\Core\FunctionPipe)
+			->wrap(__FILE__ . '.FileClasses.json')
+			->pipe('\file_get_contents')
+			->pipe([JSON::_class, 'decode'], true)
+			->unwrap();
+
 		static::$installedPlugins =
 			(new \Yasca\Core\IteratorBuilder)
 			->from(\get_declared_classes())
@@ -101,10 +108,13 @@ abstract class Plugin {
 				->select(static function($rdi){return $rdi->getSubPathname();})
 				->whereRegex('`(?<!base)\.php$`ui')
 				->select(static function($relativePath){
-					$name = \substr($relativePath, 0, -4 /*\strlen('.php')*/);
-					$name = \str_replace('/', '\\', $name);
-					$name = __NAMESPACE__ . '\\Plugins\\' . $name;
-					return $name;
+					return
+						__NAMESPACE__ . '\\Plugins\\' .
+						(new \Yasca\Core\FunctionPipe)
+						->wrap($relativePath)
+						->pipe('\substr', 0, - \strlen('.php'))
+						->pipeLast('\str_replace', '/', '\\')
+						->unwrap();
 				})
 			)
 			->where(static function($current){
@@ -114,23 +124,25 @@ abstract class Plugin {
 				}
 				return false;
 			})
-			->selectKeys(static function($plugin){return [
+			->selectKeys(static function($plugin){
+				return [
 					$plugin,
-					(new \Yasca\Core\IteratorBuilder)
-					->from(Iterators::traitsOf($plugin))
-					->firstOrNull(static function($trait){
+					(new \Yasca\Core\FunctionPipe)
+					->wrap($plugin)
+					->pipe([Iterators::_class, 'traitsOf'])
+					->toIteratorBuilder()
+					->where(static function($trait){
 						return $trait === __NAMESPACE__ . '\AggregateFileContentsPlugin' ||
 							   $trait === __NAMESPACE__ . '\MulticastPlugin' ||
 							   $trait === __NAMESPACE__ . '\SingleFileContentsPlugin' ||
 							   $trait === __NAMESPACE__ . '\SingleFilePathPlugin';
 					})
+					->firstOrNull()
 				];
 			})
 			->where(static function($plugin, $trait){return $trait !== null;})
 			->groupBy(static function($plugin, $trait){return $trait;})
-			->select(static function($plugins){
-				return Iterators::toFixedArray($plugins);
-			})
+			->select(Operators::paramLimit([Iterators::_class,'toFixedArray'], 1))
 			->toArray(true);
 	},
 	null,

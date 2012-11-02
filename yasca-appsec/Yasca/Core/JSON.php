@@ -10,6 +10,11 @@ final class JSON {
 	private function __construct(){}
 
 	/**
+	 * https://wiki.php.net/rfc/class_name_scalars
+	 */
+	const _class = __CLASS__;
+
+	/**
 	 * Returns the JSON representation of $value
 	 * See http://php.net/manual/en/function.json-encode.php
 	 * @param mixed $value The value being encoded
@@ -19,7 +24,7 @@ final class JSON {
 	 */
 	public static function encode($value, $options = 0){
 		$retval = \json_encode($value, $options);
-		self::throwIfNecessary($value);
+		self::throwIfNecessary();
 		return $retval;
 	}
 

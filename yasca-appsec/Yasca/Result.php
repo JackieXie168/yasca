@@ -2,6 +2,7 @@
 declare(encoding='UTF-8');
 namespace Yasca;
 use \Yasca\Core\Iterators;
+use \Yasca\Core\Operators;
 
 /**
  * Result Class
@@ -10,7 +11,6 @@ use \Yasca\Core\Iterators;
  * one Result object created for each such issue.
  * @author Michael V. Scovetta <scovetta@users.sourceforge.net>
  * @author Cory Carson <cory.carson@boeing.com> (version 3)
- * @version 3
  * @license see doc/LICENSE
  * @package Yasca
  */
@@ -18,39 +18,53 @@ final class Result {
 	use \Yasca\Core\Options;
 
 	public function __construct(){
-		$this->setOption('severity',  5);
-		$this->setOption('category',  'General');
-		$this->setOption('pluginName','BuiltIn');
+		$this->setOptions([
+			'severity' => 5,
+			'category' => 'General',
+			'pluginName' => 'BuiltIn',
+		]);
 	}
 
 	protected function setOption($key, $value){
-		if 	     ($key === 'lineNumber' ||
-				  $key === 'severity'
-		){
-			$this->$key = \intval($value);
-
-		} elseif ($key === 'unsafeSourceCode' ||
-				  $key === 'references' 	  ||
-				  $key === 'unsafeData'
-		){
-			$this->$key = Iterators::toArray($value, true);
-
-		} elseif ($key === 'message' 	 ||
-				  $key === 'description' ||
-				  $key === 'pluginName'  ||
-				  $key === 'category'
-		){
-			if (\is_string($value) !== true){
-				throw new \InvalidArgumentException("$key must be a string");
-			}
-			$this->$key = $value;
-
-		} elseif ($key === 'filename'){
-			if ($value !== null && \is_string($value) === true && $value !== ''){
-				$this->filename = $value;
-			}
-		} else {
-			throw new \InvalidArgumentException("$key is invalid");
-		}
+		$this->$key =
+			Operators::match($key,
+				[
+					Operators::curryTail(
+						[Operators::_class,'in'],
+						'lineNumber', 'severity'
+					),
+					Operators::paramLimit(
+						Operators::curry('\intval', $value),
+						0
+					)
+				],
+				[
+					Operators::curryTail(
+						[Operators::_class,'in'],
+						'unsafeSourceCode', 'references', 'unsafeData'
+					),
+					Operators::curry([Iterators::_class,'toArray'], $value, true)
+				],
+				[
+					static function($key) use ($value){
+						return Operators::in($key, 'message', 'description', 'pluginName', 'category') &&
+							   \is_string($value);
+					},
+					Operators::identity($value)
+				],
+				[
+					static function($key) use ($value){
+						return Operators::in($key, 'filename') &&
+							   \is_string($value);
+					},
+					Operators::identity($value)
+				],
+				[
+					Operators::identity(true),
+					static function($key) use ($value) {
+						throw new \InvalidArgumentException("$key invalid with value $value");
+					}
+				]
+			);
 	}
 }

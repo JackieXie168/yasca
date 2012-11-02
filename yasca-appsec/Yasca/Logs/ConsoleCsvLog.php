@@ -2,6 +2,7 @@
 declare(encoding='UTF-8');
 namespace Yasca\Logs;
 use \Yasca\Core\Iterators;
+use \Yasca\Core\Operators;
 
 /**
  * @author Cory Carson <cory.carson@boeing.com> (version 3)
@@ -9,15 +10,19 @@ use \Yasca\Core\Iterators;
 final class ConsoleCsvLog extends \Yasca\Log {
 	const OPTIONS = <<<'EOT'
 --log,ConsoleCsvLog[,filename,levels]
-levels: The numerical value of the level flags (DEBUG: 1, INFO: 2, ERROR: 4)
+levels: The numerical value of the level flags (DEBUG: 1, INFO: 2, ERROR: 4, ALL: 7)
 EOT;
 
 	private $levels;
 	public function __construct($args){
-		$this->levels = Iterators::elementAtOrNull($args, 0);
-		if ($this->levels === null){
-			$this->levels = (Level::DEBUG | Level::INFO | Level::ERROR);
-		}
+		$this->levels =
+			(new \Yasca\Core\FunctionPipe)
+			->wrap($args)
+			->pipe([Iterators::_class,'elementAtOrNull'], 0)
+			->pipe([Operators::_class, 'nullCoalesce'],
+				(Level::DEBUG | Level::INFO | Level::ERROR)
+			)
+			->unwrap();
 	}
 
 	public function update(\SplSubject $subject){

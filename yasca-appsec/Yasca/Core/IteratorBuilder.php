@@ -6,142 +6,167 @@ namespace Yasca\Core;
  * Allows composing PHP collections and projections in a functional style
  * @author Cory Carson <cory.carson@boeing.com> (version 3)
  */
-final class IteratorBuilder implements \IteratorAggregate {
-	public function __call($name, array $arguments){
-		if (isset($this->$name) === true){
-			$f = $this->$name;
-			$argCount = \count($arguments);
-		} else {
-			//Forward calls not defined locally to Iterators
-			$f = [__NAMESPACE__ . '\Iterators', $name];
-			$argCount = \array_unshift($arguments, $this->iterator);
-		}
-
-		//\call_user_func() is expensive. Avoid for most calls.
-		//As of PHP 5.4.3, switch does not use strict equality
-		if ($argCount === 0){
-			return $f();
-		} elseif ($argCount === 1){
-			return $f($arguments[0]);
-		} elseif ($argCount === 2){
-			return $f($arguments[0], $arguments[1]);
-		} elseif ($argCount === 3){
-			return $f($arguments[0], $arguments[1], $arguments[2]);
-		} else {
-			return \call_user_func_array($f, $arguments);
-		}
-	}
+final class IteratorBuilder implements \IteratorAggregate, Wrapper {
+	/**
+	 * https://wiki.php.net/rfc/class_name_scalars
+	 */
+	const _class = __CLASS__;
 
 	private $iterator = null;
 	public function getIterator(){
 		return $this->iterator;
 	}
 
-	public function __construct(){
-		$this->from = function($values){
+	public function unwrap(){
+		return $this->iterator;
+	}
+
+	public function toFunctionPipe(){
+		return (new \Yasca\Core\FunctionPipe)
+		->wrap($this->unwrap());
+	}
+
+	public function from($values){
+		if ($this->iterator === null){
 			$this->iterator = Iterators::ensureIsIterator($values);
 
 			//TODO: More intelligent handling of RecursiveIterators
 			if ($this->iterator instanceof \RecursiveIterator){
 				$this->iterator = new \RecursiveIteratorIterator($this->iterator);
 			}
+		} else {
+			throw new IteratorException('Iterator already assigned');
+		}
+		return $this;
+	}
 
-			$this->where = function(callable $filter){
-				$this->iterator = new \CallbackFilterIterator($this->iterator, $filter);
-				return $this;
-			};
+	public function any() {
+		return Iterators::any($this->iterator);
+	}
 
-			$this->whereRegex = function($regex, $mode = \RegexIterator::MATCH, $flags = 0, $preg_flags = 0){
-				/**
-				 * Ignores calls where $regex === null
-				 */
-				if ($regex !== null){
-					$this->iterator = new \RegexIterator($this->iterator, $regex, $mode, $flags, $preg_flags);
-				}
-				return $this;
-			};
+	public function choose(callable $projection){
+		$this->iterator = Iterators::choose($this->iterator, $projection);
+		return $this;
+	}
 
-			$this->select = function(callable $projection){
-				$this->iterator = new ProjectionIterator($this->iterator, $projection);
-				return $this;
-			};
+	public function concat() {
+		$arguments = \func_get_args();
+		\array_unshift($arguments, $this->iterator);
+		$this->iterator = Operators::invokeArray([Iterators::_class, 'concat'], $arguments);
+		return $this;
+	}
 
-			$this->selectKeys = function(callable $projection){
-				$this->iterator = new ProjectionKeyIterator($this->iterator, $projection);
-				return $this;
-			};
+	public function contains($value) {
+		return Iterators::contains($this->iterator, $value);
+	}
 
-			$this->selectMany = function(callable $manyProjection){
-				$this->iterator = new ManyProjectionIterator($this->iterator, $manyProjection);
-				return $this;
-			};
+	public function count(){
+		return Iterators::count($this->iterator);
+	}
 
-			//Overwrite old 'from'
-			$this->from = $this->selectMany;
+	public function defaultIfEmpty($value){
+		$this->iterator = Iterators::defaultIfEmpty($this->iterator, $value);
+		return $this;
+	}
 
-			$this->concat = function(/* $... */){
-				//AppendIterator is explicitly avoided
-				//https://bugs.php.net/bug.php?id=62212
+	public function elementAt($key){
+		return Iterators::elementAt($this->iterator, $key);
+	}
 
-				$args = \func_get_args();
-				if (Iterators::any($args) === true){
-					$iterators = new \SplDoublyLinkedList();
-					$iterators->push($this->iterator);
-					foreach($args as $value){
-						$iter = Iterators::ensureIsIterator($value);
-						$iterators->push($iter);
-					}
-					$this->iterator = new ManyProjectionIterator($iterators, static function($iter){
-						return $iter;
-					});
-				}
-				return $this;
-			};
+	public function elementAtOrNull($key){
+		return Iterators::elementAtOrNull($this->iterator, $key);
+	}
 
-			$this->slice = function($offset, $count){
-				$this->iterator = new \LimitIterator($this->iterator, $offset, $count);
-				return $this;
-			};
+	public function first() {
+		return Iterators::first($this->iterator);
+	}
 
-			$this->skip = function($offset){
-				$this->iterator = new \LimitIterator($this->iterator, $offset);
-				return $this;
-			};
+	public function firstOrNull() {
+		return Iterators::firstOrNull($this->iterator);
+	}
 
-			$this->take = function($count){
-				$this->iterator = new \LimitIterator($this->iterator, 0, $count);
-				return $this;
-			};
+	public static function fold(callable $projection){
+		return Iterators::fold($this->iterator, $projection);
+	}
 
-			$this->groupBy = function(callable $selector){
-				/**
-				 * Group the provided $values, using the result of $selector as the array key.
-				 * @param unknown_type $values Any foreachable object or value
-				 * @param callable $selector Params ($value, $key, $values). Returns any array key.
-				 * @return array of \Iterator
-				 */
-				$grouping = [];
-				foreach($this->iterator as $key => $value){
-					$groupKey = $selector($value, $key, $this->iterator);
-					if (isset($grouping[$groupKey]) !== true){
-						$grouping[$groupKey] = new \SplQueue();
-					}
-					$grouping[$groupKey]->enqueue($value);
-				}
-				$this->iterator = Iterators::ensureIsIterator($grouping);
-				return $this;
-			};
+	public function forAll(callable $f){
+		Iterators::forAll($this->iterator, $f);
+	}
 
-			$this->defaultIfEmpty = function($value){
-				$this->iterator = new DefaultIterator($this->iterator, $value);
-				return $this;
-			};
+	public function groupBy(callable $selector){
+		$this->iterator = Iterators::groupBy($this->iterator, $selector);
+		return $this;
+	}
 
-			$this->unique = function(){
-				$this->iterator = new UniqueIterator($this->iterator);
-				return $this;
-			};
-			return $this;
-		};
+	public function join($separator){
+		return Iterators::join($this->iterator, $separator);
+	}
+
+	public function select(callable $projection){
+		$this->iterator = Iterators::select($this->iterator, $projection);
+		return $this;
+	}
+
+	public function selectKeys(callable $projection){
+		$this->iterator = Iterators::selectKeys($this->iterator, $projection);
+		return $this;
+	}
+
+	public function selectMany(callable $manyProjection){
+		$this->iterator = Iterators::selectMany($this->iterator, $manyProjection);
+		return $this;
+	}
+
+	public function slice($offset, $count){
+		$this->iterator = Iterators::slice($this->iterator, $offset, $count);
+		return $this;
+	}
+
+	public function skip($count){
+		$this->iterator = Iterators::skip($this->iterator, $count);
+		return $this;
+	}
+
+	public function take($count){
+		$this->iterator = Iterators::take($this->iterator, $count);
+		return $this;
+	}
+
+	public function toArray($useKeys = false){
+		return Iterators::toArray($this->iterator, $useKeys);
+	}
+
+	public function toFixedArray($useKeys = false){
+		return Iterators::toFixedArray($this->iterator, $useKeys);
+	}
+
+	public function toList(){
+		return Iterators::toList($this->iterator);
+	}
+
+	public function toObjectStorage($keysAsData = false){
+		return Iterators::toObjectStorage($this->iterator, $keysAsData);
+	}
+
+	public function where(callable $filter){
+		$this->iterator = Iterators::where($this->iterator, $filter);
+		return $this;
+	}
+
+	public function whereRegex($regex, $mode = \RegexIterator::MATCH, $flags = 0, $preg_flags = 0){
+		$this->iterator = Iterators::whereRegex($this->iterator, $regex, $mode, $flags, $preg_flags);
+		return $this;
+	}
+
+	public function unique(){
+		$this->iterator = Iterators::unique($this->iterator);
+		return $this;
+	}
+
+	public function zip(){
+		$arguments = \func_get_args();
+		\array_unshift($arguments, $this->iterator);
+		$this->iterator = Operators::invokeArray([Iterators::_class, 'zip'], $arguments);
+		return $this;
 	}
 }

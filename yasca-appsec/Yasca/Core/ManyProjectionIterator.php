@@ -16,33 +16,27 @@ final class ManyProjectionIterator implements \Iterator {
 	/** @var bool */ 	  private $projectionNeeded = true;
 
 	/**
+	 * https://wiki.php.net/rfc/class_name_scalars
+	 */
+	const _class = __CLASS__;
+
+	/**
 	 * @param \Iterator $iter
 	 * @param callable $projection Params: (value, key, iterator). Returns Iterator of newValues
 	 */
 	public function __construct(\Iterator $iter, callable $projection){
-		//When stacking, curry the projection instead.
-		if ($iter instanceof ProjectionIterator){
-			list($innerProjection, $this->innerIterator) =
-				\Closure::bind(
-					function(){return [$this->projection, $this->innerIterator,];},
-					$iter,
-					$iter
-				)->__invoke();
-			$this->projection = static function($current, $key, $iterator) use ($projection, $innerProjection){
-				return $projection($innerProjection($current, $key, $iterator), $key, $iterator);
-			};
-		} else {
-			$this->innerIterator = $iter;
-			$this->projection = $projection;
-		}
+		$this->innerIterator = $iter;
+		$this->projection = $projection;
 	}
 
 	private function project(){
 		$projection = $this->projection;
-		$this->currentIterator = $projection(
-			$this->innerIterator->current(),
-			$this->innerIterator->key(),
-			$this->innerIterator);
+		$this->currentIterator =
+			$projection(
+				$this->innerIterator->current(),
+				$this->innerIterator->key(),
+				$this->innerIterator
+			);
 		if ($this->currentIterator instanceof \IteratorAggregate){
 			$this->currentIterator = $this->currentIterator->getIterator();
 		} elseif (($this->currentIterator instanceof \Iterator) !== true){

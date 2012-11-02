@@ -8,6 +8,12 @@ namespace Yasca\Core;
  */
 final class SplObserverAdapter implements \SplObserver {
 	/** @val callable */ private $listener;
+
+	/**
+	 * https://wiki.php.net/rfc/class_name_scalars
+	 */
+	const _class = __CLASS__;
+
 	/**
 	 * @param callable $listener Params: (value from event). Return value ignored.
 	 */
