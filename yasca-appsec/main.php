@@ -34,7 +34,7 @@ $addDefaultReport = true;
 $reports = new \SplQueue();
 
 $version =
-	'Yasca version ' . \Yasca\Scanner::VERSION . "\n" +
+	'Yasca version ' . \Yasca\Scanner::VERSION . "\n" .
 	'Copyright (c) 2010 Michael V. Scovetta. See docs/LICENSE for license information.';
 
 $help = <<<"EOT"
@@ -103,7 +103,7 @@ foreach (
 
 	as $switch => $options
 ){
-	//As of PHP 5.4.8, switch() uses loose comparision instead of strict.
+	//As of PHP 5.4, switch() uses loose comparision instead of strict.
 	//Use if/elseif instead.
 	if 		 ($switch === '-h' 		||
 			  $switch === '--help'  ||

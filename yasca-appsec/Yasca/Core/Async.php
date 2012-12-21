@@ -6,7 +6,7 @@ namespace Yasca\Core;
  * An emulation of asynchonous tasks/threads found in other platforms, such as Python.
  * Because all "async" calls are still synchronous within one PHP thread, it is best used when
  * spawning and monitoring processes or network connections while executing
- * other PHP code. (PNCTL libraries are not available on Windows as of PHP 5.4.8)
+ * other PHP code. (PNCTL libraries are not available on Windows as of PHP 5.4)
  *
  * @author Cory Carson <cory.carson@boeing.com> (version 3)
  */
@@ -32,8 +32,8 @@ class Async {
 	 */
 	public static function fromResult($result){
 		return new self(
-			static function() { return true; },
-			static function() use ($result) { return $result; }
+			Operators::identity(true),
+			Operators::identity($result)
 		);
 	}
 

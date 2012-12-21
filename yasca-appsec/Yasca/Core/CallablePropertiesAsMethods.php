@@ -3,7 +3,7 @@ declare(encoding='UTF-8');
 namespace Yasca\Core;
 
 /**
- * PHP 5.4.8 does not support calling callable properties as methods
+ * PHP 5.4 does not support calling callable properties as methods
  * This trait allows simulating that support. Remove if/when a future PHP
  * version supports this natively.
  * @author Cory Carson <cory.carson@boeing.com> (version 3)

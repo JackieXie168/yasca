@@ -19,19 +19,13 @@ trait Base {
 	private $uniqueData = [];
 
 	public function getResultIterator(){
-		return Operators::match($this->uniqueData,
-			[
-				[Iterators::_class,'any'],
-				function($uniqueData){
-					return $this->newResult()->setOptions([
-						'unsafeData' => \array_keys($uniqueData),
-					]);
-				}
-			],
-			[
-				Operators::identity(true), Operators::identity(new \EmptyIterator())
-			]
-		);
+		if (Iterators::any($this->uniqueData) === true){
+			return $this->newResult()->setOptions([
+				'unsafeData' => \array_keys($this->uniqueData),
+			]);
+		} else {
+			return new \EmptyIterator();
+		}
 	}
 
     public function apply($fileContents){

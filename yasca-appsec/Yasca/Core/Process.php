@@ -9,7 +9,7 @@ namespace Yasca\Core;
  * In addition, provides Async methods, such as attaching a callback for
  * when the process completes.
  *
- * (PNCTL libraries are not available on Windows as of PHP 5.4.8)
+ * (PNCTL libraries are not available on Windows as of PHP 5.4)
  *
  * @author Cory Carson <cory.carson@boeing.com> (version 3)
  */
@@ -140,18 +140,11 @@ class Process extends Async {
 		->where(Operators::curry([Operators::_class,'equals'], false))
 		->toFunctionPipe()
 		->pipe([Iterators::_class,'count'])
-		->pipe([Operators::_class,'match'],
-			[
-				Operators::curry([Operators::_class,'equals'], 0),
-				Operators::identity(null)
-			],
-			[
-				Operators::identity(true),
-				static function($failureCount){
-					throw new \Exception("Unable to close $failuteCount process pipes");
-				}
-			]
-		);
+		->pipe(static function($failureCount){
+			if ($failureCount !== 0){
+				throw new \Exception("Unable to close $failureCount process pipes");
+			}
+		});
 
 		if (\is_resource($this->process) === true){
 			\proc_close($this->process);

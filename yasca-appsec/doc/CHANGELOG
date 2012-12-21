@@ -1,3 +1,9 @@
+Version 3.0.4 released 12/21/2012
+    PHP updated from 5.4.8 to 5.4.10
+    JQuery updated from 1.8.2 to 1.8.3
+    Fixed crash when handling process launch errors (Process.php)
+    Removed Operators::match, updated code that used it.
+
 Version 3.0.2 released 10/31/2012
 	PHP updated to 5.4.8
 	Updated FindBugs from 2.0 to 2.0.1

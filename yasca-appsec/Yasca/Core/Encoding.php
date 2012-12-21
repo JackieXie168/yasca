@@ -34,7 +34,7 @@ final class Encoding {
 			return $encoding;
 		}
 
-		//As of PHP 5.4.8, UTF-16 encoding detection fails always
+		//As of PHP 5.4, UTF-16 encoding detection fails always
 		//http://us.php.net/manual/en/function.mb-detect-encoding.php
 		$first4 = \substr($retval, 0, 4);
 

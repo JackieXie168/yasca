@@ -85,10 +85,6 @@ final class IteratorBuilder implements \IteratorAggregate, Wrapper {
 		return Iterators::firstOrNull($this->iterator);
 	}
 
-	public static function fold(callable $projection){
-		return Iterators::fold($this->iterator, $projection);
-	}
-
 	public function forAll(callable $f){
 		Iterators::forAll($this->iterator, $f);
 	}

@@ -10,26 +10,6 @@ final class Operators{
 	 */
 	const _class = __CLASS__;
 
-	public static function _and($a, $b){
-		return $a && $b;
-	}
-
-	public static function _or($a, $b){
-		return $a || $b;
-	}
-
-	public static function call(){
-		$arguments = \func_get_args();
-		$first = \array_shift($arguments);
-		$second = \array_shift($arguments);
-		$f = [$first, $second];
-		return Operators::invokeArray($f, $arguments);
-	}
-
-	public static function callArray($first, $second, array $arguments){
-		return Operators::invokeArray([$first, $second], $arguments);
-	}
-
 	public static function equals($a, $b){
 		return $a === $b;
 	}
@@ -87,8 +67,6 @@ final class Operators{
 	 * (inner, outer, arg2, arg3, ...)
 	 * Returns a function f, that when called, returns:
 	 * outer(inner(), arg2, arg3, ... , f_argument1, f_argument2, ...)
-	 *
-	 * Enter description here ...
 	 */
 	public static function compose(){
 		$arguments = \func_get_args();
@@ -198,17 +176,5 @@ final class Operators{
 				->toArray()
 			);
 		};
-	}
-
-	public static function match(){
-		$arguments = \func_get_args();
-		$value = \array_shift($arguments);
-		foreach($arguments as $list){
-			list($condition, $projection) = $list;
-			if ($condition($value) === true){
-				return $projection($value);
-			}
-		}
-		throw new \Exception('Value not matched');
 	}
 }

@@ -55,7 +55,7 @@ final class Plugin extends \Yasca\Plugin {
 					'ProgramW6432',
 				])
 
-				//Windows PHP 5.4.3 segfaults on:
+				//Windows PHP 5.4 segfaults on:
 				//Iterators::elementAtOrNull($_ENV, 'ProgramFiles');
 				//Pull these out the old fashioned way: test then get.
 				->where(static function($specialDir){

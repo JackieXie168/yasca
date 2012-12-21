@@ -37,7 +37,7 @@ EOT;
 {$c(Operators::curry('\file_get_contents', __DIR__ . '/HtmlFileReport.css'))}
 </style>
 <script type="text/javascript">
-{$c(Operators::curry('\file_get_contents', __DIR__ . '/jquery-1.8.2.min.js'))}
+{$c(Operators::curry('\file_get_contents', __DIR__ . '/jquery-1.8.3.min.js'))}
 </script>
 <script type="text/javascript">
 {$c(Operators::curry('\file_get_contents', __DIR__ . '/HtmlFileReport.js'))}

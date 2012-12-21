@@ -31,8 +31,8 @@ final class Iterators {
 	 * @throws IteratorException
 	 */
 	public static function choose(\Iterator $iterator, callable $projection){
-		return new \CallbackFilterIterator(
-			new ProjectionIterator($iterator, $projection),
+		return Iterators::where(
+			Iterators::select($iterator, $projection),
 			static function($value) { return $value !== null; }
 		);
 	}
@@ -213,33 +213,17 @@ final class Iterators {
 			return $values->getIterator();
 		} elseif ($values instanceof \Traversable){
 			if ($values instanceof \DOMNodeList){
-				//PHP 5.4.3 IteratorIterator does not behave itself with \DOMNodeList
+				//PHP 5.4 IteratorIterator does not behave itself with \DOMNodeList
 	        	//https://bugs.php.net/bug.php?id=60762
 	        	//As a workaround, cache the items by making an eager copy
 		        return self::toList($values);
 			} else {
 				return new \IteratorIterator($values);
 			}
-		} elseif ($values instanceof \Closure){
-			return self::ensureIsIterator($values());
 		} elseif ($values instanceof Wrapper){
-			while($values instanceof Wrapper){
-				$values = $values->unwrap();
-			}
-			return self::ensureIsIterator($values);
+			return self::ensureIsIterator($values->unwrap());
 		} elseif ($values === null){
 			return new \EmptyIterator();
-		} elseif(\is_scalar($values) === true) {
-			if (\is_string($values) === true){
-				$len = \strlen($values);
-				$arr = new \SplFixedArray();
-				for($i = 0; $arr < $len; $i += 1){
-					$arr[$i] = $values[$i];
-				}
-				return $arr;
-			} else {
-				return new \ArrayIterator([$values]);
-			}
 		} else {
 			$copy = [];
 			foreach($values as $key => $value){
@@ -272,20 +256,6 @@ final class Iterators {
 			return $value;
 		}
 		return null;
-	}
-
-	public static function fold($values, callable $projection){
-		$first = true;
-		$retval = null;
-		foreach($values as $value){
-			if ($first === true){
-				$retval = $value;
-				$first = false;
-				continue;
-			}
-			$retval = $projection($retval, $value);
-		}
-		return $retval;
 	}
 
 	/**
@@ -571,7 +541,7 @@ final class Iterators {
 	 */
 	public static function unique(\Iterator $iterator){
 		$objectStorage = new \SplObjectStorage();
-		return new \CallbackFilterIterator(
+		return Iterators::Where(
 			$iterator,
 			static function($current) use ($objectStorage){
 				static $array = [];
